@@ -1,0 +1,66 @@
+@use "./theme";
+
+@mixin xs() {
+  font-size: theme.$text-xs;
+  line-height: theme.$lineheight-xs;
+}
+
+@mixin sm() {
+  font-size: theme.$text-sm;
+  line-height: theme.$lineheight-sm;
+}
+
+@mixin base() {
+  font-size: theme.$text-base;
+  line-height: theme.$lineheight-base;
+}
+
+@mixin lg() {
+  font-size: theme.$text-lg;
+  line-height: theme.$text-lg;
+}
+
+@mixin xl() {
+  font-size: theme.$text-xl;
+  line-height: theme.$text-xl;
+}
+
+@mixin xl2() {
+  font-size: theme.$text-2xl;
+  line-height: theme.$text-2xl;
+}
+
+@mixin xl3() {
+  font-size: theme.$text-3xl;
+  line-height: theme.$text-3xl;
+}
+
+@mixin xl4() {
+  font-size: theme.$text-4xl;
+  line-height: theme.$text-4xl;
+}
+
+@mixin xl5() {
+  font-size: theme.$text-5xl;
+  line-height: theme.$text-5xl;
+}
+
+@mixin xl6() {
+  font-size: theme.$text-6xl;
+  line-height: theme.$text-6xl;
+}
+
+@mixin xl7() {
+  font-size: theme.$text-7xl;
+  line-height: theme.$text-7xl;
+}
+
+@mixin xl8() {
+  font-size: theme.$text-8xl;
+  line-height: theme.$text-8xl;
+}
+
+@mixin xl9() {
+  font-size: theme.$text-9xl;
+  line-height: theme.$text-9xl;
+}

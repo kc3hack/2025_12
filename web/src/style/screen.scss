@@ -1,0 +1,31 @@
+@use "./theme";
+
+@mixin sm {
+  @media screen and (min-width: theme.$screen-sm) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media screen and (min-width: theme.$screen-md) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media screen and (min-width: theme.$screen-lg) {
+    @content;
+  }
+}
+
+@mixin xl {
+  @media screen and (min-width: theme.$screen-xl) {
+    @content;
+  }
+}
+
+@mixin xl2 {
+  @media screen and (min-width: theme.$screen-2xl) {
+    @content;
+  }
+}
