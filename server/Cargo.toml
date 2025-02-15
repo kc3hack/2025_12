@@ -1,5 +1,5 @@
 [workspace]
-members = ["chat"]
+members = ["chat", "db"]
 default-members = ["chat"]
 
 [workspace.package]
