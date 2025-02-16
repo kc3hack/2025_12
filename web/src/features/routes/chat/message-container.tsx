@@ -9,6 +9,7 @@ type Props = { bottomRef: RefObject<HTMLDivElement | null> };
 
 export const MessageContainer = (props: Props) => {
   const [messages] = useAtom(messagesAtom);
+
   return (
     <div className={style.message_container}>
       {messages.map(message => (

@@ -1,7 +1,7 @@
 "use client";
-import { Footer } from "@/features/routes/root/footer";
-import style from "@routes/root/index.module.scss";
-import { MessageContainer } from "@routes/root/message-container";
+import { Footer } from "@/features/routes/chat/footer";
+import style from "@routes/chat/index.module.scss";
+import { MessageContainer } from "@routes/chat/message-container";
 import { useRef } from "react";
 
 const Home = () => {
