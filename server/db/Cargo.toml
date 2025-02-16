@@ -4,3 +4,13 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+models = { path = "../models" }
+sqlx = { version = "0.8.3", features = [
+  "runtime-tokio-rustls",
+  "any",
+  "mysql",
+  "chrono",
+  "migrate",
+] }
+tokio = { workspace = true, features = ["macros"] }
+dotenvy.workspace = true
