@@ -1,0 +1,45 @@
+.message_container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100vh - 9em);
+  margin-top: auto;
+  overflow-y: scroll;
+
+  .message_wrapper {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 80%;
+    margin: 1em;
+
+    &.is_me {
+      margin-left: auto;
+
+      .message {
+        background-color: #ffc0cb;
+        border-radius: 1em 1em 0.4em 1em;
+      }
+    }
+
+    &:not(.is_me) {
+      margin-right: auto;
+
+      .message {
+        background-color: #e2e8f0;
+        border-radius: 1em 1em 1em 0.4em;
+      }
+    }
+
+    .avatar {
+      margin-right: 1.0em;
+      margin-left: 0.5em;
+    }
+
+    .message {
+      padding: 0.8em 1em;
+      white-space: pre-line;
+      line-break: anywhere;
+    }
+  }
+}
