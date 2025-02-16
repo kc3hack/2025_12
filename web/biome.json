@@ -28,5 +28,10 @@
       "trailingCommas": "none",
       "arrowParentheses": "asNeeded"
     }
+  },
+  "files": {
+    "ignore": [
+      "src/components/ui/*.tsx"
+    ]
   }
 }
