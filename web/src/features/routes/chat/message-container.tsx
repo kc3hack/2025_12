@@ -1,5 +1,5 @@
 "use client";
-import { useState, type RefObject } from "react";
+import { type RefObject } from "react";
 import { messagesAtom } from "../../message/store";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
@@ -33,8 +33,9 @@ export const MessageContainer = (props: Props) => {
       {messages.map(message => (
         <div
           key={message.id}
-          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${props.replyingTo === message.id ? style.replying : ""
-            }`}
+          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${
+            props.replyingTo === message.id ? style.replying : ""
+          }`}
         >
           {!message.is_me && (
             <Avatar className={style.avatar}>
