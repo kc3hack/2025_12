@@ -6,22 +6,40 @@
   margin-top: auto;
   overflow-y: scroll;
 
-  .message {
-    max-width: calc(100% - 10em);
-    padding: 1em;
+  .message_wrapper {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 80%;
     margin: 1em;
-    white-space: pre-line;
-    border-radius: 1em;
-    line-break: anywhere;
-
-    &:not(.is_me) {
-      margin-right: auto;
-      background-color: #e2e8f0;
-    }
 
     &.is_me {
       margin-left: auto;
-      background-color: #ffc0cb;
+
+      .message {
+        background-color: #ffc0cb;
+        border-radius: 1em 1em 0.4em 1em;
+      }
+    }
+
+    &:not(.is_me) {
+      margin-right: auto;
+
+      .message {
+        background-color: #e2e8f0;
+        border-radius: 1em 1em 1em 0.4em;
+      }
+    }
+
+    .avatar {
+      margin-right: 1.0em;
+      margin-left: 0.5em;
+    }
+
+    .message {
+      padding: 0.8em 1em;
+      white-space: pre-line;
+      line-break: anywhere;
     }
   }
 }
