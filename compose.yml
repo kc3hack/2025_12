@@ -1,0 +1,14 @@
+services:
+  occha_db:
+    container_name: occha_db
+    image: mysql:latest
+    tty: true
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - ./db/data:/var/lib/mysql
