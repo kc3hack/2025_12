@@ -7,4 +7,4 @@ CREATE TABLE messages (
     PRIMARY KEY (id),
     FOREIGN KEY (room_id) REFERENCES rooms (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);

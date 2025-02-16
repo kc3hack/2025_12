@@ -5,4 +5,4 @@ CREATE TABLE participants (
     PRIMARY KEY (room_id, user_id),
     FOREIGN KEY (room_id) REFERENCES rooms (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
