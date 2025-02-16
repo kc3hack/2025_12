@@ -2,6 +2,7 @@ import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from "@c
 import type { Metadata } from "next";
 import "@/style/global.scss";
 import "@/style/theme-tailwind.css";
+import { jaJP } from "@clerk/localizations";
 
 export const metadata: Metadata = {
   title: "Occha",
@@ -14,7 +15,7 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={jaJP}>
       <html lang="en">
         <body>{children}</body>
       </html>

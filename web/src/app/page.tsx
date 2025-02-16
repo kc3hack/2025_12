@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 const Home = () => {
   return (
     <div>
+      <Button>Push me</Button>
       <SignedOut>
         <SignInButton />
       </SignedOut>
