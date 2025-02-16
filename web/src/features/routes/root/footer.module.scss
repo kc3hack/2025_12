@@ -1,0 +1,16 @@
+.footer {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 1em 2em 2em 2em;
+
+  .text_area {
+    padding-right: 6em;
+  }
+
+  .send_button {
+    position: absolute;
+    right: 1em;
+  }
+}
