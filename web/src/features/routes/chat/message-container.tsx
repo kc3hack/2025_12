@@ -14,7 +14,7 @@ import {
 type Props = { bottomRef: RefObject<HTMLDivElement | null> };
 
 export const MessageContainer = (props: Props) => {
-  const [messages, setMessages] = useAtom(messagesAtom); // setMessagesを追加
+  const [messages, setMessages] = useAtom(messagesAtom);
 
   const deleteMessage = (id: string) => {
     setMessages(messages.filter(message => message.id !== id));
