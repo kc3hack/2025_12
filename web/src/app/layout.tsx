@@ -1,21 +1,25 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "@/style/global.scss";
 import "@/style/theme-tailwind.css";
+import { jaJP } from "@clerk/localizations";
 
 export const metadata: Metadata = {
   title: "Occha",
-  description: "",
+  description: ""
 };
 
 const RootLayout = ({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <ClerkProvider localization={jaJP}>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 };
 
