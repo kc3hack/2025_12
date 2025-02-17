@@ -1,6 +1,12 @@
 mod clerk;
 
-use axum::{routing::post, Extension, Router};
+use axum::{
+    extract::State,
+    http::{HeaderMap, StatusCode},
+    response::Json,
+    routing::{get, post},
+    Extension, Router,
+};
 use clerk::webhook_signup;
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
@@ -44,6 +50,7 @@ async fn main() {
     let app_state = AppState::new(db);
 
     let app = Router::new()
+        .route("/users/me", get(get_user_me))
         .route("/webhooks/signup", post(webhook_signup))
         .layer(Extension(clerk))
         .with_state(app_state);
@@ -52,4 +59,20 @@ async fn main() {
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app).await.unwrap();
+}
+
+#[axum::debug_handler]
+async fn get_user_me(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+) -> Result<Json<models::User>, StatusCode> {
+    let db = state.db.lock().await;
+    let user_id = clerk::get_user_id(headers);
+
+    let id = db
+        .get_user(&user_id)
+        .await
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+    Ok(Json(id))
 }
