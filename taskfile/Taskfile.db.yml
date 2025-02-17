@@ -21,3 +21,10 @@ tasks:
   db:drop:
     desc: Drop database
     cmd: sqlx database drop
+
+  db:refresh:
+    desc: Refresh database
+    cmds:
+      - task: db:drop
+      - task: db:create
+      - task: migrate:run
