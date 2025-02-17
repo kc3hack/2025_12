@@ -1,5 +1,4 @@
 use crate::DB;
-use sqlx::types::chrono::{DateTime, Utc};
 
 impl DB {
     pub async fn add_user(&mut self, user: models::User) -> Result<(), sqlx::Error> {
@@ -32,7 +31,6 @@ impl DB {
         user_id: &str,
         nickname: Option<&str>,
         introduction: Option<&str>,
-        created_at: Option<DateTime<Utc>>,
     ) -> Result<(), sqlx::Error> {
         if let Some(nickname) = nickname {
             let query = sqlx::query!(
@@ -48,15 +46,6 @@ impl DB {
                 "UPDATE users SET introduction = ? WHERE id = ?",
                 introduction,
                 user_id
-            );
-            self.execute(query).await?;
-        }
-
-        if let Some(created_at) = created_at {
-            let query = sqlx::query!(
-                "UPDATE users SET created_at = ? WHERE id = ?",
-                created_at,
-                created_at
             );
             self.execute(query).await?;
         }
@@ -122,8 +111,7 @@ mod test {
         dotenvy::dotenv().unwrap();
 
         let mut db = DB::from_pool(pool);
-        db.update_user("0", Some("changed-user"), None, None)
-            .await?;
+        db.update_user("0", Some("changed-user"), None).await?;
 
         let user = db.get_user("0").await?;
         assert_eq!(user.nickname, "changed-user");
