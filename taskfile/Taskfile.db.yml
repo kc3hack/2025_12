@@ -1,0 +1,23 @@
+version: '3'
+silent: true
+
+tasks:
+  migrate:run:
+    desc: Run migration
+    cmd: sqlx migrate run
+
+  migrate:revert:
+    desc: Revert migration
+    cmd: sqlx migrate revert
+
+  migrate:add:
+    desc: Add migration
+    cmd: sqlx migrate add -r {{.CLI_ARGS}} 
+
+  db:create:
+    desc: Create database
+    cmd: sqlx database create
+
+  db:drop:
+    desc: Drop database
+    cmd: sqlx database drop
