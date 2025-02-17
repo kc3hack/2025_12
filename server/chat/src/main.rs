@@ -70,12 +70,12 @@ async fn get_user_me(
     let db = state.db.lock().await;
     let user_id = clerk::get_user_id(headers);
 
-    let id = db
+    let user = db
         .get_user(&user_id)
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    Ok(Json(id))
+    Ok(Json(user))
 }
 
 #[axum::debug_handler]
@@ -85,10 +85,10 @@ async fn get_user(
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
 
-    let id = db
+    let user = db
         .get_user(&user_id)
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    Ok(Json(id))
+    Ok(Json(user))
 }
