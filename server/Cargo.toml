@@ -1,5 +1,5 @@
 [workspace]
-members = ["chat", "db"]
+members = ["chat", "db", "models"]
 default-members = ["chat"]
 
 [workspace.package]
@@ -7,3 +7,8 @@ name = "occha-server"
 authors = ["Occha Dev"]
 version = "0.1.0"
 edition = "2021"
+
+[workspace.dependencies]
+chrono = "0.4.39"
+dotenvy = "0.15.7"
+tokio = "1.43.0"
