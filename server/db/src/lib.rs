@@ -1,4 +1,5 @@
 mod message;
+mod participants;
 mod user;
 
 use sqlx::{
