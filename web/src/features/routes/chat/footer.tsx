@@ -10,12 +10,16 @@ import { v4 as uuidv4 } from "uuid";
 import { messagesAtom } from "@/features/message/store";
 import type { Message } from "@/features/message/type";
 
+type ReplyMessage = {
+  id: string;
+  author_name: string;
+};
+
 type Props = {
   bottomRef: RefObject<HTMLDivElement | null>;
-  replyingTo: string | null;
   replyingToRef: RefObject<HTMLDivElement | null>;
-  replyingAuther: string | null;
-  setReplyingTo: (id: string | null) => void;
+  replyingMessage: ReplyMessage | null;
+  setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
 export const Footer = (props: Props) => {
@@ -32,7 +36,7 @@ export const Footer = (props: Props) => {
       return;
     }
 
-    props.setReplyingTo(null);
+    props.setReplyingMessage(null);
 
     const newMessage: Message = {
       id: uuidv4(),
@@ -75,19 +79,23 @@ export const Footer = (props: Props) => {
 
   return (
     <div className={style.footer}>
-      {props.replyingTo && (
+      {props.replyingMessage && (
         <div>
           <button type="button" className={style.reply_area} onClick={() => scrollReply()}>
-            <p>{props.replyingAuther}に返信</p>
+            <p>{props.replyingMessage.author_name}に返信</p>
           </button>
-          <button type="button" className={style.cancel} onClick={() => props.setReplyingTo(null)}>
+          <button
+            type="button"
+            className={style.cancel}
+            onClick={() => props.setReplyingMessage(null)}
+          >
             ×
           </button>
         </div>
       )}
       <div className={style.input_area}>
         <Textarea
-          className={`${style.text_area} ${props.replyingTo ? style.no_top_radius : ""}`}
+          className={`${style.text_area} ${props.replyingMessage && style.no_top_radius}`}
           placeholder="Type your message here."
           onKeyDown={handleKeyDown}
           onCompositionStart={() => setIsComposing(true)}

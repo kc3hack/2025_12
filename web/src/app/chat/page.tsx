@@ -4,27 +4,29 @@ import style from "@routes/chat/index.module.scss";
 import { MessageContainer } from "@routes/chat/message-container";
 import { useRef, useState } from "react";
 
+type ReplyMessage = {
+  id: string;
+  author_name: string;
+};
+
 const Home = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const replyingToRef = useRef<HTMLDivElement | null>(null);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyingAuther, setReplyingAuther] = useState<string | null>(null);
+  const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(null);
 
   return (
     <div className={style.home_page}>
       <MessageContainer
         bottomRef={bottomRef}
         replyingToRef={replyingToRef}
-        replyingTo={replyingTo}
-        setReplyingTo={setReplyingTo}
-        setReplyingAuther={setReplyingAuther}
+        replyingMessage={replyingMessage}
+        setReplyingMessage={setReplyingMessage}
       />
       <Footer
         bottomRef={bottomRef}
         replyingToRef={replyingToRef}
-        replyingTo={replyingTo}
-        replyingAuther={replyingAuther}
-        setReplyingTo={setReplyingTo}
+        replyingMessage={replyingMessage}
+        setReplyingMessage={setReplyingMessage}
       />
     </div>
   );
