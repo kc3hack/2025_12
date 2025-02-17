@@ -1,7 +1,7 @@
 .message_container {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 9em);
+  max-height: calc(100vh - 10em);
   margin-top: auto;
   overflow-y: scroll;
 
@@ -9,12 +9,13 @@
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0.5em;
+    padding: 1em;
     margin: 0.5em 0;
 
 
     &.is_me {
       flex-direction: row-reverse;
+      padding-left: 10em;
       margin-left: auto;
 
       .message {
@@ -24,6 +25,7 @@
     }
 
     &:not(.is_me) {
+      padding-right: 10em;
       margin-right: auto;
 
       .message {
@@ -38,7 +40,6 @@
 
     .avatar {
       margin-right: 1.0em;
-      margin-left: 0.5em;
     }
 
     .message {

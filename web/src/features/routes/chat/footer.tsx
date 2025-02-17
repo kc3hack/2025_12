@@ -9,11 +9,13 @@ import type { KeyboardEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { messagesAtom } from "@/features/message/store";
 import type { Message } from "@/features/message/type";
+import { ReplyMessage } from "./message-container";
 
 type Props = {
   bottomRef: RefObject<HTMLDivElement | null>;
-  replyingTo: string | null;
-  setReplyingTo: (id: string | null) => void;
+  replyingToRef: RefObject<HTMLDivElement | null>;
+  replyingMessage: ReplyMessage | null;
+  setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
 export const Footer = (props: Props) => {
@@ -30,11 +32,11 @@ export const Footer = (props: Props) => {
       return;
     }
 
-    props.setReplyingTo(null);
+    props.setReplyingMessage(null);
 
     const newMessage: Message = {
       id: uuidv4(),
-      author: "me",
+      author: "小生",
       content: inputRef.current.value,
       is_me: true,
       icon: "https://github.com/shadcn.png"
@@ -42,12 +44,12 @@ export const Footer = (props: Props) => {
 
     inputRef.current.value = "";
     setTimeout(() => {
-      props.bottomRef.current?.scrollIntoView();
+      props.bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 0);
 
     const yesMessage: Message = {
       id: uuidv4(),
-      author: "bot",
+      author: "50%yesman",
       content: Math.random() < 0.5 ? "はい" : "いいえ",
       is_me: false,
       icon: "https://github.com/shadcn.png"
@@ -67,19 +69,39 @@ export const Footer = (props: Props) => {
     }
   };
 
+  const scrollReply = () => {
+    props.replyingToRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   return (
     <div className={style.footer}>
-      <Textarea
-        className={style.text_area}
-        placeholder="Type your message here."
-        onKeyDown={handleKeyDown}
-        onCompositionStart={() => setIsComposing(true)}
-        onCompositionEnd={() => setIsComposing(false)}
-        ref={inputRef}
-      />
-      <Button onClick={handleSubmit} className={style.send_button}>
-        <SendHorizontal />
-      </Button>
+      {props.replyingMessage && (
+        <div>
+          <button type="button" className={style.reply_area} onClick={() => scrollReply()}>
+            <p>{props.replyingMessage.author_name}に返信</p>
+          </button>
+          <button
+            type="button"
+            className={style.cancel}
+            onClick={() => props.setReplyingMessage(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <div className={style.input_area}>
+        <Textarea
+          className={`${style.text_area} ${props.replyingMessage && style.no_top_radius}`}
+          placeholder="Type your message here."
+          onKeyDown={handleKeyDown}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          ref={inputRef}
+        />
+        <Button onClick={handleSubmit} className={style.send_button}>
+          <SendHorizontal />
+        </Button>
+      </div>
     </div>
   );
 };
