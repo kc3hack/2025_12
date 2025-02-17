@@ -13,6 +13,8 @@ import type { Message } from "@/features/message/type";
 type Props = {
   bottomRef: RefObject<HTMLDivElement | null>;
   replyingTo: string | null;
+  replyingToRef: RefObject<HTMLDivElement | null>;
+  replyingAuther: string | null;
   setReplyingTo: (id: string | null) => void;
 };
 
@@ -34,7 +36,7 @@ export const Footer = (props: Props) => {
 
     const newMessage: Message = {
       id: uuidv4(),
-      author: "me",
+      author: "小生",
       content: inputRef.current.value,
       is_me: true,
       icon: "https://github.com/shadcn.png"
@@ -42,12 +44,12 @@ export const Footer = (props: Props) => {
 
     inputRef.current.value = "";
     setTimeout(() => {
-      props.bottomRef.current?.scrollIntoView();
+      props.bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 0);
 
     const yesMessage: Message = {
       id: uuidv4(),
-      author: "bot",
+      author: "50%yesman",
       content: Math.random() < 0.5 ? "はい" : "いいえ",
       is_me: false,
       icon: "https://github.com/shadcn.png"
@@ -67,19 +69,35 @@ export const Footer = (props: Props) => {
     }
   };
 
+  const scrollReply = () => {
+    props.replyingToRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   return (
     <div className={style.footer}>
-      <Textarea
-        className={style.text_area}
-        placeholder="Type your message here."
-        onKeyDown={handleKeyDown}
-        onCompositionStart={() => setIsComposing(true)}
-        onCompositionEnd={() => setIsComposing(false)}
-        ref={inputRef}
-      />
-      <Button onClick={handleSubmit} className={style.send_button}>
-        <SendHorizontal />
-      </Button>
+      {props.replyingTo && (
+        <div>
+          <button type="button" className={style.reply_area} onClick={() => scrollReply()}>
+            <p>{props.replyingAuther}に返信</p>
+          </button>
+          <button type="button" className={style.cancel} onClick={() => props.setReplyingTo(null)}>
+            ×
+          </button>
+        </div>
+      )}
+      <div className={style.input_area}>
+        <Textarea
+          className={`${style.text_area} ${props.replyingTo ? style.no_top_radius : ""}`}
+          placeholder="Type your message here."
+          onKeyDown={handleKeyDown}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          ref={inputRef}
+        />
+        <Button onClick={handleSubmit} className={style.send_button}>
+          <SendHorizontal />
+        </Button>
+      </div>
     </div>
   );
 };

@@ -1,16 +1,38 @@
 .footer {
   position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 1em 2em 2em 2em;
+  margin: 1em;
 
-  .text_area {
-    padding-right: 6em;
+  .reply_area {
+    width: 100%;
+    padding: 0.2em;
+    text-align: center;
+    background-color: #f0f0f0;
   }
 
-  .send_button {
+  .cancel {
     position: absolute;
     right: 1em;
+  }
+
+  .input_area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+
+    .text_area {
+      padding-right: 6em;
+    }
+
+    .no_top_radius {
+      padding-right: 6em;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .send_button {
+      position: absolute;
+      right: 1em;
+    }
   }
 }
