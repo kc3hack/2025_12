@@ -51,7 +51,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/users/me", get(get_user_me))
-        .route("/users/:id", get(get_user))
+        .route("/users/{id}", get(get_user))
         .route("/webhooks/signup", post(webhook_signup))
         .layer(Extension(clerk))
         .with_state(app_state);
