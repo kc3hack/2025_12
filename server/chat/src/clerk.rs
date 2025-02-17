@@ -40,7 +40,7 @@ pub async fn webhook_signup(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
     body: Bytes,
-) -> Result<(), StatusCode> {
+) -> Result<StatusCode, StatusCode> {
     let mut db = state.db.lock().await;
 
     tracing::debug!("webhook received");
@@ -83,5 +83,5 @@ pub async fn webhook_signup(
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    Err(StatusCode::NO_CONTENT)
+    Ok(StatusCode::OK)
 }
