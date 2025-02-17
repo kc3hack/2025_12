@@ -60,3 +60,7 @@ tasks:
     desc: Install dependencies
     deps:
       - task: web:install
+
+  ngrok:
+    desc: Start ngrok tunnel
+    cmd: ngrok http --domain={{.NGROK_DOMAIN}} 3050
