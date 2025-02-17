@@ -10,7 +10,11 @@ import { v4 as uuidv4 } from "uuid";
 import { messagesAtom } from "@/features/message/store";
 import type { Message } from "@/features/message/type";
 
-type Props = { bottomRef: RefObject<HTMLDivElement | null> };
+type Props = {
+  bottomRef: RefObject<HTMLDivElement | null>;
+  replyingTo: string | null;
+  setReplyingTo: (id: string | null) => void;
+};
 
 export const Footer = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
@@ -25,6 +29,8 @@ export const Footer = (props: Props) => {
     if (inputRef.current.value === "") {
       return;
     }
+
+    props.setReplyingTo(null);
 
     const newMessage: Message = {
       id: uuidv4(),

@@ -1,7 +1,6 @@
 .message_container {
   display: flex;
   flex-direction: column;
-  width: 100%;
   max-height: calc(100vh - 9em);
   margin-top: auto;
   overflow-y: scroll;
@@ -9,11 +8,13 @@
   .message_wrapper {
     display: flex;
     align-items: center;
-    width: fit-content;
-    max-width: 80%;
-    margin: 1em;
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+
 
     &.is_me {
+      flex-direction: row-reverse;
       margin-left: auto;
 
       .message {
@@ -31,13 +32,18 @@
       }
     }
 
+    &.replying {
+      background-color: lightblue;
+    }
+
     .avatar {
       margin-right: 1.0em;
       margin-left: 0.5em;
     }
 
     .message {
-      padding: 0.8em 1em;
+      box-sizing: border-box;
+      padding: 0.7em 1em;
       white-space: pre-line;
       line-break: anywhere;
     }
