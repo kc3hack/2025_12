@@ -11,21 +11,35 @@ import {
   ContextMenuTrigger
 } from "@/components/ui/context-menu";
 
+export type ReplyMessage = {
+  id: string;
+  author_name: string;
+};
+
 type Props = {
   bottomRef: RefObject<HTMLDivElement | null>;
-  replyingTo: string | null;
-  setReplyingTo: (id: string | null) => void;
+  replyingToRef: RefObject<HTMLDivElement | null>;
+  replyingMessage: ReplyMessage | null;
+  setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
 export const MessageContainer = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
 
   const deleteMessage = (id: string) => {
+    if (id === props.replyingMessage?.id) {
+      props.setReplyingMessage(null);
+    }
     setMessages(messages.filter(message => message.id !== id));
   };
 
-  const handleReply = (id: string) => {
-    props.setReplyingTo(id);
+  const handleReply = (id: string, author: string) => {
+    const message: ReplyMessage = {
+      id: id,
+      author_name: author
+    };
+
+    props.setReplyingMessage(message);
   };
 
   return (
@@ -33,9 +47,9 @@ export const MessageContainer = (props: Props) => {
       {messages.map(message => (
         <div
           key={message.id}
-          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${
-            props.replyingTo === message.id ? style.replying : ""
-          }`}
+          ref={props.replyingMessage?.id === message.id ? props.replyingToRef : null}
+          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${props.replyingMessage?.id === message.id && style.replying
+            }`}
         >
           {!message.is_me && (
             <Avatar className={style.avatar}>
@@ -52,7 +66,9 @@ export const MessageContainer = (props: Props) => {
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuItem onClick={() => deleteMessage(message.id)}>削除</ContextMenuItem>
-              <ContextMenuItem onClick={() => handleReply(message.id)}>返信</ContextMenuItem>
+              <ContextMenuItem onClick={() => handleReply(message.id, message.author)}>
+                返信
+              </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
         </div>
