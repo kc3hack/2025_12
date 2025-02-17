@@ -1,0 +1,59 @@
+version: '3'
+silent: true
+
+# docker-compose派とdocker compose派のどちらにも対応する
+vars:
+  COMPOSE_CMD:
+    sh: |
+      if command -v docker compose >/dev/null 2>&1; then
+        echo "docker compose"
+      elif command -v docker-compose >/dev/null 2>&1; then
+        echo "docker-compose"
+      else
+        echo "docker compose"
+      fi
+
+includes:
+  web:
+    dir: ./web
+    taskfile: ./taskfile/Taskfile.web.yml
+
+  server:
+    dir: ./server
+    taskfile: ./taskfile/Taskfile.server.yml
+
+  db:
+    dir: ./db
+    taskfile: ./taskfile/Taskfile.db.yml
+    flatten: true
+
+tasks:
+  default:
+    desc: List all tasks
+    aliases:
+      - list
+    cmd: task -l
+
+  up:
+    desc: Up docker
+    cmds:
+     - "{{.COMPOSE_CMD}} up -d"
+
+  down:
+    desc: Down docker
+    cmd: "{{.COMPOSE_CMD}} down"
+
+  test:
+    deps:
+      - task: server:test
+
+  dev:
+    desc: Start dev server
+    deps:
+      - task: web:dev
+      - task: server:dev
+
+  install:
+    desc: Install dependencies
+    deps:
+      - task: web:install
