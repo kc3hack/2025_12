@@ -1,3 +1,4 @@
+mod message;
 mod user;
 
 use sqlx::{
