@@ -1,8 +1,12 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
-    "ignore": ["./src/components/ui/**/*"],
-    "include": ["./src/**/*"]
+    "ignore": [
+      "./src/components/ui/**/*"
+    ],
+    "include": [
+      "./src/**/*"
+    ]
   },
   "organizeImports": {
     "enabled": true
@@ -32,10 +36,5 @@
       "trailingCommas": "none",
       "arrowParentheses": "asNeeded"
     }
-  },
-  "files": {
-    "ignore": [
-      "src/components/ui/*.tsx"
-    ]
   }
 }
