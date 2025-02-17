@@ -32,14 +32,13 @@ export const Footer = (props: Props) => {
       return;
     }
 
-    props.setReplyingMessage(null);
-
     const newMessage: Message = {
       id: uuidv4(),
       author: "小生",
       content: inputRef.current.value,
       is_me: true,
-      icon: "https://github.com/shadcn.png"
+      icon: "https://github.com/shadcn.png",
+      reply_to_id: props.replyingMessage?.id
     };
 
     inputRef.current.value = "";
@@ -52,8 +51,11 @@ export const Footer = (props: Props) => {
       author: "50%yesman",
       content: Math.random() < 0.5 ? "はい" : "いいえ",
       is_me: false,
-      icon: "https://github.com/shadcn.png"
+      icon: "https://github.com/shadcn.png",
+      reply_to_id: undefined
     };
+
+    props.setReplyingMessage(null);
 
     setMessages([...messages, newMessage, yesMessage]);
   };
