@@ -1,6 +1,7 @@
 version: '3'
 silent: true
 
+
 tasks:
   default:
     desc: List for server
@@ -13,3 +14,7 @@ tasks:
   test:
     desc: Run server test
     cmd: cargo test --workspace
+
+  ngrok:
+    desc: Start ngrok tunnel
+    cmd: ngrok http --domain={{.NGROK_DOMAIN}} 3050
