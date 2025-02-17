@@ -1,7 +1,7 @@
 mod clerk;
 
 use axum::{
-    extract::State,
+    extract::{Path, State},
     http::{HeaderMap, StatusCode},
     response::Json,
     routing::{get, post},
@@ -51,6 +51,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/users/me", get(get_user_me))
+        .route("/users/:id", get(get_user))
         .route("/webhooks/signup", post(webhook_signup))
         .layer(Extension(clerk))
         .with_state(app_state);
@@ -68,6 +69,21 @@ async fn get_user_me(
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
     let user_id = clerk::get_user_id(headers);
+
+    let id = db
+        .get_user(&user_id)
+        .await
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+    Ok(Json(id))
+}
+
+#[axum::debug_handler]
+async fn get_user(
+    Path(user_id): Path<String>,
+    State(state): State<Arc<AppState>>,
+) -> Result<Json<models::User>, StatusCode> {
+    let db = state.db.lock().await;
 
     let id = db
         .get_user(&user_id)
