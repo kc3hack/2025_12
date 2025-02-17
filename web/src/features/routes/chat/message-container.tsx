@@ -11,7 +11,7 @@ import {
   ContextMenuTrigger
 } from "@/components/ui/context-menu";
 
-type ReplyMessage = {
+export type ReplyMessage = {
   id: string;
   author_name: string;
 };
@@ -48,9 +48,8 @@ export const MessageContainer = (props: Props) => {
         <div
           key={message.id}
           ref={props.replyingMessage?.id === message.id ? props.replyingToRef : null}
-          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${
-            props.replyingMessage?.id === message.id && style.replying
-          }`}
+          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${props.replyingMessage?.id === message.id && style.replying
+            }`}
         >
           {!message.is_me && (
             <Avatar className={style.avatar}>

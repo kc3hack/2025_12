@@ -9,11 +9,7 @@ import type { KeyboardEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { messagesAtom } from "@/features/message/store";
 import type { Message } from "@/features/message/type";
-
-type ReplyMessage = {
-  id: string;
-  author_name: string;
-};
+import { ReplyMessage } from "./message-container";
 
 type Props = {
   bottomRef: RefObject<HTMLDivElement | null>;

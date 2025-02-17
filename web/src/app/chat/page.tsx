@@ -1,13 +1,8 @@
 "use client";
 import { Footer } from "@/features/routes/chat/footer";
 import style from "@routes/chat/index.module.scss";
-import { MessageContainer } from "@routes/chat/message-container";
+import { MessageContainer, ReplyMessage } from "@routes/chat/message-container";
 import { useRef, useState } from "react";
-
-type ReplyMessage = {
-  id: string;
-  author_name: string;
-};
 
 const Home = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
