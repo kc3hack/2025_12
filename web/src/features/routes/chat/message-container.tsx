@@ -1,5 +1,5 @@
 "use client";
-import type { RefObject } from "react";
+import { type RefObject } from "react";
 import { messagesAtom } from "../../message/store";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
@@ -11,7 +11,11 @@ import {
   ContextMenuTrigger
 } from "@/components/ui/context-menu";
 
-type Props = { bottomRef: RefObject<HTMLDivElement | null> };
+type Props = {
+  bottomRef: RefObject<HTMLDivElement | null>;
+  replyingTo: string | null;
+  setReplyingTo: (id: string | null) => void;
+};
 
 export const MessageContainer = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
@@ -20,12 +24,18 @@ export const MessageContainer = (props: Props) => {
     setMessages(messages.filter(message => message.id !== id));
   };
 
+  const handleReply = (id: string) => {
+    props.setReplyingTo(id);
+  };
+
   return (
     <div className={style.message_container}>
       {messages.map(message => (
         <div
           key={message.id}
-          className={`${style.message_wrapper} ${message.is_me && style.is_me}`}
+          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${
+            props.replyingTo === message.id ? style.replying : ""
+          }`}
         >
           {!message.is_me && (
             <Avatar className={style.avatar}>
@@ -42,7 +52,7 @@ export const MessageContainer = (props: Props) => {
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuItem onClick={() => deleteMessage(message.id)}>削除</ContextMenuItem>
-              <ContextMenuItem>返信</ContextMenuItem>
+              <ContextMenuItem onClick={() => handleReply(message.id)}>返信</ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
         </div>
