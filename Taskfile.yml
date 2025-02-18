@@ -1,6 +1,9 @@
 version: '3'
 silent: true
 
+dotenv:
+  - ".env"
+
 # docker-compose派とdocker compose派のどちらにも対応する
 vars:
   COMPOSE_CMD:
@@ -57,3 +60,7 @@ tasks:
     desc: Install dependencies
     deps:
       - task: web:install
+
+  ngrok:
+    desc: Start ngrok tunnel
+    cmd: ngrok http --domain={{.NGROK_DOMAIN}} 3050
