@@ -1,4 +1,5 @@
 mod clerk;
+mod webhook;
 
 use axum::{
     extract::{Path, State},
@@ -7,13 +8,14 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
-use clerk::webhook_signup;
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
 use std::{env, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
+use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
 
+#[derive(Debug)]
 struct AppState {
     db: Mutex<DB>,
 }
@@ -52,7 +54,9 @@ async fn main() {
     let app = Router::new()
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
-        .route("/webhooks/signup", post(webhook_signup))
+        .route("/webhooks/user_signup", post(webhook_user_signup))
+        .route("/webhooks/user_deleted", post(webhook_user_deleted))
+        .route("/webhooks/user_updated", post(webhook_user_updated))
         .layer(Extension(clerk))
         .with_state(app_state);
 
@@ -63,6 +67,7 @@ async fn main() {
 }
 
 #[axum::debug_handler]
+#[tracing::instrument(skip(headers))]
 async fn get_user_me(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,

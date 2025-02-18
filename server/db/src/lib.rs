@@ -13,6 +13,7 @@ pub struct DBOption {
     pub acquire_timeout: Duration,
 }
 
+#[derive(Debug)]
 pub struct DB {
     pool: MySqlPool,
     transaction: Option<Transaction<'static, MySql>>,

@@ -7,3 +7,4 @@ edition.workspace = true
 sqlx = { version = "0.8.3", features = ["chrono"] }
 serde = { version = "1.0.217", features = ["derive"] }
 chrono = { workspace = true, features = ["serde"] }
+clerk-rs = "0.4.0"

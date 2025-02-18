@@ -1,7 +1,9 @@
 use crate::DB;
 
 impl DB {
-    pub async fn add_user(&mut self, user: models::User) -> Result<(), sqlx::Error> {
+    pub async fn add_user(&mut self, user: impl Into<models::User>) -> Result<(), sqlx::Error> {
+        let user = user.into();
+
         let id = user.id;
         let nickname = user.nickname;
         let created_at = user.created_at;

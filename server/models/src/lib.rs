@@ -4,9 +4,25 @@ use serde::{Deserialize, Serialize};
 #[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct User {
     pub id: String,
-    pub nickname: String,
+    pub nickname: Option<String>,
     pub introduction: Option<String>,
     pub created_at: DateTime<Utc>,
+}
+
+impl From<clerk_rs::models::User> for User {
+    fn from(value: clerk_rs::models::User) -> Self {
+        let created_at = value
+            .created_at
+            .and_then(DateTime::<Utc>::from_timestamp_millis)
+            .unwrap_or_else(Utc::now);
+
+        User {
+            id: value.id.unwrap_or_default(),
+            nickname: None,
+            introduction: None,
+            created_at,
+        }
+    }
 }
 
 #[derive(sqlx::FromRow)]

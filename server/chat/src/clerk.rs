@@ -1,21 +1,37 @@
-use crate::AppState;
 use axum::{
     body::Bytes,
-    extract::State,
     http::{HeaderMap, StatusCode},
 };
 use base64::Engine as _;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::{env, sync::Arc};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use std::env;
 
-pub fn get_user_id(header: HeaderMap) -> String {
+#[allow(dead_code)]
+pub struct VerifiedWebhook {
+    body: Bytes,
+    headers: HeaderMap,
+}
+
+impl VerifiedWebhook {
+    pub fn data<T: DeserializeOwned>(self) -> Result<T, StatusCode> {
+        let wh_value = serde_json::from_slice::<serde_json::Value>(&self.body)
+            .map_err(|_| StatusCode::BAD_REQUEST)?;
+        let data_value = wh_value.get("data").ok_or(StatusCode::BAD_REQUEST)?;
+        let data =
+            serde_json::from_value(data_value.clone()).map_err(|_| StatusCode::BAD_REQUEST)?;
+
+        Ok(data)
+    }
+}
+
+#[tracing::instrument(skip_all)]
+pub fn get_user_id(headers: HeaderMap) -> String {
     #[derive(Serialize, Deserialize)]
     struct Claims {
         sub: String,
     }
 
-    let payload = header
+    let payload = headers
         .get("authorization")
         .unwrap()
         .to_str()
@@ -35,18 +51,14 @@ pub fn get_user_id(header: HeaderMap) -> String {
     claims.sub
 }
 
-#[axum::debug_handler]
-pub async fn webhook_signup(
-    State(state): State<Arc<AppState>>,
-    headers: HeaderMap,
+#[tracing::instrument(skip_all)]
+pub fn verify_webhook(
     body: Bytes,
-) -> Result<StatusCode, StatusCode> {
-    let mut db = state.db.lock().await;
-
-    tracing::debug!("webhook received");
-
+    headers: HeaderMap,
+    signing_secret_name: &str,
+) -> Result<VerifiedWebhook, StatusCode> {
     let signing_secret =
-        env::var("SIGNING_SECRET").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        env::var(signing_secret_name).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let wh = svix::webhooks::Webhook::new(&signing_secret)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -55,33 +67,7 @@ pub async fn webhook_signup(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    tracing::debug!("svix verify successed");
+    tracing::debug!("svix verify succeeded");
 
-    let wh_value =
-        serde_json::from_slice::<serde_json::Value>(&body).map_err(|_| StatusCode::BAD_REQUEST)?;
-
-    let data_value = wh_value.get("data").ok_or(StatusCode::BAD_REQUEST)?;
-
-    let user = serde_json::from_value::<clerk_rs::models::User>(data_value.clone())
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
-
-    user.id.clone().inspect(|id| {
-        tracing::debug!("User Signed up: id:{id}");
-    });
-
-    let created_at = user
-        .created_at
-        .and_then(DateTime::<Utc>::from_timestamp_millis)
-        .unwrap_or_else(Utc::now);
-
-    db.add_user(models::User {
-        id: user.id.unwrap(),
-        nickname: "".to_owned(),
-        introduction: Some("".to_owned()),
-        created_at,
-    })
-    .await
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    Ok(StatusCode::OK)
+    Ok(VerifiedWebhook { body, headers })
 }
