@@ -94,7 +94,7 @@ export const Footer = (props: Props) => {
       <div className={style.input_area}>
         <Textarea
           className={style.text_area}
-          data-replyingMessage={props.replyingMessage}
+          data-replying-message={props.replyingMessage}
           placeholder="Type your message here."
           onKeyDown={handleKeyDown}
           onCompositionStart={() => setIsComposing(true)}
