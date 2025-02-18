@@ -36,6 +36,22 @@ pub fn get_user_id(header: HeaderMap) -> String {
 }
 
 #[axum::debug_handler]
+#[utoipa::path(
+    get,
+    path = "/webhook/signup",
+    summary = "Webhook Signup",
+    request_body(
+        content = String,
+        content_type = "application/octet-stream",
+        description = "Raw binary data"
+    ),
+    description = "Clerkからユーザーがアカウント登録したときに呼ばれるWebhook",
+    responses(
+        (status = 200, description = "OK"),
+        (status = 400, description = "Bad Request"),
+        (status = 500, description = "Internal Server Error")
+    ),
+)]
 pub async fn webhook_signup(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
