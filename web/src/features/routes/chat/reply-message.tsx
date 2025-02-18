@@ -19,7 +19,7 @@ const scrollToMessage = (id: string | null) => {
   }
 };
 
-export const Reply = (props: Props) => {
+export const ReplyMessagePosition = (props: Props) => {
   const [messages] = useAtom(messagesAtom);
 
   const replyMesage = messages.find(replyMessage => replyMessage.id === props.message.reply_to_id);

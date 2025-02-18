@@ -12,7 +12,7 @@ import {
   ContextMenuTrigger
 } from "@/components/ui/context-menu";
 import { ReplyMessage } from "./message-container";
-import { Reply } from "./reply";
+import { ReplyMessagePosition } from "./reply-message";
 
 type Props = {
   message: Message;
@@ -59,7 +59,7 @@ export const MessageCell = (props: Props) => {
 
       <ContextMenu>
         <ContextMenuTrigger>
-          <Reply message={props.message} />
+          <ReplyMessagePosition message={props.message} />
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
