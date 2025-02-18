@@ -37,8 +37,8 @@ export const Footer = (props: Props) => {
       author: "小生",
       content: inputRef.current.value,
       is_me: true,
-      icon: "https://github.com/shadcn.png",
-      reply_to_id: props.replyingMessage?.id
+      icon: null,
+      reply_to_id: props.replyingMessage ? props.replyingMessage.id : null
     };
 
     inputRef.current.value = "";
@@ -52,7 +52,7 @@ export const Footer = (props: Props) => {
       content: Math.random() < 0.5 ? "はい" : "いいえ",
       is_me: false,
       icon: "https://github.com/shadcn.png",
-      reply_to_id: undefined
+      reply_to_id: null
     };
 
     props.setReplyingMessage(null);
