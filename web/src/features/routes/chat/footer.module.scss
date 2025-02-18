@@ -2,7 +2,7 @@
   position: relative;
   margin: 1em;
 
-  .reply_area {
+  .reply_bar {
     width: 100%;
     padding: 0.2em;
     text-align: center;
@@ -24,7 +24,7 @@
       padding-right: 6em;
     }
 
-    .no_top_radius {
+    .text_area[data-replyingMessage] {
       padding-right: 6em;
       border-top-left-radius: 0;
       border-top-right-radius: 0;

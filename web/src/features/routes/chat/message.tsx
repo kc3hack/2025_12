@@ -4,6 +4,7 @@ import { messagesAtom } from "../../message/store";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Message } from "@/features/message/type";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -14,13 +15,14 @@ import { ReplyMessage } from "./message-container";
 import { Reply } from "./reply";
 
 type Props = {
+  message: Message;
   bottomRef: RefObject<HTMLDivElement | null>;
   replyingToRef: RefObject<HTMLDivElement | null>;
   replyingMessage: ReplyMessage | null;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
-export const Message = (props: Props) => {
+export const MessageCell = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
 
   const deleteMessage = (id: string) => {
@@ -31,49 +33,45 @@ export const Message = (props: Props) => {
   };
 
   const handleReply = (id: string, author: string, content: string) => {
-    const message: ReplyMessage = {
+    const replyMessage: ReplyMessage = {
       id: id,
       author_name: author,
       content: content
     };
 
-    props.setReplyingMessage(message);
+    props.setReplyingMessage(replyMessage);
   };
 
   return (
-    <div className={style.message_container}>
-      {messages.map(message => (
-        <div
-          key={message.id}
-          id={`message-${message.id}`}
-          ref={props.replyingMessage?.id === message.id ? props.replyingToRef : null}
-          className={`${style.message_wrapper} ${message.is_me && style.is_me} ${
-            props.replyingMessage?.id === message.id && style.replying
-          }`}
-        >
-          {!message.is_me && message.icon && (
-            <Avatar className={style.avatar}>
-              <AvatarImage src={message.icon} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          )}
+    <div
+      id={`message-${props.message.id}`}
+      ref={props.replyingMessage?.id === props.message.id ? props.replyingToRef : null}
+      className={style.message_wrapper}
+      data-is-me={props.message.is_me}
+      data-is-replying={props.replyingMessage?.id === props.message.id}
+    >
+      {!props.message.is_me && props.message.icon && (
+        <Avatar className={style.avatar}>
+          <AvatarImage src={props.message.icon} />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      )}
 
-          <ContextMenu>
-            <ContextMenuTrigger>
-              <Reply message={message} />
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <ContextMenuItem onClick={() => deleteMessage(message.id)}>削除</ContextMenuItem>
-              <ContextMenuItem
-                onClick={() => handleReply(message.id, message.author, message.content)}
-              >
-                返信
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
-        </div>
-      ))}
-      <div ref={props.bottomRef} />
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <Reply message={props.message} />
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
+          <ContextMenuItem
+            onClick={() =>
+              handleReply(props.message.id, props.message.author, props.message.content)
+            }
+          >
+            返信
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     </div>
   );
 };

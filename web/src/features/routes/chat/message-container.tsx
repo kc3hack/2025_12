@@ -1,6 +1,9 @@
 "use client";
+import style from "./messagecontainer.module.scss";
 import { type RefObject } from "react";
-import { Message } from "./message";
+import { MessageCell } from "./message";
+import { messagesAtom } from "@/features/message/store";
+import { useAtom } from "jotai";
 
 export type ReplyMessage = {
   id: string;
@@ -16,12 +19,21 @@ type Props = {
 };
 
 export const MessageContainer = (props: Props) => {
+  const [messages] = useAtom(messagesAtom);
+
   return (
-    <Message
-      bottomRef={props.bottomRef}
-      replyingToRef={props.replyingToRef}
-      replyingMessage={props.replyingMessage}
-      setReplyingMessage={props.setReplyingMessage}
-    />
+    <div className={style.message_container}>
+      {messages.map(message => (
+        <MessageCell
+          key={message.id}
+          message={message}
+          bottomRef={props.bottomRef}
+          replyingToRef={props.replyingToRef}
+          replyingMessage={props.replyingMessage}
+          setReplyingMessage={props.setReplyingMessage}
+        />
+      ))}
+      <div ref={props.bottomRef} />
+    </div>
   );
 };
