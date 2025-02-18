@@ -12,8 +12,7 @@
     padding: 1em;
     margin: 0.5em 0;
 
-
-    &.is_me {
+    &[data-is-me="true"] {
       flex-direction: row-reverse;
       padding-left: 10em;
       margin-left: auto;
@@ -24,7 +23,8 @@
       }
     }
 
-    &:not(.is_me) {
+
+    &[data-is-me="false"] {
       padding-right: 10em;
       margin-right: auto;
 
@@ -34,7 +34,7 @@
       }
     }
 
-    &.replying {
+    &[data-is-replying="true"] {
       background-color: lightblue;
     }
 
@@ -45,8 +45,14 @@
     .message {
       box-sizing: border-box;
       padding: 0.7em 1em;
-      white-space: pre-line;
       line-break: anywhere;
+
+      .message_reply_area {
+        height: auto;
+        text-align: left;
+        background: transparent;
+        border-color: black;
+      }
     }
   }
 }

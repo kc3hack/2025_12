@@ -32,14 +32,13 @@ export const Footer = (props: Props) => {
       return;
     }
 
-    props.setReplyingMessage(null);
-
     const newMessage: Message = {
       id: uuidv4(),
       author: "小生",
       content: inputRef.current.value,
       is_me: true,
-      icon: "https://github.com/shadcn.png"
+      icon: null, //自分のアイコンに変更して
+      reply_to_id: props.replyingMessage ? props.replyingMessage.id : null
     };
 
     inputRef.current.value = "";
@@ -52,8 +51,11 @@ export const Footer = (props: Props) => {
       author: "50%yesman",
       content: Math.random() < 0.5 ? "はい" : "いいえ",
       is_me: false,
-      icon: "https://github.com/shadcn.png"
+      icon: "https://github.com/shadcn.png",
+      reply_to_id: null
     };
+
+    props.setReplyingMessage(null);
 
     setMessages([...messages, newMessage, yesMessage]);
   };
@@ -77,7 +79,7 @@ export const Footer = (props: Props) => {
     <div className={style.footer}>
       {props.replyingMessage && (
         <div>
-          <button type="button" className={style.reply_area} onClick={() => scrollReply()}>
+          <button type="button" className={style.reply_bar} onClick={() => scrollReply()}>
             <p>{props.replyingMessage.author_name}に返信</p>
           </button>
           <button
@@ -91,7 +93,8 @@ export const Footer = (props: Props) => {
       )}
       <div className={style.input_area}>
         <Textarea
-          className={`${style.text_area} ${props.replyingMessage && style.no_top_radius}`}
+          className={style.text_area}
+          data-replying-message={props.replyingMessage}
           placeholder="Type your message here."
           onKeyDown={handleKeyDown}
           onCompositionStart={() => setIsComposing(true)}
