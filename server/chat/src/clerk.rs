@@ -51,6 +51,7 @@ pub fn get_user_id(header: HeaderMap) -> String {
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
+    tag = "User"
 )]
 pub async fn webhook_signup(
     State(state): State<Arc<AppState>>,

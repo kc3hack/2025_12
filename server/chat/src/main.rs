@@ -74,8 +74,9 @@ async fn main() {
     description = "ログインユーザーの情報を取得します",
     responses(
         (status = 200, description = "Found user", body = models::User),
-        (status = 401, description = "Not found")
+        (status = 404, description = "Not found")
     ),
+    tag = "User"
 )]
 async fn get_user_me(
     State(state): State<Arc<AppState>>,
@@ -98,13 +99,11 @@ async fn get_user_me(
     path = "/users/{id}",
     summary = "Get user by id",
     description = "IDからユーザーを取得します",
-    params(
-        ("user_id" = String, Path, description = "User ID"),
-    ),
     responses(
         (status = 200, description = "Found user", body = models::User),
-        (status = 401, description = "Not found")
+        (status = 404, description = "Not found")
     ),
+    tag = "User"
 )]
 async fn get_user(
     Path(user_id): Path<String>,
