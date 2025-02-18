@@ -38,7 +38,8 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let config = ClerkConfiguration::new(None, None, Some("your_secret_key".to_string()), None);
+    let clerk_secret_key = env::var("CLERK_SECRET_KEY").expect("Clerk secret key not found");
+    let config = ClerkConfiguration::new(None, None, Some(clerk_secret_key), None);
     let clerk = Clerk::new(config);
 
     let db = DB::from_option(DBOption {
