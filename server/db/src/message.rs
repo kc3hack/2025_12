@@ -1,3 +1,5 @@
+use models::MessageUpdate;
+
 use crate::DB;
 
 impl DB {
@@ -35,15 +37,14 @@ impl DB {
     pub async fn update_message(
         &mut self,
         id: &str,
-        user_id: Option<Option<&str>>,
-        content: Option<&str>,
+        message_option: MessageUpdate,
     ) -> Result<(), sqlx::Error> {
-        if let Some(user_id) = user_id {
+        if let Some(user_id) = message_option.user_id {
             let query = sqlx::query!("UPDATE messages SET user_id = ? WHERE id = ?", user_id, id);
             self.execute(query).await?;
         }
 
-        if let Some(content) = content {
+        if let Some(content) = message_option.content {
             let query = sqlx::query!("UPDATE messages SET content = ? WHERE id = ?", content, id);
             self.execute(query).await?;
         }
@@ -66,6 +67,7 @@ impl DB {
 #[cfg(test)]
 mod test {
     use super::DB;
+    use models::MessageUpdate;
     use sqlx::{types::chrono::Utc, MySqlPool};
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
@@ -121,12 +123,25 @@ mod test {
         dotenvy::dotenv().unwrap();
 
         let mut db = DB::from_pool(pool);
-        db.update_message("0", None, Some("changed-message"))
-            .await?;
+        db.update_message(
+            "0",
+            MessageUpdate {
+                user_id: None,
+                content: Some("changed-message".to_owned()),
+            },
+        )
+        .await?;
         let message = db.get_message("0").await?;
         assert_eq!(message.user_id, Some("0".to_owned()));
 
-        db.update_message("0", Some(None), None).await?;
+        db.update_message(
+            "0",
+            MessageUpdate {
+                user_id: Some(None),
+                content: Some("changed-message".to_owned()),
+            },
+        )
+        .await?;
         let message = db.get_message("0").await?;
         assert_eq!(message.user_id, None);
         assert_eq!(message.content, "changed-message");

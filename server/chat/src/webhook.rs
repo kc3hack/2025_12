@@ -76,12 +76,9 @@ pub async fn webhook_user_updated(
         tracing::debug!("User updated: id:{id}");
     });
 
-    if let Some(user_id) = user.id {
-        // update
-        // db.update_user(&user_id)
-        //     .await
-        //     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    }
+    db.update_user(&user.id.clone().unwrap_or_default(), user)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(StatusCode::OK)
 }

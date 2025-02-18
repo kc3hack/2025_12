@@ -9,15 +9,30 @@ pub struct User {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Default)]
+pub struct UserUpdate {
+    pub nickname: Option<Option<String>>,
+    pub introduction: Option<Option<String>>,
+}
+
+impl From<clerk_rs::models::User> for UserUpdate {
+    fn from(_user: clerk_rs::models::User) -> Self {
+        UserUpdate {
+            nickname: None,
+            introduction: None,
+        }
+    }
+}
+
 impl From<clerk_rs::models::User> for User {
-    fn from(value: clerk_rs::models::User) -> Self {
-        let created_at = value
+    fn from(user: clerk_rs::models::User) -> Self {
+        let created_at = user
             .created_at
             .and_then(DateTime::<Utc>::from_timestamp_millis)
             .unwrap_or_else(Utc::now);
 
         User {
-            id: value.id.unwrap_or_default(),
+            id: user.id.unwrap_or_default(),
             nickname: None,
             introduction: None,
             created_at,
@@ -33,4 +48,9 @@ pub struct Message {
     pub content: String,
     pub reply_to_id: Option<String>,
     pub created_at: DateTime<Utc>,
+}
+
+pub struct MessageUpdate {
+    pub user_id: Option<Option<String>>,
+    pub content: Option<String>,
 }
