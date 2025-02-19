@@ -130,6 +130,8 @@ async fn get_user(
         get_user,
         get_user_me,
         webhook::webhook_user_signup,
+        webhook::webhook_user_deleted,
+        webhook::webhook_user_updated,
     ),
     components(schemas(
         models::User,

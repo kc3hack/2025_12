@@ -10,14 +10,14 @@ use std::sync::Arc;
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
     get,
-    path = "/webhook/signup",
-    summary = "Webhook Signup",
+    path = "/webhook/user_signup",
+    summary = "Webhook for clerk user.created",
     request_body(
         content = String,
         content_type = "application/octet-stream",
         description = "Raw binary data"
     ),
-    description = "ユーザーがアカウント登録したときにClerkから呼ばれるWebhook",
+    description = "ユーザーがアカウントを登録したときにClerkから呼ばれるWebhook",
     responses(
         (status = 200, description = "OK"),
         (status = 400, description = "Bad Request"),
@@ -50,6 +50,23 @@ pub async fn webhook_user_signup(
 
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers, body))]
+#[utoipa::path(
+    get,
+    path = "/webhook/user_deleted",
+    summary = "Webhook for clerk user.deleted",
+    request_body(
+        content = String,
+        content_type = "application/octet-stream",
+        description = "Raw binary data"
+    ),
+    description = "ユーザーがアカウントを削除したときにClerkから呼ばれるWebhook",
+    responses(
+        (status = 200, description = "OK"),
+        (status = 400, description = "Bad Request"),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = "User"
+)]
 pub async fn webhook_user_deleted(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
@@ -77,6 +94,23 @@ pub async fn webhook_user_deleted(
 
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers, body))]
+#[utoipa::path(
+    get,
+    path = "/webhook/user_updated",
+    summary = "Webhook for clerk user.updated",
+    request_body(
+        content = String,
+        content_type = "application/octet-stream",
+        description = "Raw binary data"
+    ),
+    description = "ユーザーがアカウント情報を更新したときにClerkから呼ばれるWebhook",
+    responses(
+        (status = 200, description = "OK"),
+        (status = 400, description = "Bad Request"),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = "User"
+)]
 pub async fn webhook_user_updated(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
