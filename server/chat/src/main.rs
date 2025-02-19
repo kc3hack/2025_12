@@ -1,4 +1,5 @@
 mod clerk;
+mod webhook;
 
 use axum::{
     extract::{Path, State},
@@ -7,7 +8,6 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
-use clerk::webhook_signup;
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
 use std::{env, sync::Arc, time::Duration};
@@ -15,7 +15,9 @@ use tokio::sync::Mutex;
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
+use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
 
+#[derive(Debug)]
 struct AppState {
     db: Mutex<DB>,
 }
@@ -56,7 +58,9 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
-        .route("/webhooks/signup", post(webhook_signup))
+        .route("/webhooks/user_signup", post(webhook_user_signup))
+        .route("/webhooks/user_deleted", post(webhook_user_deleted))
+        .route("/webhooks/user_updated", post(webhook_user_updated))
         .layer(Extension(clerk))
         .with_state(app_state);
 
@@ -67,6 +71,7 @@ async fn main() {
 }
 
 #[axum::debug_handler]
+#[tracing::instrument(skip(headers))]
 #[utoipa::path(
     get,
     path = "/users/me",
@@ -124,7 +129,9 @@ async fn get_user(
     paths(
         get_user,
         get_user_me,
-        clerk::webhook_signup,
+        webhook::webhook_user_signup,
+        webhook::webhook_user_deleted,
+        webhook::webhook_user_updated,
     ),
     components(schemas(
         models::User,

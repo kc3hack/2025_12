@@ -1,7 +1,11 @@
+use models::UserUpdate;
+
 use crate::DB;
 
 impl DB {
-    pub async fn add_user(&mut self, user: models::User) -> Result<(), sqlx::Error> {
+    pub async fn add_user(&mut self, user: impl Into<models::User>) -> Result<(), sqlx::Error> {
+        let user = user.into();
+
         let id = user.id;
         let nickname = user.nickname;
         let created_at = user.created_at;
@@ -29,10 +33,11 @@ impl DB {
     pub async fn update_user(
         &mut self,
         user_id: &str,
-        nickname: Option<&str>,
-        introduction: Option<&str>,
+        user_option: impl Into<UserUpdate>,
     ) -> Result<(), sqlx::Error> {
-        if let Some(nickname) = nickname {
+        let user_option = user_option.into();
+
+        if let Some(nickname) = user_option.nickname {
             let query = sqlx::query!(
                 "UPDATE users SET nickname = ? WHERE id = ?",
                 nickname,
@@ -41,7 +46,7 @@ impl DB {
             self.execute(query).await?;
         }
 
-        if let Some(introduction) = introduction {
+        if let Some(introduction) = user_option.introduction {
             let query = sqlx::query!(
                 "UPDATE users SET introduction = ? WHERE id = ?",
                 introduction,
@@ -67,6 +72,7 @@ impl DB {
 #[cfg(test)]
 mod test {
     use super::DB;
+    use models::UserUpdate;
     use sqlx::{types::chrono::Utc, MySqlPool};
 
     #[sqlx::test(migrations = "../../db/migrations")]
@@ -77,7 +83,7 @@ mod test {
 
         db.add_user(models::User {
             id: "sample".to_owned(),
-            nickname: "sample_user".to_owned(),
+            nickname: Some("sample_user".to_owned()),
             introduction: Some("hello".to_owned()),
             created_at: Utc::now(),
         })
@@ -111,10 +117,17 @@ mod test {
         dotenvy::dotenv().unwrap();
 
         let mut db = DB::from_pool(pool);
-        db.update_user("0", Some("changed-user"), None).await?;
+        db.update_user(
+            "0",
+            UserUpdate {
+                nickname: Some(Some("changed-user".to_owned())),
+                introduction: None,
+            },
+        )
+        .await?;
 
         let user = db.get_user("0").await?;
-        assert_eq!(user.nickname, "changed-user");
+        assert_eq!(user.nickname, Some("changed-user".to_owned()));
 
         Ok(())
     }

@@ -11,7 +11,7 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing = "0.1.41"
 rand = "0.9.0"
 parking_lot = "0.12.3"
-clerk-rs = { version = "0.4.0" }
+clerk-rs = "0.4.0"
 db = { path = "../db" }
 models = { path = "../models" }
 serde = { version = "1.0.217", features = ["derive"] }
