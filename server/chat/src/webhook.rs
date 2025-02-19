@@ -9,7 +9,7 @@ use std::sync::Arc;
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
-    get,
+    post,
     path = "/webhook/user_signup",
     summary = "Webhook for clerk user.created",
     request_body(
@@ -41,9 +41,10 @@ pub async fn webhook_user_signup(
         tracing::debug!("User signed up: id:{id}");
     });
 
-    db.add_user(user)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    db.add_user(user).await.map_err(|e| {
+        tracing::debug!("{e}");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
     Ok(StatusCode::OK)
 }
@@ -51,7 +52,7 @@ pub async fn webhook_user_signup(
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
-    get,
+    post,
     path = "/webhook/user_deleted",
     summary = "Webhook for clerk user.deleted",
     request_body(
@@ -84,9 +85,10 @@ pub async fn webhook_user_deleted(
     });
 
     if let Some(user_id) = user.id {
-        db.remove_user(&user_id)
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        db.remove_user(&user_id).await.map_err(|e| {
+            tracing::debug!("{e}");
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
     }
 
     Ok(StatusCode::OK)
@@ -95,7 +97,7 @@ pub async fn webhook_user_deleted(
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
-    get,
+    post,
     path = "/webhook/user_updated",
     summary = "Webhook for clerk user.updated",
     request_body(
@@ -129,7 +131,10 @@ pub async fn webhook_user_updated(
 
     db.update_user(&user.id.clone().unwrap_or_default(), user)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            tracing::error!("{e}");
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
 
     Ok(StatusCode::OK)
 }
