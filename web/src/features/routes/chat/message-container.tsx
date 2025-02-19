@@ -12,9 +12,10 @@ export type ReplyMessage = {
 };
 
 type Props = {
-  bottomRef: RefObject<HTMLDivElement | null>;
+  latestMessagePositionRef: RefObject<HTMLDivElement | null>;
   replyingToRef: RefObject<HTMLDivElement | null>;
   replyingMessage: ReplyMessage | null;
+  bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
@@ -27,13 +28,14 @@ export const MessageContainer = (props: Props) => {
         <MessageCell
           key={message.id}
           message={message}
-          bottomRef={props.bottomRef}
+          latestMessagePositionRef={props.latestMessagePositionRef}
           replyingToRef={props.replyingToRef}
           replyingMessage={props.replyingMessage}
+          bottomInputRef={props.bottomInputRef}
           setReplyingMessage={props.setReplyingMessage}
         />
       ))}
-      <div ref={props.bottomRef} />
+      <div ref={props.latestMessagePositionRef} />
     </div>
   );
 };

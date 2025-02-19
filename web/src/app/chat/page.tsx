@@ -5,20 +5,23 @@ import { MessageContainer, ReplyMessage } from "@routes/chat/message-container";
 import { useRef, useState } from "react";
 
 const Home = () => {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const latestMessagePositionRef = useRef<HTMLDivElement>(null);
   const replyingToRef = useRef<HTMLDivElement | null>(null);
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(null);
+  const bottomInputRef = useRef<HTMLTextAreaElement>(null);
 
   return (
     <div className={style.home_page}>
       <MessageContainer
-        bottomRef={bottomRef}
+        bottomInputRef={bottomInputRef}
+        latestMessagePositionRef={latestMessagePositionRef}
         replyingToRef={replyingToRef}
         replyingMessage={replyingMessage}
         setReplyingMessage={setReplyingMessage}
       />
       <Footer
-        bottomRef={bottomRef}
+        bottomInputRef={bottomInputRef}
+        latestMessagePositionRef={latestMessagePositionRef}
         replyingToRef={replyingToRef}
         replyingMessage={replyingMessage}
         setReplyingMessage={setReplyingMessage}
