@@ -45,7 +45,7 @@ pub fn get_user_id(header: HeaderMap) -> String {
         content_type = "application/octet-stream",
         description = "Raw binary data"
     ),
-    description = "Clerkからユーザーがアカウント登録したときに呼ばれるWebhook",
+    description = "ユーザーがアカウント登録したときにClerkから呼ばれるWebhook",
     responses(
         (status = 200, description = "OK"),
         (status = 400, description = "Bad Request"),

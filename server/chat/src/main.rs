@@ -71,7 +71,7 @@ async fn main() {
     get,
     path = "/users/me",
     summary = "Get user me",
-    description = "ログインユーザーの情報を取得します",
+    description = "ログインユーザーの情報を取得",
     responses(
         (status = 200, description = "Found user", body = models::User),
         (status = 404, description = "Not found")
@@ -98,10 +98,10 @@ async fn get_user_me(
     get,
     path = "/users/{id}",
     summary = "Get user by id",
-    description = "IDからユーザーを取得します",
+    description = "IDからユーザーを取得",
     responses(
         (status = 200, description = "Found user", body = models::User),
-        (status = 404, description = "Not found")
+        (status = 404, description = "User not found")
     ),
     tag = "User"
 )]
