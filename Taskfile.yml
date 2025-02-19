@@ -51,7 +51,7 @@ tasks:
 
   down:
     desc: Down docker
-    cmd: "{{.COMPOSE_CMD}} down"
+    cmd: "{{.DOPPLER_CMD}} {{.COMPOSE_CMD}} down"
 
   test:
     deps:
