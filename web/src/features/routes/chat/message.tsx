@@ -16,9 +16,10 @@ import { ReplyMessagePosition } from "./reply-message";
 
 type Props = {
   message: Message;
-  bottomRef: RefObject<HTMLDivElement | null>;
+  latestMessagePositionRef: RefObject<HTMLDivElement | null>;
   replyingToRef: RefObject<HTMLDivElement | null>;
   replyingMessage: ReplyMessage | null;
+  bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
@@ -40,6 +41,10 @@ export const MessageCell = (props: Props) => {
     };
 
     props.setReplyingMessage(replyMessage);
+
+    if (props.bottomInputRef.current) {
+      props.bottomInputRef.current.focus();
+    }
   };
 
   return (
