@@ -13,6 +13,8 @@ use db::{DBOption, DB};
 use std::{env, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
 
 #[derive(Debug)]
@@ -40,7 +42,8 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let config = ClerkConfiguration::new(None, None, Some("your_secret_key".to_string()), None);
+    let clerk_secret_key = env::var("CLERK_SECRET_KEY").expect("Clerk secret key not found");
+    let config = ClerkConfiguration::new(None, None, Some(clerk_secret_key), None);
     let clerk = Clerk::new(config);
 
     let db = DB::from_option(DBOption {
@@ -52,6 +55,7 @@ async fn main() {
     let app_state = AppState::new(db);
 
     let app = Router::new()
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
         .route("/webhooks/user_signup", post(webhook_user_signup))
@@ -68,6 +72,17 @@ async fn main() {
 
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers))]
+#[utoipa::path(
+    get,
+    path = "/users/me",
+    summary = "Get user me",
+    description = "ログインユーザーの情報を取得",
+    responses(
+        (status = 200, description = "Found user", body = models::User),
+        (status = 404, description = "Not found")
+    ),
+    tag = "User"
+)]
 async fn get_user_me(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
@@ -84,6 +99,17 @@ async fn get_user_me(
 }
 
 #[axum::debug_handler]
+#[utoipa::path(
+    get,
+    path = "/users/{id}",
+    summary = "Get user by id",
+    description = "IDからユーザーを取得",
+    responses(
+        (status = 200, description = "Found user", body = models::User),
+        (status = 404, description = "User not found")
+    ),
+    tag = "User"
+)]
 async fn get_user(
     Path(user_id): Path<String>,
     State(state): State<Arc<AppState>>,
@@ -97,3 +123,17 @@ async fn get_user(
 
     Ok(Json(user))
 }
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        get_user,
+        get_user_me,
+        webhook::webhook_user_signup,
+    ),
+    components(schemas(
+        models::User,
+    )),
+    tags((name = "User"))
+)]
+struct ApiDoc;

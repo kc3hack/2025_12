@@ -3,5 +3,6 @@ export type Message = {
   author: string;
   content: string;
   is_me: boolean;
-  icon: string;
+  icon: string | null;
+  reply_to_id: string | null;
 };

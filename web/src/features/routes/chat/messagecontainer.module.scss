@@ -1,7 +1,7 @@
 .message_container {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 9em);
+  max-height: calc(100vh - 10em);
   margin-top: auto;
   overflow-y: scroll;
 
@@ -9,12 +9,12 @@
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0.5em;
+    padding: 1em;
     margin: 0.5em 0;
 
-
-    &.is_me {
+    &[data-is-me="true"] {
       flex-direction: row-reverse;
+      padding-left: 10em;
       margin-left: auto;
 
       .message {
@@ -23,7 +23,9 @@
       }
     }
 
-    &:not(.is_me) {
+
+    &[data-is-me="false"] {
+      padding-right: 10em;
       margin-right: auto;
 
       .message {
@@ -32,20 +34,25 @@
       }
     }
 
-    &.replying {
+    &[data-is-replying="true"] {
       background-color: lightblue;
     }
 
     .avatar {
       margin-right: 1.0em;
-      margin-left: 0.5em;
     }
 
     .message {
       box-sizing: border-box;
       padding: 0.7em 1em;
-      white-space: pre-line;
       line-break: anywhere;
+
+      .message_reply_area {
+        height: auto;
+        text-align: left;
+        background: transparent;
+        border-color: black;
+      }
     }
   }
 }

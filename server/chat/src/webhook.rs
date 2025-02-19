@@ -8,6 +8,23 @@ use std::sync::Arc;
 
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers, body))]
+#[utoipa::path(
+    get,
+    path = "/webhook/signup",
+    summary = "Webhook Signup",
+    request_body(
+        content = String,
+        content_type = "application/octet-stream",
+        description = "Raw binary data"
+    ),
+    description = "ユーザーがアカウント登録したときにClerkから呼ばれるWebhook",
+    responses(
+        (status = 200, description = "OK"),
+        (status = 400, description = "Bad Request"),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = "User"
+)]
 pub async fn webhook_user_signup(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,

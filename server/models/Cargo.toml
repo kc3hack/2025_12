@@ -8,3 +8,5 @@ sqlx = { version = "0.8.3", features = ["chrono"] }
 serde = { version = "1.0.217", features = ["derive"] }
 chrono = { workspace = true, features = ["serde"] }
 clerk-rs = "0.4.0"
+utoipa = { version = "5.3.1", features = ["axum_extras", "chrono"] }
+utoipa-swagger-ui = { version = "9.0.0", features = ["axum"] }
