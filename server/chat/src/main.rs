@@ -13,6 +13,8 @@ use db::{DBOption, DB};
 use std::{env, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 struct AppState {
     db: Mutex<DB>,
@@ -51,6 +53,7 @@ async fn main() {
     let app_state = AppState::new(db);
 
     let app = Router::new()
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
         .route("/webhooks/signup", post(webhook_signup))
@@ -64,6 +67,17 @@ async fn main() {
 }
 
 #[axum::debug_handler]
+#[utoipa::path(
+    get,
+    path = "/users/me",
+    summary = "Get user me",
+    description = "ログインユーザーの情報を取得",
+    responses(
+        (status = 200, description = "Found user", body = models::User),
+        (status = 404, description = "Not found")
+    ),
+    tag = "User"
+)]
 async fn get_user_me(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
@@ -80,6 +94,17 @@ async fn get_user_me(
 }
 
 #[axum::debug_handler]
+#[utoipa::path(
+    get,
+    path = "/users/{id}",
+    summary = "Get user by id",
+    description = "IDからユーザーを取得",
+    responses(
+        (status = 200, description = "Found user", body = models::User),
+        (status = 404, description = "User not found")
+    ),
+    tag = "User"
+)]
 async fn get_user(
     Path(user_id): Path<String>,
     State(state): State<Arc<AppState>>,
@@ -93,3 +118,17 @@ async fn get_user(
 
     Ok(Json(user))
 }
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        get_user,
+        get_user_me,
+        clerk::webhook_signup,
+    ),
+    components(schemas(
+        models::User,
+    )),
+    tags((name = "User"))
+)]
+struct ApiDoc;
