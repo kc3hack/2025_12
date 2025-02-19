@@ -70,8 +70,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
     pub async fn add_message_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
 
         db.add_message(models::Message {
@@ -92,8 +90,6 @@ mod test {
         fixtures("user", "room", "message")
     )]
     pub async fn get_message_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let db = DB::from_pool(pool);
         let _ = db.get_message("0").await?;
 
@@ -105,8 +101,6 @@ mod test {
         fixtures("user", "room", "message")
     )]
     pub async fn remove_message_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
         db.remove_message("0").await?;
 
@@ -118,8 +112,6 @@ mod test {
         fixtures("user", "room", "message")
     )]
     pub async fn update_message_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
         db.update_message("0", None, Some("changed-message"))
             .await?;

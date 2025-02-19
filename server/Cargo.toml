@@ -10,5 +10,4 @@ edition = "2021"
 
 [workspace.dependencies]
 chrono = "0.4.39"
-dotenvy = "0.15.7"
 tokio = "1.43.0"

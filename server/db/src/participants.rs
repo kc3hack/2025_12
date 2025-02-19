@@ -58,8 +58,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
     pub async fn add_participant_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
 
         db.add_participant(models::Participant {
@@ -77,8 +75,6 @@ mod test {
         fixtures("user", "room", "participant")
     )]
     pub async fn get_participant_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let db = DB::from_pool(pool);
         let _ = db.get_participant("0", "0").await?;
 
@@ -87,8 +83,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
     pub async fn remove_participant_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
         db.remove_participant("0", "0").await?;
 

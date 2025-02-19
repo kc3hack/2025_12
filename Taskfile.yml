@@ -6,6 +6,7 @@ dotenv:
 
 # docker-compose派とdocker compose派のどちらにも対応する
 vars:
+  DOPPLER_CMD: doppler run --
   COMPOSE_CMD:
     sh: |
       if command -v docker compose >/dev/null 2>&1; then
@@ -40,7 +41,7 @@ tasks:
   up:
     desc: Up docker
     cmds:
-     - "{{.COMPOSE_CMD}} up -d"
+     - "{{.DOPPLER_CMD}} {{.COMPOSE_CMD}} up -d"
 
   down:
     desc: Down docker
@@ -64,3 +65,8 @@ tasks:
   ngrok:
     desc: Start ngrok tunnel
     cmd: ngrok http --domain={{.NGROK_DOMAIN}} 3050
+  
+  nvim:
+    desc: Nvim with env
+    cmd: "{{.DOPPLER_CMD}} nvim"
+

@@ -4,23 +4,23 @@ silent: true
 tasks:
   migrate:run:
     desc: Run migration
-    cmd: sqlx migrate run
+    cmd: "{{.DOPPLER_CMD}} sqlx migrate run"
 
   migrate:revert:
     desc: Revert migration
-    cmd: sqlx migrate revert
+    cmd: "{{.DOPPLER_CMD}} sqlx migrate revert"
 
   migrate:add:
     desc: Add migration
-    cmd: sqlx migrate add -r {{.CLI_ARGS}} 
+    cmd: "{{.DOPPLER_CMD}} sqlx migrate add -r {{.CLI_ARGS}}"
 
   db:create:
     desc: Create database
-    cmd: sqlx database create
+    cmd: "{{.DOPPLER_CMD}} sqlx database create"
 
   db:drop:
     desc: Drop database
-    cmd: sqlx database drop
+    cmd: "{{.DOPPLER_CMD}} sqlx database drop"
 
   db:refresh:
     desc: Refresh database
