@@ -31,12 +31,14 @@
       .message {
         background-color: #e2e8f0;
         border-radius: 1em 1em 1em 0.4em;
+
       }
     }
 
     &[data-is-replying="true"] {
       background-color: lightblue;
     }
+
 
     .avatar {
       margin-right: 1.0em;
@@ -54,5 +56,19 @@
         border-color: black;
       }
     }
+  }
+}
+
+.highlight {
+  animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    background-color: green;
+  }
+
+  to {
+    background-color: transparent;
   }
 }

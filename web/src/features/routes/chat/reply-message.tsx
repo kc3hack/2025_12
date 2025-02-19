@@ -9,20 +9,26 @@ type Props = {
   message: Message;
 };
 
-const scrollToMessage = (id: string | null) => {
-  const element = document.getElementById(`message-${id}`);
-  if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }
-};
-
 export const ReplyMessagePosition = (props: Props) => {
   const [messages] = useAtom(messagesAtom);
 
   const replyMesage = messages.find(replyMessage => replyMessage.id === props.message.reply_to_id);
+
+  const scrollToMessage = (id: string | null) => {
+    const element = document.getElementById(`message-${id}`);
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      element.classList.add(style.highlight);
+      setTimeout(() => {
+        element.classList.remove(style.highlight);
+      }, 1000);
+    }
+  };
 
   return (
     <div className={style.message}>
