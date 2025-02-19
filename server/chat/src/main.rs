@@ -1,10 +1,9 @@
+mod api;
 mod clerk;
 mod webhook;
 
+use api::user::{get_user, get_user_me};
 use axum::{
-    extract::{Path, State},
-    http::{HeaderMap, StatusCode},
-    response::Json,
     routing::{get, post},
     Extension, Router,
 };
@@ -65,68 +64,16 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3050").await.unwrap();
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
 
+    tracing::debug!("you can see swagger here: http://localhost:3050/swagger-ui",);
+
     axum::serve(listener, app).await.unwrap();
-}
-
-#[axum::debug_handler]
-#[tracing::instrument(skip(headers))]
-#[utoipa::path(
-    get,
-    path = "/users/me",
-    summary = "Get user me",
-    description = "ログインユーザーの情報を取得",
-    responses(
-        (status = 200, description = "Found user", body = models::User),
-        (status = 404, description = "Not found")
-    ),
-    tag = "User"
-)]
-async fn get_user_me(
-    State(state): State<Arc<AppState>>,
-    headers: HeaderMap,
-) -> Result<Json<models::User>, StatusCode> {
-    let db = state.db.lock().await;
-    let user_id = clerk::get_user_id(headers);
-
-    let user = db
-        .get_user(&user_id)
-        .await
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-
-    Ok(Json(user))
-}
-
-#[axum::debug_handler]
-#[utoipa::path(
-    get,
-    path = "/users/{id}",
-    summary = "Get user by id",
-    description = "IDからユーザーを取得",
-    responses(
-        (status = 200, description = "Found user", body = models::User),
-        (status = 404, description = "User not found")
-    ),
-    tag = "User"
-)]
-async fn get_user(
-    Path(user_id): Path<String>,
-    State(state): State<Arc<AppState>>,
-) -> Result<Json<models::User>, StatusCode> {
-    let db = state.db.lock().await;
-
-    let user = db
-        .get_user(&user_id)
-        .await
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-
-    Ok(Json(user))
 }
 
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        get_user,
-        get_user_me,
+        api::user::get_user,
+        api::user::get_user_me,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
         webhook::webhook_user_updated,
