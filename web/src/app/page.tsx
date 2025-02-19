@@ -6,6 +6,7 @@ import { apiClient } from "../zodios/apiclient";
 
 const Home = () => {
   const { getToken } = useAuth();
+
   return (
     <div>
       <Button>Push me</Button>
@@ -17,8 +18,7 @@ const Home = () => {
       </SignedIn>
       <Button
         onClick={async () => {
-          const token = await getToken();
-          await apiClient.get_user_me({ headers: { Authorization: token } });
+          await apiClient.get_user_me({ headers: { Authorization: `Bearer ${await getToken()}` } });
         }}
       >
         Push me
