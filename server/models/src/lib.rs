@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema)]
+#[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema, Debug)]
 pub struct User {
     pub id: String,
     pub nickname: Option<String>,
@@ -41,7 +41,7 @@ impl From<clerk_rs::models::User> for User {
     }
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(sqlx::FromRow, Serialize, Deserialize)]
 pub struct Room {
     pub id: String,
     pub creator_id: Option<String>,

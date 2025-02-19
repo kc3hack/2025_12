@@ -20,3 +20,4 @@ svix = "1.57.0"
 chrono = "0.4.39"
 utoipa = { version = "5.3.1", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "9.0.0", features = ["axum"] }
+futures = "0.3.31"
