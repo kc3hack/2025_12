@@ -6,7 +6,13 @@ dotenv:
 
 # docker-compose派とdocker compose派のどちらにも対応する
 vars:
-  DOPPLER_CMD: doppler run --
+  DOPPLER_CMD:
+    sh: |
+      if command -v doppler >/dev/null 2>&1; then
+        echo "doppler run --"
+      else
+        echo ""
+      fi
   COMPOSE_CMD:
     sh: |
       if command -v docker compose >/dev/null 2>&1; then
