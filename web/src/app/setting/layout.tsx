@@ -1,12 +1,17 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import style from "../../features/routes/settings-scss/page.module.scss";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const SettingsSidebar = () => {
   const Router = useRouter();
+  const PathName = usePathname();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [PathName]);
   return (
     <div className={style.setting_container}>
       <button type="button" className={style.setting1} onClick={() => Router.push("./profile")}>

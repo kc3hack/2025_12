@@ -7,8 +7,11 @@ body{
     display:flex;
     flex-direction: column;
     width: 30%;
-    overflow:scroll ;
-    
+    overflow:scroll;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
     .setting1{
         
         font-size: 150%;
@@ -40,25 +43,27 @@ body{
 
 .profile_container{
     display:flex;
-
+   
    
     .profile{
-      
+        display:flex;
+        flex-direction:column;
         padding: 2em;
         font-size: 2em;
-        margin-top:-38em;
-        
-
+        margin-top:0em;   
+    }   
+        .image{
+            margin-top: 1em;
+          
+        }
     
-    }
-    .image{
-        margin-top: -110em;
-    }
+    
+   
     .namebox_container{
         display: flex;
         flex-direction: column;
-        margin-left: 5em;
-        margin-top: -55em;
+        margin-left: 0em;
+        margin-top: 10em;
         margin-bottom: auto;
         .namebox{
             background: rgb(165, 165, 165);
@@ -84,7 +89,7 @@ body{
 
 .account_container{
     display:flex;
-    overflow: scroll;
+
     .account{
         padding: 3em 1em;       
         font-size: 2em;
