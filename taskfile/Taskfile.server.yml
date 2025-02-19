@@ -1,7 +1,6 @@
 version: '3'
 silent: true
 
-
 tasks:
   default:
     desc: List for server
@@ -9,8 +8,8 @@ tasks:
 
   dev:
     desc: Start backend server
-    cmd: cargo run
+    cmd: "{{.DOPPLER_CMD}} cargo run"
 
   test:
     desc: Run server test
-    cmd: cargo test --workspace
+    cmd: "{{.DOPPLER_CMD}} cargo test --workspace"

@@ -32,8 +32,6 @@ impl AppState {
 
 #[tokio::main]
 async fn main() {
-    dotenvy::dotenv().unwrap();
-
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()

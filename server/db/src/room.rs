@@ -80,8 +80,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user"))]
     pub async fn add_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
 
         db.add_room(models::Room {
@@ -98,8 +96,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
     pub async fn get_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let db = DB::from_pool(pool);
         let _ = db.get_room("0").await?;
 
@@ -108,8 +104,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
     pub async fn remove_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
         db.remove_room("0").await?;
 
@@ -118,8 +112,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
     pub async fn update_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let date = Utc.with_ymd_and_hms(2021, 1, 1, 0, 0, 0).unwrap();
         let mut db = DB::from_pool(pool);
         db.update_room("0", None, Some(date)).await?;

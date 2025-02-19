@@ -77,8 +77,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations")]
     pub async fn add_user_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
 
         db.add_user(models::User {
@@ -94,8 +92,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user"))]
     pub async fn get_user_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let db = DB::from_pool(pool);
         let _ = db.get_user("0").await?;
 
@@ -104,8 +100,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user"))]
     pub async fn remove_user_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
         db.remove_user("0").await?;
 
@@ -114,8 +108,6 @@ mod test {
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user"))]
     pub async fn update_user_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
-        dotenvy::dotenv().unwrap();
-
         let mut db = DB::from_pool(pool);
         db.update_user(
             "0",

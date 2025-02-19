@@ -13,4 +13,3 @@ sqlx = { version = "0.8.3", features = [
   "migrate",
 ] }
 tokio = { workspace = true, features = ["macros"] }
-dotenvy.workspace = true
