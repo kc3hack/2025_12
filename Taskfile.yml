@@ -76,3 +76,6 @@ tasks:
     desc: Nvim with env
     cmd: "{{.DOPPLER_CMD}} nvim"
 
+  zodios-gen:
+    desc: Generate API
+    cmd: pnpm openapi-zod-client http://localhost:3050/api-docs/openapi.json -o src/zodios/api.ts 
