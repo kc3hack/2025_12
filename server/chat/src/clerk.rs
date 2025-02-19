@@ -25,19 +25,43 @@ impl VerifiedWebhook {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn get_user_id(headers: HeaderMap) -> String {
+fn extract_payload(headers: HeaderMap) -> Result<String, StatusCode> {
+    let auth_header = headers
+        .get("authorization")
+        .ok_or(StatusCode::UNAUTHORIZED)?;
+    let auth_str = auth_header.to_str().map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+    if !auth_str.starts_with("Bearer ") {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    let token = &auth_str[7..];
+    let parts: Vec<&str> = token.split(".").collect();
+
+    if parts.len() != 3 {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    Ok(parts[1].to_string())
+}
+
+#[tracing::instrument(skip_all)]
+pub fn get_user_id(headers: HeaderMap) -> Result<String, StatusCode> {
     #[derive(Serialize, Deserialize)]
     struct Claims {
         sub: String,
     }
 
-    let payload = headers
-        .get("authorization")
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .split(".")
-        .collect::<Vec<_>>()[1];
+    let payload = match extract_payload(headers) {
+        Ok(v) => {
+            tracing::debug!("Got authorized request");
+            v
+        }
+        Err(e) => {
+            tracing::debug!("Got unauthorized request");
+            return Err(e);
+        }
+    };
 
     let bytes = base64::engine::GeneralPurpose::new(
         &base64::alphabet::URL_SAFE,
@@ -48,7 +72,7 @@ pub fn get_user_id(headers: HeaderMap) -> String {
 
     let claims: Claims = serde_json::from_str(String::from_utf8(bytes).unwrap().as_str()).unwrap();
 
-    claims.sub
+    Ok(claims.sub)
 }
 
 #[tracing::instrument(skip_all)]

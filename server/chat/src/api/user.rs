@@ -24,7 +24,7 @@ pub async fn get_user_me(
     headers: HeaderMap,
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
-    let user_id = clerk::get_user_id(headers);
+    let user_id = clerk::get_user_id(headers)?;
 
     let user = db
         .get_user(&user_id)
