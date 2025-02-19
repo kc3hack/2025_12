@@ -29,7 +29,7 @@ const CreateProfilePage = () => {
             <p>名前</p>
             <Input />
             <p>自己紹介</p>
-            <Textarea />
+            <Textarea className={style.input_introduction} />
           </div>
         </CardContent>
         <CardFooter className={style.footer}>
