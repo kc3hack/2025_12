@@ -26,15 +26,16 @@ pub async fn get_user_me(
     let db = state.db.lock().await;
     let user_id = clerk::get_user_id(headers)?;
 
-    let user = db
-        .get_user(&user_id)
-        .await
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let user = db.get_user(&user_id).await.map_err(|e| {
+        tracing::error!("{e}");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
     Ok(Json(user))
 }
 
 #[axum::debug_handler]
+#[tracing::instrument]
 #[utoipa::path(
     get,
     path = "/users/{id}",
@@ -52,10 +53,10 @@ pub async fn get_user(
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
 
-    let user = db
-        .get_user(&user_id)
-        .await
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let user = db.get_user(&user_id).await.map_err(|e| {
+        tracing::error!("{e}");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
     Ok(Json(user))
 }
