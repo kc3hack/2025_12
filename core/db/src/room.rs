@@ -2,12 +2,12 @@ use crate::DB;
 use sqlx::types::chrono::{DateTime, Utc};
 
 impl DB {
-    pub async fn add_room(&mut self, user: models::Room) -> Result<(), sqlx::Error> {
-        let id = user.id;
-        let creator_id = user.creator_id;
-        let url = user.url;
-        let expired_at = user.expired_at;
-        let created_at = user.created_at;
+    pub async fn add_room(&mut self, room: models::Room) -> Result<(), sqlx::Error> {
+        let id = room.id;
+        let creator_id = room.creator_id;
+        let url = room.url;
+        let expired_at = room.expired_at;
+        let created_at = room.created_at;
 
         let query = sqlx::query!(
             "INSERT INTO rooms (id, creator_id, url, expired_at, created_at) VALUES (?, ?, ?, ?, ?)",
