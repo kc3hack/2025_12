@@ -1,0 +1,26 @@
+.friends_container {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+
+    .item_container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: center;
+        margin: 15px;
+    }
+
+
+}
+
+.circle {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: skyblue;
+    text-align: center;
+    line-height: 80px;
+}

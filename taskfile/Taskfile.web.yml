@@ -16,6 +16,14 @@ tasks:
     desc: Install dependencies
     cmd: "{{.DOPPLER_CMD}} pnpm install --frozen-lockfile"
 
+  add:
+    desc: Add library to web
+    cmd: pnpm add {{.CLI_ARGS}}
+
+  remove:
+    desc: Remove library to web
+    cmd: pnpm uninstall {{.CLI_ARGS}}
+
   format:
     desc: Run format
     cmd: "{{.DOPPLER_CMD}} pnpm biome format"
