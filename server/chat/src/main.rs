@@ -1,6 +1,7 @@
 mod api;
 mod clerk;
 mod webhook;
+mod websocket;
 
 use api::user::{get_user, get_user_me};
 use axum::{
@@ -9,23 +10,43 @@ use axum::{
 };
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
-use std::{env, sync::Arc, time::Duration};
-use tokio::sync::Mutex;
+use models::Room;
+use std::{collections::HashMap, env, sync::Arc, time::Duration};
+use tokio::sync::{broadcast, Mutex};
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
+use websocket::{websocket_handler, EventFromServer};
 
 #[derive(Debug)]
 struct AppState {
     db: Mutex<DB>,
+    room_tx: Mutex<HashMap<String, broadcast::Sender<EventFromServer>>>,
 }
 
 impl AppState {
     fn new(db: DB) -> Arc<Self> {
         let mutex_db = Mutex::new(db);
-        let app_state = AppState { db: mutex_db };
+        let app_state = AppState {
+            db: mutex_db,
+            room_tx: Mutex::new(HashMap::new()),
+        };
         Arc::new(app_state)
+    }
+
+    async fn join(&self, room_id: &str) -> Result<Room, ()> {
+        let mut room_tx = self.room_tx.lock().await;
+
+        let db = self.db.lock().await;
+        let room = db.get_room(room_id).await.unwrap();
+
+        if !room_tx.contains_key(room_id) {
+            let (tx, _rx) = broadcast::channel(100);
+            room_tx.insert(room.id.clone(), tx);
+        }
+
+        Ok(room)
     }
 }
 
@@ -58,6 +79,7 @@ async fn main() {
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
+        .route("/websocket/{room_id}", get(websocket_handler))
         .layer(Extension(clerk))
         .with_state(app_state);
 

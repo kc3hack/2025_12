@@ -1,6 +1,5 @@
-use models::MessageUpdate;
-
 use crate::DB;
+use models::MessageUpdate;
 
 impl DB {
     pub async fn add_message(&mut self, message: models::Message) -> Result<(), sqlx::Error> {
