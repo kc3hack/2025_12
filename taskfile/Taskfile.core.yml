@@ -3,13 +3,13 @@ silent: true
 
 tasks:
   default:
-    desc: List for server
-    cmd: "task -l | grep server:"
+    desc: List for core
+    cmd: "task -l | grep core:"
 
   dev:
-    desc: Start backend server
+    desc: Start core server
     cmd: "{{.DOPPLER_CMD}} cargo run"
 
   test:
-    desc: Run server test
+    desc: Run core test
     cmd: "{{.DOPPLER_CMD}} cargo test --workspace"

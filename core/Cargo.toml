@@ -3,7 +3,7 @@ members = ["chat", "db", "models"]
 default-members = ["chat"]
 
 [workspace.package]
-name = "occha-server"
+name = "occha-core"
 authors = ["Occha Dev"]
 version = "0.1.0"
 edition = "2021"
