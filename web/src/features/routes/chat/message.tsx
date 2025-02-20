@@ -18,6 +18,7 @@ import {
 import { ReplyMessage } from "./message-container";
 import { MessageContent } from "./message-content";
 import { MessageReaction } from "./message-reaction";
+import { MessageAuther } from "./message-author";
 
 type Props = {
   message: Message;
@@ -94,6 +95,7 @@ export const MessageCell = (props: Props) => {
       <ContextMenu>
         <ContextMenuTrigger>
           <div>
+            <MessageAuther messageAuther={props.message.author} />
             <MessageContent message={props.message} />
             <MessageReaction message={props.message} />
           </div>

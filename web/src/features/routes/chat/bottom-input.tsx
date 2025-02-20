@@ -59,8 +59,11 @@ export const BottomInput = memo((props: Props) => {
 
     const yesMessage: Message = {
       id: uuidv4(),
-      author: "50%yesman",
-      content: Math.random() < 0.5 ? "はい" : "いいえ",
+      author: "debugman",
+      content:
+        Math.random() < 0.5
+          ? "はい"
+          : "いえあああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
       is_me: false,
       icon: "https://github.com/shadcn.png",
       reply_to_id: null,
