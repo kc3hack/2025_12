@@ -1,4 +1,5 @@
 import style from "./index.module.scss";
+
 const sampleData = [
   { name: "group1" },
   { name: "group2" },
@@ -34,10 +35,11 @@ const sampleData = [
   { name: "group32" },
   { name: "group33" }
 ];
+
 export const Chat = () => {
   return (
     <div className={style.chat_container}>
-      {sampleData.map((item, index) => (
+      {sampleData.map(item => (
         <div className={style.chat} key={item.name}>
           <p>{item.name}</p>
           <div className={style.icon} key={item.name} />

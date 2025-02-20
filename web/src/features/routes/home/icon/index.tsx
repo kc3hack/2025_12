@@ -1,5 +1,6 @@
 import style from "./index.module.scss";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 const sampleData = [
   { name: "tanaka" },
   { name: "matsuda" },
@@ -9,7 +10,7 @@ const sampleData = [
   { name: "hayasi" }
 ];
 
-const Sample = () => {
+export const Icon = () => {
   return (
     <div className={style.friends_container}>
       {sampleData.map(item => (
@@ -25,13 +26,6 @@ const Sample = () => {
           </div>
         </div>
       ))}
-    </div>
-  );
-};
-export const Friends = () => {
-  return (
-    <div>
-      <Sample />
     </div>
   );
 };
