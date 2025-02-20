@@ -58,7 +58,7 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "debug".into()),
+                .unwrap_or_else(|_| "trace".into()),
         )
         .with(tracing_subscriber::fmt::layer().pretty())
         .init();
@@ -111,7 +111,9 @@ async fn main() {
     ),
     components(schemas(
         models::User,
+        models::Room,
     )),
-    tags((name = "User"))
+    tags((name = "User")),
+    tags((name = "Room"))
 )]
 struct ApiDoc;

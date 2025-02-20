@@ -1,6 +1,22 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
+const Room = z
+  .object({
+    created_at: z.string().datetime({ offset: true }),
+    creator_id: z.union([z.string(), z.null()]).optional(),
+    expired_at: z.union([z.string(), z.null()]).optional(),
+    id: z.string(),
+    url: z.string(),
+  })
+  .passthrough();
+const RoomUpdate = z
+  .object({
+    creator_id: z.union([z.string(), z.null()]),
+    expired_at: z.union([z.string(), z.null()]),
+  })
+  .partial()
+  .passthrough();
 const User = z
   .object({
     created_at: z.string().datetime({ offset: true }),
@@ -11,10 +27,106 @@ const User = z
   .passthrough();
 
 export const schemas = {
+  Room,
+  RoomUpdate,
   User,
 };
 
 const endpoints = makeApi([
+  {
+    method: "post",
+    path: "/rooms",
+    alias: "create_room",
+    description: `ルームを新規作成`,
+    requestFormat: "json",
+    response: Room,
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "delete",
+    path: "/rooms/:room_id",
+    alias: "delete_room",
+    description: `ルームを削除`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "room_id",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "patch",
+    path: "/rooms/:room_id",
+    alias: "update_room",
+    description: `ルームをアップデート`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: RoomUpdate,
+      },
+      {
+        name: "room_id",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: Room,
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
   {
     method: "get",
     path: "/users/:id",
@@ -35,6 +147,16 @@ const endpoints = makeApi([
         description: `User not found`,
         schema: z.void(),
       },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
     ],
   },
   {
@@ -47,13 +169,23 @@ const endpoints = makeApi([
     errors: [
       {
         status: 404,
-        description: `Not found`,
+        description: `User not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
         schema: z.void(),
       },
     ],
   },
   {
-    method: "get",
+    method: "post",
     path: "/webhook/user_deleted",
     alias: "webhook_user_deleted",
     description: `ユーザーがアカウントを削除したときにClerkから呼ばれるWebhook`,
@@ -81,7 +213,7 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
+    method: "post",
     path: "/webhook/user_signup",
     alias: "webhook_user_signup",
     description: `ユーザーがアカウントを登録したときにClerkから呼ばれるWebhook`,
@@ -109,7 +241,7 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
+    method: "post",
     path: "/webhook/user_updated",
     alias: "webhook_user_updated",
     description: `ユーザーがアカウント情報を更新したときにClerkから呼ばれるWebhook`,
