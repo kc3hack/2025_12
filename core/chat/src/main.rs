@@ -102,6 +102,9 @@ async fn main() {
     paths(
         api::user::get_user,
         api::user::get_user_me,
+        api::room::create_room,
+        api::room::delete_room,
+        api::room::update_room,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
         webhook::webhook_user_updated,
