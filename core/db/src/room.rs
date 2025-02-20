@@ -1,5 +1,5 @@
 use crate::DB;
-use sqlx::types::chrono::{DateTime, Utc};
+use models::RoomUpdate;
 
 impl DB {
     pub async fn add_room(&mut self, room: models::Room) -> Result<(), sqlx::Error> {
@@ -34,10 +34,9 @@ impl DB {
     pub async fn update_room(
         &mut self,
         room_id: &str,
-        creator_id: Option<Option<&str>>,
-        expired_at: Option<DateTime<Utc>>,
+        room_update: RoomUpdate,
     ) -> Result<(), sqlx::Error> {
-        if let Some(creator_id) = creator_id {
+        if let Some(creator_id) = room_update.creator_id {
             let query = sqlx::query!(
                 "UPDATE rooms SET creator_id = ? WHERE id = ?",
                 creator_id,
@@ -46,7 +45,7 @@ impl DB {
             self.execute(query).await?;
         }
 
-        if let Some(expired_at) = expired_at {
+        if let Some(expired_at) = room_update.expired_at {
             let query = sqlx::query!(
                 "UPDATE rooms SET expired_at = ? WHERE id = ?",
                 expired_at,
@@ -73,6 +72,7 @@ impl DB {
 #[cfg(test)]
 mod test {
     use super::DB;
+    use models::RoomUpdate;
     use sqlx::{
         types::chrono::{TimeZone, Utc},
         MySqlPool,
@@ -114,11 +114,25 @@ mod test {
     pub async fn update_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
         let date = Utc.with_ymd_and_hms(2021, 1, 1, 0, 0, 0).unwrap();
         let mut db = DB::from_pool(pool);
-        db.update_room("0", None, Some(date)).await?;
+        db.update_room(
+            "0",
+            RoomUpdate {
+                creator_id: None,
+                expired_at: Some(Some(date)),
+            },
+        )
+        .await?;
         let room = db.get_room("0").await?;
         assert_eq!(room.expired_at, Some(date));
 
-        db.update_room("0", Some(None), None).await?;
+        db.update_room(
+            "0",
+            RoomUpdate {
+                creator_id: Some(None),
+                expired_at: None,
+            },
+        )
+        .await?;
         let room = db.get_room("0").await?;
         assert_eq!(room.creator_id, None);
         assert_eq!(room.expired_at, Some(date));
