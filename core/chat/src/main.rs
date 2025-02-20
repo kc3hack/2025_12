@@ -58,7 +58,7 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "debug".into()),
+                .unwrap_or_else(|_| "trace".into()),
         )
         .with(tracing_subscriber::fmt::layer().pretty())
         .init();
@@ -102,13 +102,18 @@ async fn main() {
     paths(
         api::user::get_user,
         api::user::get_user_me,
+        api::room::create_room,
+        api::room::delete_room,
+        api::room::update_room,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
         webhook::webhook_user_updated,
     ),
     components(schemas(
         models::User,
+        models::Room,
     )),
-    tags((name = "User"))
+    tags((name = "User")),
+    tags((name = "Room"))
 )]
 struct ApiDoc;
