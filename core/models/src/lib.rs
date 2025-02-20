@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use utoipa::{PartialSchema, ToSchema};
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema, Debug)]
 pub struct User {
@@ -42,13 +42,22 @@ impl From<clerk_rs::models::User> for User {
     }
 }
 
-#[derive(Clone, sqlx::FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, sqlx::FromRow, Serialize, Deserialize, ToSchema)]
 pub struct Room {
     pub id: String,
     pub creator_id: Option<String>,
     pub url: String,
     pub expired_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct RoomUpdate {
+    #[schema(nullable = true, format = DateTime )]
+    pub creator_id: Option<Option<String>>,
+
+    #[schema(nullable = true, format = DateTime)]
+    pub expired_at: Option<Option<DateTime<Utc>>>,
 }
 
 #[derive(sqlx::FromRow)]

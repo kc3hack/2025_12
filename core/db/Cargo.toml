@@ -13,3 +13,5 @@ sqlx = { version = "0.8.3", features = [
   "migrate",
 ] }
 tokio = { workspace = true, features = ["macros"] }
+http = "1.2.0"
+tracing = "0.1.41"

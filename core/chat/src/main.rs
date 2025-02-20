@@ -3,9 +3,12 @@ mod clerk;
 mod webhook;
 mod websocket;
 
-use api::user::{get_user, get_user_me};
+use api::{
+    room::{create_room, delete_room, update_room},
+    user::{get_user, get_user_me},
+};
 use axum::{
-    routing::{get, post},
+    routing::{delete, get, patch, post},
     Extension, Router,
 };
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
@@ -55,9 +58,9 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| format!("{}=trace", env!("CARGO_CRATE_NAME")).into()),
+                .unwrap_or_else(|_| "debug".into()),
         )
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().pretty())
         .init();
 
     let clerk_secret_key = env::var("CLERK_SECRET_KEY").expect("Clerk secret key not found");
@@ -76,6 +79,9 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
+        .route("/rooms", post(create_room))
+        .route("/rooms/{room_id}", delete(delete_room))
+        .route("/rooms/{room_id}", patch(update_room))
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
@@ -84,9 +90,9 @@ async fn main() {
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3050").await.unwrap();
-    tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    tracing::info!("listening on {}", listener.local_addr().unwrap());
 
-    tracing::debug!("you can see swagger here: http://localhost:3050/swagger-ui",);
+    tracing::info!("you can see swagger here: http://localhost:3050/swagger-ui",);
 
     axum::serve(listener, app).await.unwrap();
 }

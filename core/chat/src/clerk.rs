@@ -46,7 +46,7 @@ fn extract_payload(headers: HeaderMap) -> Result<String, StatusCode> {
 }
 
 #[tracing::instrument(skip_all)]
-pub fn get_user_id(headers: HeaderMap) -> Result<String, StatusCode> {
+pub fn get_authenticated_user_id(headers: HeaderMap) -> Result<String, StatusCode> {
     #[derive(Serialize, Deserialize)]
     struct Claims {
         sub: String,

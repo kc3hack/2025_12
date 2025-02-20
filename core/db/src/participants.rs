@@ -1,10 +1,13 @@
 use crate::DB;
 
 impl DB {
-    pub async fn add_participant(&mut self, user: models::Participant) -> Result<(), sqlx::Error> {
-        let room_id = user.room_id;
-        let user_id = user.user_id;
-        let joined_at = user.joined_at;
+    pub async fn add_participant(
+        &mut self,
+        participant: models::Participant,
+    ) -> Result<(), sqlx::Error> {
+        let room_id = participant.room_id;
+        let user_id = participant.user_id;
+        let joined_at = participant.joined_at;
 
         let query = sqlx::query!(
             "INSERT INTO participants (room_id, user_id, joined_at) VALUES (?, ?, ?)",
