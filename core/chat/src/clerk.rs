@@ -24,54 +24,44 @@ impl VerifiedWebhook {
     }
 }
 
-#[tracing::instrument(skip_all)]
-fn extract_payload(headers: HeaderMap) -> Result<String, StatusCode> {
-    let auth_header = headers
-        .get("authorization")
-        .ok_or(StatusCode::UNAUTHORIZED)?;
-    let auth_str = auth_header.to_str().map_err(|_| StatusCode::UNAUTHORIZED)?;
+pub fn get_bearer_from_header(headers: &HeaderMap) -> Result<&str, ()> {
+    let auth_header = headers.get("authorization").ok_or(())?;
+    let auth_str = auth_header.to_str().map_err(|_| ())?;
 
     if !auth_str.starts_with("Bearer ") {
-        return Err(StatusCode::UNAUTHORIZED);
+        return Err(());
     }
 
-    let token = &auth_str[7..];
+    Ok(&auth_str[7..])
+}
+
+#[tracing::instrument(skip_all)]
+pub fn get_payload_from_token(token: &str) -> Result<String, ()> {
     let parts: Vec<&str> = token.split(".").collect();
 
     if parts.len() != 3 {
-        return Err(StatusCode::UNAUTHORIZED);
+        return Err(());
     }
 
     Ok(parts[1].to_string())
 }
 
 #[tracing::instrument(skip_all)]
-pub fn get_authenticated_user_id(headers: HeaderMap) -> Result<String, StatusCode> {
+pub fn get_authenticated_user_id(payload: String) -> Result<String, ()> {
     #[derive(Serialize, Deserialize)]
     struct Claims {
         sub: String,
     }
-
-    let payload = match extract_payload(headers) {
-        Ok(v) => {
-            tracing::debug!("Got authorized request");
-            v
-        }
-        Err(e) => {
-            tracing::debug!("Got unauthorized request");
-            return Err(e);
-        }
-    };
 
     let bytes = base64::engine::GeneralPurpose::new(
         &base64::alphabet::URL_SAFE,
         base64::engine::general_purpose::NO_PAD,
     )
     .decode(payload)
-    .unwrap();
+    .map_err(|_| ())?;
 
-    let claims: Claims = serde_json::from_str(String::from_utf8(bytes).unwrap().as_str()).unwrap();
-
+    let claims: Claims =
+        serde_json::from_str(String::from_utf8(bytes).unwrap().as_str()).map_err(|_| ())?;
     Ok(claims.sub)
 }
 
@@ -94,4 +84,16 @@ pub fn verify_webhook(
     tracing::debug!("svix verify succeeded");
 
     Ok(VerifiedWebhook { body, headers })
+}
+
+pub trait ExtractPayload {
+    fn extract_payload(&self) -> Result<String, ()>;
+}
+
+impl ExtractPayload for HeaderMap {
+    fn extract_payload(&self) -> Result<String, ()> {
+        let token = get_bearer_from_header(self)?;
+        let payload = get_payload_from_token(token)?;
+        Ok(payload)
+    }
 }

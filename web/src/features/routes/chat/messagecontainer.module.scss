@@ -13,6 +13,24 @@
     padding: 1em;
     margin: 0.5em 0;
 
+    .avatar {
+      margin-right: 1.0em;
+    }
+
+    .message {
+      box-sizing: border-box;
+      padding: 0.7em 1em;
+      line-break: anywhere;
+
+      .message_reply_area {
+        width: 100%;
+        height: auto;
+        text-align: left;
+        background: transparent;
+        border-color: black;
+      }
+    }
+
     &[data-is-me="true"] {
       flex-direction: row-reverse;
       padding-left: 10em;
@@ -49,8 +67,8 @@
 
       .message_reactions {
         display: flex;
-        @include utils.space-x(0.3em);
         flex-direction: row-reverse;
+        @include utils.space-x(0.3em);
 
         .reaction {
           border-radius: 20em;
@@ -58,29 +76,8 @@
       }
     }
 
-
-
     &[data-is-replying="true"] {
       background-color: lightblue;
-    }
-
-
-    .avatar {
-      margin-right: 1.0em;
-    }
-
-    .message {
-      box-sizing: border-box;
-      padding: 0.7em 1em;
-      line-break: anywhere;
-
-      .message_reply_area {
-        width: 100%;
-        height: auto;
-        text-align: left;
-        background: transparent;
-        border-color: black;
-      }
     }
   }
 }
