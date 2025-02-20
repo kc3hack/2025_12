@@ -1,0 +1,14 @@
+.search {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0em 1em;
+
+    .input {
+        width: 20em;
+    }
+
+    .drop {
+        width: 10em;
+    }
+}
