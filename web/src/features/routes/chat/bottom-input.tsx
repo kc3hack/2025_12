@@ -1,8 +1,10 @@
 "use client";
+
+import style from "./footer.module.scss";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
-import style from "./footer.module.scss";
 import type { KeyboardEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Message } from "@/features/message/type";
@@ -11,6 +13,8 @@ import { useAtom } from "jotai";
 import { memo, type RefObject, useEffect, useState } from "react";
 import { ReplyMessage } from "./message-container";
 import { wsAtom } from "@/features/websocket/store";
+import { EventFromServer } from "@/types/EventFromServer";
+import { EventFromClient } from "@/types/EventFromClient";
 
 type Props = {
   replyingMessage: ReplyMessage | null;
@@ -38,10 +42,19 @@ export const BottomInput = memo((props: Props) => {
 
   useEffect(() => {
     ws?.addEventListener("message", e => {
-      const msg = JSON.parse(e.data).Message;
-      if (!msg) {
+      const msg: EventFromServer = JSON.parse(e.data);
+
+      if (msg.type !== "Message") {
         return;
       }
+
+      const event: EventFromClient = {
+        type: "UserMessage",
+        author_name: msg.author_name,
+        author_avatar_url: msg.author_avatar_url,
+        content: msg.content,
+        reply_to_id: null
+      };
 
       const newMessage: Message = {
         id: uuidv4(),
@@ -65,14 +78,15 @@ export const BottomInput = memo((props: Props) => {
       return;
     }
 
-    const message = {
-      type: "Message",
-      author_id: "user_2tFy1XzEZZPKKDK3QTAA224wAO9",
-      author_name: "asdfasdf",
-      content: props.bottomInputRef.current.value
+    const event: EventFromClient = {
+      type: "UserMessage",
+      author_name: "sample user",
+      author_avatar_url: "",
+      content: props.bottomInputRef.current.value,
+      reply_to_id: null
     };
 
-    ws?.send(JSON.stringify(message));
+    ws?.send(JSON.stringify(event));
 
     props.bottomInputRef.current.value = "";
   };

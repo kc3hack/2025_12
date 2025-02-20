@@ -1,6 +1,8 @@
+pub mod websocket;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use utoipa::{PartialSchema, ToSchema};
+use utoipa::ToSchema;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema, Debug)]
 pub struct User {

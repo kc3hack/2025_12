@@ -3,7 +3,7 @@
   "files": {
     "ignore": [
       "./src/components/ui/**/*",
-      "./src/zodios/*"
+      "./src/types/*"
     ],
     "include": [
       "./src/**/*"

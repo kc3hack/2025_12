@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { wsAtom } from "@/features/websocket/store";
 import { useAuth } from "@clerk/nextjs";
+import { EventFromClient } from "@/types/EventFromClient";
 
 const Room = () => {
   const { getToken } = useAuth();
@@ -15,18 +16,23 @@ const Room = () => {
   const replyingToRef = useRef<HTMLDivElement | null>(null);
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(null);
   const bottomInputRef = useRef<HTMLTextAreaElement>(null);
-  const [roomId, setRoomId] = useState("");
+  const [roomId] = useState("");
 
   const [ws] = useAtom(wsAtom);
 
   useEffect(() => {
     ws?.addEventListener("open", async () => {
-      const message = {
+      const token = await getToken();
+      if (!token) {
+        return;
+      }
+
+      const event: EventFromClient = {
         type: "JoinRoom",
-        token: await getToken()
+        token: token
       };
 
-      ws.send(JSON.stringify(message));
+      ws.send(JSON.stringify(event));
     });
 
     return () => {

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, SignInButton, useAuth, UserButton } from "@clerk/nextjs";
-import { apiClient } from "../zodios/apiclient";
+import { apiClient } from "@/lib/apiClient";
 import { MiniChat } from "@/features/mini-chat";
 
 const Home = () => {

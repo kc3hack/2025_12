@@ -48,6 +48,6 @@ tasks:
     desc: Run biome check with --write
     cmd: "{{.DOPPLER_CMD}} pnpm biome check --write"
 
-  zodios-gen:
+  gen-types:
     desc: Generate API
-    cmd: pnpm openapi-zod-client http://localhost:3050/api-docs/openapi.json -o src/zodios/api.ts 
+    cmd: pnpm openapi-zod-client http://localhost:3050/api-docs/openapi.json -o src/types/api.ts 
