@@ -35,7 +35,7 @@ impl DB {
         &mut self,
         room_id: &str,
         room_update: RoomUpdate,
-    ) -> Result<(), sqlx::Error> {
+    ) -> Result<models::Room, sqlx::Error> {
         if let Some(creator_id) = room_update.creator_id {
             let query = sqlx::query!(
                 "UPDATE rooms SET creator_id = ? WHERE id = ?",
@@ -54,7 +54,8 @@ impl DB {
             self.execute(query).await?;
         }
 
-        Ok(())
+        let updated_room = self.get_room(room_id).await?;
+        Ok(updated_room)
     }
 
     pub async fn get_room(&self, room_id: &str) -> Result<models::Room, sqlx::Error> {

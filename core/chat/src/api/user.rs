@@ -4,6 +4,7 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::Json,
 };
+use db::error::IntoStatusCode;
 use std::sync::Arc;
 
 #[axum::debug_handler]
@@ -15,7 +16,9 @@ use std::sync::Arc;
     description = "ログインユーザーの情報を取得",
     responses(
         (status = 200, description = "Found user", body = models::User),
-        (status = 404, description = "Not found")
+        (status = 404, description = "User not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Failed to communicate database"),
     ),
     tag = "User"
 )]
@@ -25,11 +28,7 @@ pub async fn get_user_me(
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
     let user_id = clerk::get_user_id(headers)?;
-
-    let user = db.get_user(&user_id).await.map_err(|e| {
-        tracing::error!("{e}");
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    let user = db.get_user(&user_id).await.into_statuscode()?;
 
     Ok(Json(user))
 }
@@ -43,7 +42,9 @@ pub async fn get_user_me(
     description = "IDからユーザーを取得",
     responses(
         (status = 200, description = "Found user", body = models::User),
-        (status = 404, description = "User not found")
+        (status = 404, description = "User not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Failed to communicate database"),
     ),
     tag = "User"
 )]
@@ -52,11 +53,7 @@ pub async fn get_user(
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
-
-    let user = db.get_user(&user_id).await.map_err(|e| {
-        tracing::error!("{e}");
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    let user = db.get_user(&user_id).await.into_statuscode()?;
 
     Ok(Json(user))
 }

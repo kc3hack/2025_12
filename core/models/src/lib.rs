@@ -51,8 +51,12 @@ pub struct Room {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct RoomUpdate {
+    #[schema(nullable = true, format = DateTime )]
     pub creator_id: Option<Option<String>>,
+
+    #[schema(nullable = true, format = DateTime)]
     pub expired_at: Option<Option<DateTime<Utc>>>,
 }
 

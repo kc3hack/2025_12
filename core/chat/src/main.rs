@@ -3,9 +3,12 @@ mod clerk;
 mod webhook;
 mod websocket;
 
-use api::user::{get_user, get_user_me};
+use api::{
+    room::{create_room, delete_room, update_room},
+    user::{get_user, get_user_me},
+};
 use axum::{
-    routing::{get, post},
+    routing::{delete, get, patch, post},
     Extension, Router,
 };
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
@@ -76,6 +79,9 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
+        .route("/rooms", post(create_room))
+        .route("/rooms/{room_id}", delete(delete_room))
+        .route("/rooms/{room_id}", patch(update_room))
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
