@@ -443,6 +443,7 @@ dependencies = [
  "models",
  "sqlx",
  "tokio",
+ "tracing",
 ]
 
 [[package]]

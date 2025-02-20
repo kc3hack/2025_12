@@ -58,9 +58,9 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| format!("{}=trace", env!("CARGO_CRATE_NAME")).into()),
+                .unwrap_or_else(|_| "debug".into()),
         )
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().pretty())
         .init();
 
     let clerk_secret_key = env::var("CLERK_SECRET_KEY").expect("Clerk secret key not found");
@@ -90,9 +90,9 @@ async fn main() {
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3050").await.unwrap();
-    tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    tracing::info!("listening on {}", listener.local_addr().unwrap());
 
-    tracing::debug!("you can see swagger here: http://localhost:3050/swagger-ui",);
+    tracing::info!("you can see swagger here: http://localhost:3050/swagger-ui",);
 
     axum::serve(listener, app).await.unwrap();
 }

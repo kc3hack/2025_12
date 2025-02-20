@@ -39,17 +39,7 @@ impl DB {
 
     pub async fn from_option(option: DBOption) -> Self {
         let db_url = std::env::var("DATABASE_URL").expect("Failed to get URL");
-        let pool = MySqlPoolOptions::new()
-            .max_connections(option.max_connections)
-            .acquire_timeout(option.acquire_timeout)
-            .connect(&db_url)
-            .await
-            .expect("Cannot connect to database");
-
-        DB {
-            pool,
-            transaction: None,
-        }
+        DB::new(&db_url, option).await
     }
 
     pub fn from_pool(pool: MySqlPool) -> Self {

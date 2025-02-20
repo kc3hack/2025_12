@@ -8,6 +8,7 @@ use chrono::Utc;
 use db::error::IntoStatusCode;
 use models::RoomUpdate;
 use std::sync::Arc;
+use uuid::Uuid;
 
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers))]
@@ -30,13 +31,12 @@ pub async fn create_room(
 ) -> Result<(StatusCode, HeaderMap, Json<models::Room>), StatusCode> {
     let mut db = state.db.lock().await;
     let user_id = clerk::get_authenticated_user_id(headers)?;
-    // let room_id = Uuid::new_v4().to_string();
-    let room_id = "0".to_owned();
+    let room_id = Uuid::new_v4().to_string();
 
     let new_room = models::Room {
         id: room_id.clone(),
         creator_id: Some(user_id),
-        url: "".to_owned(),
+        url: format!("/{room_id}"),
         expired_at: None,
         created_at: Utc::now(),
     };
@@ -45,6 +45,8 @@ pub async fn create_room(
 
     let mut response_headers = HeaderMap::new();
     response_headers.insert("Location", format!("/rooms/{}", room_id).parse().unwrap());
+
+    tracing::info!("Room created with ID: {}", room_id);
 
     Ok((StatusCode::CREATED, response_headers, Json(new_room)))
 }
@@ -73,6 +75,8 @@ pub async fn delete_room(
 
     let mut db = state.db.lock().await;
     db.remove_room(&room_id).await.into_statuscode()?;
+
+    tracing::info!("Room deleted with ID: {}", room_id);
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -112,6 +116,8 @@ pub async fn update_room(
         .update_room(&room_id, room_update)
         .await
         .into_statuscode()?;
+
+    tracing::info!("Room updated with ID: {}", room_id);
 
     Ok(Json(updated_room))
 }
