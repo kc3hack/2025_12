@@ -8,8 +8,9 @@ import { v4 as uuidv4 } from "uuid";
 import type { Message } from "@/features/message/type";
 import { messagesAtom } from "@/features/message/store";
 import { useAtom } from "jotai";
-import { memo, type RefObject, useState } from "react";
+import { memo, type RefObject, useEffect, useState } from "react";
 import { ReplyMessage } from "./message-container";
+import { wsAtom } from "@/features/websocket/store";
 
 type Props = {
   replyingMessage: ReplyMessage | null;
@@ -22,6 +23,8 @@ export const BottomInput = memo((props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
   const [isComposing, setIsComposing] = useState(false);
 
+  const [ws] = useAtom(wsAtom);
+
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.shiftKey) {
       return;
@@ -33,6 +36,26 @@ export const BottomInput = memo((props: Props) => {
     }
   };
 
+  useEffect(() => {
+    ws?.addEventListener("message", e => {
+      const msg = JSON.parse(e.data).Message;
+      if (!msg) {
+        return;
+      }
+
+      const newMessage: Message = {
+        id: uuidv4(),
+        author: msg.author_name,
+        content: msg.content,
+        is_me: true,
+        icon: null,
+        reply_to_id: null,
+        reactions: null
+      };
+      setMessages([...messages, newMessage]);
+    });
+  }, [ws, messages, setMessages]);
+
   const handleSubmit = () => {
     if (!props.bottomInputRef.current) {
       return;
@@ -42,34 +65,16 @@ export const BottomInput = memo((props: Props) => {
       return;
     }
 
-    const newMessage: Message = {
-      id: uuidv4(),
-      author: "小生",
-      content: props.bottomInputRef.current.value,
-      is_me: true,
-      icon: null, //自分のアイコンに変更して
-      reply_to_id: props.replyingMessage ? props.replyingMessage.id : null,
-      reactions: null
+    const message = {
+      type: "Message",
+      author_id: "user_2tFy1XzEZZPKKDK3QTAA224wAO9",
+      author_name: "asdfasdf",
+      content: props.bottomInputRef.current.value
     };
+
+    ws?.send(JSON.stringify(message));
 
     props.bottomInputRef.current.value = "";
-    setTimeout(() => {
-      props.latestMessagePositionRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 0);
-
-    const yesMessage: Message = {
-      id: uuidv4(),
-      author: "50%yesman",
-      content: Math.random() < 0.5 ? "はい" : "いいえ",
-      is_me: false,
-      icon: "https://github.com/shadcn.png",
-      reply_to_id: null,
-      reactions: null
-    };
-
-    props.setReplyingMessage(null);
-
-    setMessages([...messages, newMessage, yesMessage]);
   };
 
   return (

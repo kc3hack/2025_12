@@ -1,4 +1,7 @@
-use crate::{clerk, AppState};
+use crate::{
+    clerk::{self, ExtractPayload},
+    AppState,
+};
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, StatusCode},
@@ -30,7 +33,11 @@ pub async fn create_room(
     headers: HeaderMap,
 ) -> Result<(StatusCode, HeaderMap, Json<models::Room>), StatusCode> {
     let mut db = state.db.lock().await;
-    let user_id = clerk::get_authenticated_user_id(headers)?;
+    let payload = headers
+        .extract_payload()
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let user_id =
+        clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
     let room_id = Uuid::new_v4().to_string();
 
     let new_room = models::Room {
@@ -71,7 +78,10 @@ pub async fn delete_room(
     Path(room_id): Path<String>,
     headers: HeaderMap,
 ) -> Result<StatusCode, StatusCode> {
-    let _ = clerk::get_authenticated_user_id(headers)?;
+    let payload = headers
+        .extract_payload()
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let _ = clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
 
     let mut db = state.db.lock().await;
     db.remove_room(&room_id).await.into_statuscode()?;
@@ -101,15 +111,18 @@ pub async fn update_room(
     State(state): State<Arc<AppState>>,
     Path(room_id): Path<String>,
     headers: HeaderMap,
-    Json(payload): Json<RoomUpdate>,
+    Json(room_update): Json<RoomUpdate>,
 ) -> Result<Json<models::Room>, StatusCode> {
-    let _ = clerk::get_authenticated_user_id(headers)?;
+    let payload = headers
+        .extract_payload()
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let _ = clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
 
     let mut db = state.db.lock().await;
 
     let room_update = RoomUpdate {
-        creator_id: payload.creator_id.clone(),
-        expired_at: payload.expired_at,
+        creator_id: room_update.creator_id.clone(),
+        expired_at: room_update.expired_at,
     };
 
     let updated_room = db

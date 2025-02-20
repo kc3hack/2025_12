@@ -1,0 +1,58 @@
+"use client";
+
+import style from "@routes/chat/index.module.scss";
+
+import { Footer } from "@/features/routes/chat/footer";
+import { MessageContainer, ReplyMessage } from "@/features/routes/chat/message-container";
+import { useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import { wsAtom } from "@/features/websocket/store";
+import { useAuth } from "@clerk/nextjs";
+
+const Room = () => {
+  const { getToken } = useAuth();
+  const latestMessagePositionRef = useRef<HTMLDivElement>(null);
+  const replyingToRef = useRef<HTMLDivElement | null>(null);
+  const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(null);
+  const bottomInputRef = useRef<HTMLTextAreaElement>(null);
+  const [roomId, setRoomId] = useState("");
+
+  const [ws] = useAtom(wsAtom);
+
+  useEffect(() => {
+    ws?.addEventListener("open", async () => {
+      const message = {
+        type: "JoinRoom",
+        token: await getToken()
+      };
+
+      ws.send(JSON.stringify(message));
+    });
+
+    return () => {
+      ws?.close();
+    };
+  }, [ws, getToken]);
+
+  return (
+    <div className={style.home_page}>
+      <p>{roomId ? roomId : "joining room..."}</p>
+      <MessageContainer
+        bottomInputRef={bottomInputRef}
+        latestMessagePositionRef={latestMessagePositionRef}
+        replyingToRef={replyingToRef}
+        replyingMessage={replyingMessage}
+        setReplyingMessage={setReplyingMessage}
+      />
+      <Footer
+        bottomInputRef={bottomInputRef}
+        latestMessagePositionRef={latestMessagePositionRef}
+        replyingToRef={replyingToRef}
+        replyingMessage={replyingMessage}
+        setReplyingMessage={setReplyingMessage}
+      />
+    </div>
+  );
+};
+
+export default Room;
