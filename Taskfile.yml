@@ -63,6 +63,14 @@ tasks:
       - task: web:dev
       - task: server:dev
 
+  add:
+    deps:
+      - task: web:add
+
+  remove:
+    deps:
+      - task: web:remove
+
   install:
     desc: Install dependencies
     deps:
