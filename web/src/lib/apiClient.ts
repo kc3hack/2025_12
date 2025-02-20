@@ -1,4 +1,4 @@
-import { createApiClient } from "./api";
+import { createApiClient } from "@/types/api";
 
 export const apiClient = createApiClient(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}`, {
   axiosConfig: {

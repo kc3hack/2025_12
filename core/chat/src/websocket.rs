@@ -14,50 +14,9 @@ use futures::{
     stream::{SplitSink, SplitStream},
     SinkExt as _, StreamExt as _,
 };
-use serde::{Deserialize, Serialize};
+use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessage};
 use std::sync::Arc;
 use uuid::Uuid;
-
-#[derive(Debug, Deserialize)]
-#[serde(tag = "type", rename_all = "PascalCase")]
-enum EventFromClient {
-    Message(MessageFromClient),
-    JoinRoom { token: String },
-    AddReaction,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct MessageFromClient {
-    author_name: String,
-    content: String,
-    reply_to_id: Option<String>,
-}
-
-#[derive(Clone, Serialize)]
-pub enum EventFromServer {
-    Message(MessageFromServer),
-    JoinedRoom(models::Room),
-    FailedToJoinRoom { message: String },
-    AddReaction,
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-struct MessageFromServer {
-    author_name: String,
-    author_avatar_url: String,
-    content: String,
-}
-
-impl EventFromServer {
-    async fn send(
-        self,
-        sender: &mut SplitSink<WebSocket, ws::Message>,
-    ) -> Result<(), serde_json::Error> {
-        let event = serde_json::to_string(&self)?;
-        let _ = sender.send(ws::Message::text(event)).await;
-        Ok(())
-    }
-}
 
 pub async fn websocket_handler(
     ws: WebSocketUpgrade,
@@ -113,7 +72,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
         }
     };
 
-    EventFromServer::JoinedRoom(room)
+    EventFromServer::JoinedRoom(WSRoom { id: room.id })
         .send(&mut sender)
         .await
         .unwrap();
@@ -136,7 +95,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
             // WARN: Do not log FailedToJoinRoom events. It includes user's token;
 
             match event {
-                EventFromClient::Message(msg) => {
+                EventFromClient::UserMessage(msg) => {
                     let mut db = state_cloned.db.lock().await;
                     let message_id = Uuid::new_v4().to_string();
                     db.add_message(models::Message {
@@ -150,10 +109,11 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                     .await
                     .unwrap();
 
-                    let event_from_server = EventFromServer::Message(MessageFromServer {
+                    let event_from_server = EventFromServer::Message(WSUserMessage {
                         author_name: msg.author_name.clone(),
                         author_avatar_url: "".to_owned(), // TODO: Set avatar url
                         content: msg.content.clone(),
+                        reply_to_id: None,
                     });
 
                     let room_tx = state_cloned.room_tx.lock().await;
