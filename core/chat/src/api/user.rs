@@ -23,11 +23,11 @@ use std::sync::Arc;
     tag = "User"
 )]
 pub async fn get_user_me(
-    State(state): State<Arc<AppState>>,
     headers: HeaderMap,
+    State(state): State<Arc<AppState>>,
 ) -> Result<Json<models::User>, StatusCode> {
     let db = state.db.lock().await;
-    let user_id = clerk::get_user_id(headers)?;
+    let user_id = clerk::get_authenticated_user_id(headers)?;
     let user = db.get_user(&user_id).await.into_statuscode()?;
 
     Ok(Json(user))
@@ -49,9 +49,11 @@ pub async fn get_user_me(
     tag = "User"
 )]
 pub async fn get_user(
+    headers: HeaderMap,
     Path(user_id): Path<String>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<models::User>, StatusCode> {
+    let _ = clerk::get_authenticated_user_id(headers)?;
     let db = state.db.lock().await;
     let user = db.get_user(&user_id).await.into_statuscode()?;
 

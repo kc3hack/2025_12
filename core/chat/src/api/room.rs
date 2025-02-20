@@ -29,7 +29,7 @@ pub async fn create_room(
     headers: HeaderMap,
 ) -> Result<(StatusCode, HeaderMap, Json<models::Room>), StatusCode> {
     let mut db = state.db.lock().await;
-    let user_id = clerk::get_user_id(headers)?;
+    let user_id = clerk::get_authenticated_user_id(headers)?;
     // let room_id = Uuid::new_v4().to_string();
     let room_id = "0".to_owned();
 
@@ -69,7 +69,7 @@ pub async fn delete_room(
     Path(room_id): Path<String>,
     headers: HeaderMap,
 ) -> Result<StatusCode, StatusCode> {
-    let _ = clerk::get_user_id(headers)?;
+    let _ = clerk::get_authenticated_user_id(headers)?;
 
     let mut db = state.db.lock().await;
     db.remove_room(&room_id).await.into_statuscode()?;
@@ -99,7 +99,7 @@ pub async fn update_room(
     headers: HeaderMap,
     Json(payload): Json<RoomUpdate>,
 ) -> Result<Json<models::Room>, StatusCode> {
-    let _ = clerk::get_user_id(headers)?;
+    let _ = clerk::get_authenticated_user_id(headers)?;
 
     let mut db = state.db.lock().await;
 
