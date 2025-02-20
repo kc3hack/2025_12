@@ -1,13 +1,13 @@
-"use client"
-import { Chat } from "@/features/routes/home/groups";
-import { Friends } from "@/features/routes/home/header";
-import {  Searchinput } from "@/features/routes/home/search";
+"use client";
+import { Chat } from "@/features/routes/home/chat";
+import { Icon } from "@/features/routes/home/icon";
+import { Searchinput } from "@/features/routes/home/search";
 
 const home = () => {
   return (
     <div>
-      <Friends />
-      <Searchinput/>
+      <Icon />
+      <Searchinput />
       <Chat />
     </div>
   );
