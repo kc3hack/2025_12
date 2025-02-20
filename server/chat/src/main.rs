@@ -79,7 +79,7 @@ async fn main() {
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
-        .route("/websocket/:room_id", get(websocket_handler))
+        .route("/websocket/{room_id}", get(websocket_handler))
         .layer(Extension(clerk))
         .with_state(app_state);
 
