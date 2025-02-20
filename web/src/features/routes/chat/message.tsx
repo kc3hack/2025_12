@@ -4,15 +4,20 @@ import { messagesAtom } from "../../message/store";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Message } from "@/features/message/type";
+import { Message, Reaction } from "@/features/message/type";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
   ContextMenuTrigger
 } from "@/components/ui/context-menu";
 import { ReplyMessage } from "./message-container";
-import { ReplyMessagePosition } from "./reply-message";
+import { MessageContent } from "./message-content";
+import { MessageReaction } from "./message-reaction";
 
 type Props = {
   message: Message;
@@ -22,6 +27,8 @@ type Props = {
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
+
+const reactionList = [":App1e:", ":Smile:", ":Money:"];
 
 export const MessageCell = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
@@ -47,6 +54,29 @@ export const MessageCell = (props: Props) => {
     }
   };
 
+  const addReaction = (reactionName: string) => {
+    setMessages(prevMessages =>
+      prevMessages.map(msg => {
+        if (msg.id === props.message.id) {
+          const existingReactionIndex = (msg.reactions || []).findIndex(
+            r => r.reaction_name === reactionName
+          );
+          let newReactions: Reaction[] = [];
+
+          if (existingReactionIndex >= 0) {
+            newReactions = (msg.reactions || []).map((r, index) =>
+              index === existingReactionIndex ? { ...r, count: r.count + 1 } : r
+            );
+          } else {
+            newReactions = [...(msg.reactions || []), { reaction_name: reactionName, count: 1 }];
+          }
+          return { ...msg, reactions: newReactions };
+        }
+        return msg;
+      })
+    );
+  };
+
   return (
     <div
       id={`message-${props.message.id}`}
@@ -61,10 +91,12 @@ export const MessageCell = (props: Props) => {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       )}
-
       <ContextMenu>
         <ContextMenuTrigger>
-          <ReplyMessagePosition message={props.message} />
+          <div>
+            <MessageContent message={props.message} />
+            <MessageReaction message={props.message} />
+          </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
@@ -75,6 +107,18 @@ export const MessageCell = (props: Props) => {
           >
             返信
           </ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>リアクションをつける</ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-48">
+              {reactionList.map(reaction => (
+                <ContextMenuItem key={reaction} onClick={() => addReaction(reaction)}>
+                  {reaction}
+                </ContextMenuItem>
+              ))}
+              <ContextMenuSeparator />
+              <ContextMenuItem>すべての絵文字を表示</ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
         </ContextMenuContent>
       </ContextMenu>
     </div>

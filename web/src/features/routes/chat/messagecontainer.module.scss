@@ -1,3 +1,5 @@
+@use "@/style/utils";
+
 .message_container {
   display: flex;
   flex-direction: column;
@@ -7,7 +9,6 @@
 
   .message_wrapper {
     display: flex;
-    align-items: center;
     width: 100%;
     padding: 1em;
     margin: 0.5em 0;
@@ -16,24 +17,48 @@
       flex-direction: row-reverse;
       padding-left: 10em;
       margin-left: auto;
+      text-align: right;
 
       .message {
+        display: inline-block;
+        margin-bottom: 0.3em;
         background-color: #ffc0cb;
         border-radius: 1em 1em 0.4em 1em;
       }
-    }
 
+      .message_reactions {
+        display: flex;
+        @include utils.space-x(0.3em);
+
+        .reaction {
+          border-radius: 20em;
+        }
+      }
+    }
 
     &[data-is-me="false"] {
       padding-right: 10em;
       margin-right: auto;
 
       .message {
+        display: inline-block;
+        margin-bottom: 0.3em;
         background-color: #e2e8f0;
         border-radius: 1em 1em 1em 0.4em;
+      }
 
+      .message_reactions {
+        display: flex;
+        @include utils.space-x(0.3em);
+        flex-direction: row-reverse;
+
+        .reaction {
+          border-radius: 20em;
+        }
       }
     }
+
+
 
     &[data-is-replying="true"] {
       background-color: lightblue;
@@ -50,6 +75,7 @@
       line-break: anywhere;
 
       .message_reply_area {
+        width: 100%;
         height: auto;
         text-align: left;
         background: transparent;

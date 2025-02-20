@@ -4,17 +4,18 @@ import { Message } from "@/features/message/type";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
+import { useCallback } from "react";
 
 type Props = {
   message: Message;
 };
 
-export const ReplyMessagePosition = (props: Props) => {
+export const MessageContent = (props: Props) => {
   const [messages] = useAtom(messagesAtom);
 
   const replyMesage = messages.find(replyMessage => replyMessage.id === props.message.reply_to_id);
 
-  const scrollToMessage = (id: string | null) => {
+  const scrollToMessage = useCallback((id: string | null) => {
     const element = document.getElementById(`message-${id}`);
 
     if (element) {
@@ -24,11 +25,15 @@ export const ReplyMessagePosition = (props: Props) => {
       });
 
       element.classList.add(style.highlight);
-      setTimeout(() => {
+
+      const handleAnimationEnd = () => {
         element.classList.remove(style.highlight);
-      }, 1000);
+        element.removeEventListener("animationend", handleAnimationEnd);
+      };
+
+      element.addEventListener("animationend", handleAnimationEnd);
     }
-  };
+  }, []);
 
   return (
     <div className={style.message}>
