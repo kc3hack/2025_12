@@ -48,7 +48,8 @@ export const BottomInput = memo((props: Props) => {
       content: props.bottomInputRef.current.value,
       is_me: true,
       icon: null, //自分のアイコンに変更して
-      reply_to_id: props.replyingMessage ? props.replyingMessage.id : null
+      reply_to_id: props.replyingMessage ? props.replyingMessage.id : null,
+      reactions: null
     };
 
     props.bottomInputRef.current.value = "";
@@ -62,7 +63,8 @@ export const BottomInput = memo((props: Props) => {
       content: Math.random() < 0.5 ? "はい" : "いいえ",
       is_me: false,
       icon: "https://github.com/shadcn.png",
-      reply_to_id: null
+      reply_to_id: null,
+      reactions: null
     };
 
     props.setReplyingMessage(null);
