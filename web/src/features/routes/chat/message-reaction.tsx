@@ -4,13 +4,14 @@ import { Message, Reaction } from "@/features/message/type";
 import { Button } from "@/components/ui/button";
 import { messagesAtom } from "@/features/message/store";
 import { useAtom } from "jotai";
+import { memo } from "react";
 
 type Props = {
   message: Message;
 };
 
-export const MessageReaction = (props: Props) => {
-  if (!props.message || !props.message.reactions || props.message.reactions.length === 0) {
+export const MessageReaction = memo((props: Props) => {
+  if (!props.message.reactions || props.message.reactions.length === 0) {
     return null;
   }
 
@@ -50,4 +51,4 @@ export const MessageReaction = (props: Props) => {
       ))}
     </div>
   );
-};
+});

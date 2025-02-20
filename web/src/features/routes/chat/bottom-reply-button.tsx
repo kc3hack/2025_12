@@ -1,6 +1,7 @@
 import style from "./footer.module.scss";
 import { type RefObject } from "react";
 import { ReplyMessage } from "./message-container";
+import { memo } from "react";
 
 type Props = {
   replyingToRef: RefObject<HTMLDivElement | null>;
@@ -8,7 +9,7 @@ type Props = {
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
-export const BottomReplyButton = (props: Props) => {
+export const BottomReplyButton = memo((props: Props) => {
   const scrollReply = () => {
     props.replyingToRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
@@ -23,4 +24,4 @@ export const BottomReplyButton = (props: Props) => {
       </button>
     </div>
   );
-};
+});

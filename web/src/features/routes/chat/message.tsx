@@ -1,5 +1,5 @@
 "use client";
-import { type RefObject } from "react";
+import { type RefObject, useState, useCallback } from "react";
 import { messagesAtom } from "../../message/store";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
@@ -18,6 +18,7 @@ import {
 import { ReplyMessage } from "./message-container";
 import { MessageContent } from "./message-content";
 import { MessageReaction } from "./message-reaction";
+import { memo } from "react";
 
 type Props = {
   message: Message;
@@ -30,11 +31,12 @@ type Props = {
 
 const reactionList = [":App1e:", ":Smile:", ":Money:"];
 
-export const MessageCell = (props: Props) => {
+export const MessageCell = memo((props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null); // 編集中のメッセージの ID を管理
 
   const deleteMessage = (id: string) => {
-    if (id === props.replyingMessage?.id) {
+    if (props.replyingMessage?.id === id) {
       props.setReplyingMessage(null);
     }
     setMessages(messages.filter(message => message.id !== id));
@@ -68,13 +70,33 @@ export const MessageCell = (props: Props) => {
               index === existingReactionIndex ? { ...r, count: r.count + 1 } : r
             );
           } else {
-            newReactions = [...(msg.reactions || []), { reaction_name: reactionName, count: 1 }];
+            newReactions = [{ reaction_name: reactionName, count: 1 }, ...(msg.reactions || [])];
           }
           return { ...msg, reactions: newReactions };
         }
         return msg;
       })
     );
+  };
+
+  const changeMessage = (id: string) => {
+    setEditingMessageId(id); // 編集モードにする
+  };
+
+  const handleContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newContent = event.target.value;
+    setMessages(prevMessages =>
+      prevMessages.map(msg => {
+        if (msg.id === props.message.id) {
+          return { ...msg, content: newContent }; // content を更新
+        }
+        return msg;
+      })
+    );
+  };
+
+  const handleSave = () => {
+    setEditingMessageId(null); // 編集モードを解除
   };
 
   return (
@@ -94,11 +116,21 @@ export const MessageCell = (props: Props) => {
       <ContextMenu>
         <ContextMenuTrigger>
           <div>
-            <MessageContent message={props.message} />
+            {editingMessageId === props.message.id ? ( // 編集モードかどうかで表示を切り替え
+              <div>
+                <input type="text" value={props.message.content} onChange={handleContentChange} />
+                <button type="button" onClick={handleSave}>
+                  保存
+                </button>
+              </div>
+            ) : (
+              <MessageContent message={props.message} />
+            )}
             <MessageReaction message={props.message} />
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
+          <ContextMenuItem onClick={() => changeMessage(props.message.id)}>編集</ContextMenuItem>
           <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
           <ContextMenuItem
             onClick={() =>
@@ -123,4 +155,4 @@ export const MessageCell = (props: Props) => {
       </ContextMenu>
     </div>
   );
-};
+});

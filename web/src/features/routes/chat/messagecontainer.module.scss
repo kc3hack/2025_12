@@ -49,8 +49,8 @@
 
       .message_reactions {
         display: flex;
-        @include utils.space-x(0.3em);
         flex-direction: row-reverse;
+        @include utils.space-x(0.3em);
 
         .reaction {
           border-radius: 20em;

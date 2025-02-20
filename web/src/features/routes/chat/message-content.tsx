@@ -5,12 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAtom } from "jotai";
 import style from "./messagecontainer.module.scss";
 import { useCallback } from "react";
+import { memo } from "react";
 
 type Props = {
   message: Message;
 };
 
-export const MessageContent = (props: Props) => {
+export const MessageContent = memo((props: Props) => {
   const [messages] = useAtom(messagesAtom);
 
   const replyMesage = messages.find(replyMessage => replyMessage.id === props.message.reply_to_id);
@@ -64,4 +65,4 @@ export const MessageContent = (props: Props) => {
       <p>{props.message.content}</p>
     </div>
   );
-};
+});
