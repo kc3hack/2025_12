@@ -5,7 +5,6 @@ mod websocket;
 
 use api::user::{get_user, get_user_me};
 use axum::{
-    extract::ws::Utf8Bytes,
     routing::{get, post},
     Extension, Router,
 };
@@ -18,12 +17,12 @@ use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
-use websocket::websocket_handler;
+use websocket::{websocket_handler, EventFromServer};
 
 #[derive(Debug)]
 struct AppState {
     db: Mutex<DB>,
-    room_tx: Mutex<HashMap<String, broadcast::Sender<Utf8Bytes>>>,
+    room_tx: Mutex<HashMap<String, broadcast::Sender<EventFromServer>>>,
 }
 
 impl AppState {

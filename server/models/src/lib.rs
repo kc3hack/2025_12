@@ -8,6 +8,7 @@ pub struct User {
     pub nickname: Option<String>,
     pub introduction: Option<String>,
     pub created_at: DateTime<Utc>,
+    // TODO: Add avatar_url
 }
 
 #[derive(Default)]
@@ -41,7 +42,7 @@ impl From<clerk_rs::models::User> for User {
     }
 }
 
-#[derive(sqlx::FromRow, Serialize, Deserialize)]
+#[derive(Clone, sqlx::FromRow, Serialize, Deserialize)]
 pub struct Room {
     pub id: String,
     pub creator_id: Option<String>,

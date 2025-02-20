@@ -24,14 +24,14 @@ struct MessageFromClient {
     reply_to_id: Option<String>,
 }
 
-#[derive(Serialize)]
-enum EventFromServer {
+#[derive(Clone, Serialize)]
+pub enum EventFromServer {
     Message(MessageFromServer),
     JoinedRoom(models::Room),
     AddReaction,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 struct MessageFromServer {
     author_name: String,
     author_avatar_url: String,
@@ -57,6 +57,7 @@ pub async fn websocket_handler(
     ws.on_upgrade(|socket| websocket(socket, state, room_id))
 }
 
+// TODO: Handling errors without unwrap
 async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     let (mut sender, mut receiver) = stream.split();
 
@@ -80,7 +81,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                 EventFromClient::Message(msg) => {
                     let mut db = state_cloned.db.lock().await;
                     db.add_message(models::Message {
-                        id: "".to_owned(),
+                        id: "".to_owned(), // TODO: Generate Message id
                         room_id: room_id_clone.clone(),
                         user_id: Some(msg.author.id.clone()),
                         content: msg.content.clone(),
@@ -90,8 +91,13 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                     .await
                     .unwrap();
 
-                    let msg = serde_json::to_string(&msg).unwrap();
-                    let _ = tx.send(msg.into());
+                    let event_from_server = EventFromServer::Message(MessageFromServer {
+                        author_name: msg.author.nickname.unwrap_or_default(),
+                        author_avatar_url: "".to_owned(), // TODO: Set avatar url
+                        content: msg.content,
+                    });
+
+                    let _ = tx.send(event_from_server);
                 }
 
                 EventFromClient::AddReaction => {}
@@ -105,8 +111,8 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     let mut rx = tx.subscribe();
 
     let mut send_task = tokio::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
-            let _ = sender.send(ws::Message::Text(msg)).await;
+        while let Ok(event_from_server) = rx.recv().await {
+            let _ = event_from_server.send(&mut sender).await;
         }
     });
 
