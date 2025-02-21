@@ -1,4 +1,3 @@
-import style from "./index.module.scss";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,14 +10,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { roomsAtom } from "@/features/room/store";
+import { RoomType } from "@/features/room/type";
 import { apiClient } from "@/lib/apiClient";
-import { useAtom } from "jotai";
 import { useAuth } from "@clerk/nextjs";
+import { useAtom } from "jotai";
 import { useRef, useState } from "react";
+import style from "./index.module.scss";
 
-export const CreateButton = () => {
+type Props = {
+  updateDisplay: (rooms: RoomType[]) => void;
+};
+
+export const CreateButton = ({ updateDisplay }: Props) => {
   const { getToken } = useAuth();
-  const [rooms, setRooms] = useAtom(roomsAtom);
+  const [rooms] = useAtom(roomsAtom);
   const roomNameInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,7 +42,7 @@ export const CreateButton = () => {
         headers: { Authorization: `Bearer ${await getToken()}` }
       }
     );
-    setRooms([...rooms, { id: newRoom.id, name: newRoom.room_name }]);
+    updateDisplay([...rooms, { id: newRoom.id, name: newRoom.room_name }]);
 
     setIsOpen(false);
 
