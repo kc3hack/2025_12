@@ -85,7 +85,7 @@ pub async fn webhook_user_deleted(
     });
 
     if let Some(user_id) = user.id {
-        db.remove_user(&user_id).await.map_err(|e| {
+        db.delete_user(&user_id).await.map_err(|e| {
             tracing::debug!("{e}");
             StatusCode::INTERNAL_SERVER_ERROR
         })?;

@@ -90,7 +90,7 @@ pub async fn delete_room(
         .db
         .lock()
         .await
-        .remove_room(&room_id)
+        .delete_room(&room_id)
         .await
         .into_statuscode()?;
 
