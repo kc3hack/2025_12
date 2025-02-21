@@ -11,3 +11,4 @@ edition = "2021"
 [workspace.dependencies]
 chrono = "0.4.39"
 tokio = "1.43.0"
+thiserror = "2.0.11"

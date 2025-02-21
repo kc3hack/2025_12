@@ -1,5 +1,6 @@
 mod api;
 mod clerk;
+mod error;
 mod webhook;
 mod websocket;
 
