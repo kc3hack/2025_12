@@ -2,8 +2,8 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
     align-items: flex-start;
+    justify-content: center;
     overflow: scroll;
 
     .chat {
@@ -12,9 +12,9 @@
         margin: 15px;
 
         .icon {
-            margin: auto;
             width: 150px;
             height: 150px;
+            margin: auto;
             background: "#ffffff";
             border: 1px solid #000;
         }
