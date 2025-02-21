@@ -71,3 +71,36 @@ pub async fn get_user(
 
     Ok(Json(user))
 }
+
+#[axum::debug_handler]
+#[tracing::instrument(skip(headers))]
+#[utoipa::path(
+    post,
+    path = "/users/{user_id}/rooms",
+    summary = "Get rooms user have",
+    description = "ユーザーが参加しているルームを取得",
+    responses(
+        (status = 200, description = "Success to get rooms", body = Vec<models::Room>),
+        (status = 404, description = "Room not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Failed to communicate database"),
+    ),
+    tag = "User"
+)]
+pub async fn get_user_rooms(
+    State(state): State<Arc<AppState>>,
+    Path(user_id): Path<String>,
+    headers: HeaderMap,
+) -> Result<Json<Vec<models::Room>>, StatusCode> {
+    VerifiedToken::from_headers(&headers)?.verify()?;
+
+    let rooms = state
+        .db
+        .lock()
+        .await
+        .get_user_rooms(&user_id)
+        .await
+        .into_statuscode()?;
+
+    Ok(Json(rooms))
+}

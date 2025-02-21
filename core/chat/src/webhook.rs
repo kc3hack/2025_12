@@ -23,7 +23,7 @@ use std::sync::Arc;
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "User"
+    tag = "Clerk Webhook"
 )]
 pub async fn webhook_user_signup(
     State(state): State<Arc<AppState>>,
@@ -66,7 +66,7 @@ pub async fn webhook_user_signup(
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "User"
+    tag = "Clerk Webhook"
 )]
 pub async fn webhook_user_deleted(
     State(state): State<Arc<AppState>>,
@@ -111,7 +111,7 @@ pub async fn webhook_user_deleted(
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "User"
+    tag = "Clerk Webhook"
 )]
 pub async fn webhook_user_updated(
     State(state): State<Arc<AppState>>,
