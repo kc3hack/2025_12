@@ -43,7 +43,7 @@ pub async fn get_user_me(
 #[tracing::instrument]
 #[utoipa::path(
     get,
-    path = "/users/{id}",
+    path = "/users/{user_id}",
     summary = "Get user by id",
     description = "IDからユーザーを取得",
     responses(
@@ -76,7 +76,7 @@ pub async fn get_user(
 #[tracing::instrument(skip(headers))]
 #[utoipa::path(
     post,
-    path = "/users/{user_id}/rooms",
+    path = "/users/rooms",
     summary = "Get rooms user have",
     description = "ユーザーが参加しているルームを取得",
     responses(
@@ -89,10 +89,9 @@ pub async fn get_user(
 )]
 pub async fn get_user_rooms(
     State(state): State<Arc<AppState>>,
-    Path(user_id): Path<String>,
     headers: HeaderMap,
 ) -> Result<Json<Vec<models::Room>>, StatusCode> {
-    VerifiedToken::from_headers(&headers)?.verify()?;
+    let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
 
     let rooms = state
         .db
