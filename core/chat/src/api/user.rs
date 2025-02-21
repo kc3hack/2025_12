@@ -75,7 +75,7 @@ pub async fn get_user(
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers))]
 #[utoipa::path(
-    post,
+    get,
     path = "/users/rooms",
     summary = "Get rooms user have",
     description = "ユーザーが参加しているルームを取得",
