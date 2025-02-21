@@ -84,19 +84,18 @@ pub async fn delete_room(
     Path(room_id): Path<String>,
     headers: HeaderMap,
 ) -> Result<StatusCode, StatusCode> {
-    VerifiedToken::from_headers(&headers)?.verify()?;
+    let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
 
-    state
-        .db
-        .lock()
-        .await
-        .delete_room(&room_id)
-        .await
-        .into_statuscode()?;
+    let mut db = state.db.lock().await;
+    let room = db.get_room(&room_id).await.into_statuscode()?;
 
-    tracing::info!("Room deleted with ID: {}", room_id);
-
-    Ok(StatusCode::NO_CONTENT)
+    if room.creator_id == Some(user_id) {
+        db.delete_room(&room_id).await.into_statuscode()?;
+        tracing::info!("Room deleted with ID: {}", room_id);
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        Err(StatusCode::FORBIDDEN)
+    }
 }
 
 #[axum::debug_handler]
