@@ -7,12 +7,6 @@ pub enum CoreError {
 
     #[error("Authorization failed: {}", .0)]
     AuthError(&'static str),
-
-    #[error("Deserialize failed: {}", error)]
-    DeserializeError { error: serde_json::Error },
-
-    #[error("Serialize failed")]
-    SerializeError,
 }
 
 impl From<CoreError> for StatusCode {
