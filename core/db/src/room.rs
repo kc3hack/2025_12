@@ -25,7 +25,7 @@ impl DB {
         Ok(())
     }
 
-    pub async fn remove_room(&mut self, room_id: &str) -> Result<(), sqlx::Error> {
+    pub async fn delete_room(&mut self, room_id: &str) -> Result<(), sqlx::Error> {
         let query = sqlx::query!(r#"DELETE FROM rooms WHERE id = ?"#, room_id);
 
         self.execute(query).await?;
@@ -154,9 +154,9 @@ mod test {
     }
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
-    pub async fn remove_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
+    pub async fn delete_room_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
         let mut db = DB::from_pool(pool);
-        db.remove_room("0").await?;
+        db.delete_room("0").await?;
 
         Ok(())
     }

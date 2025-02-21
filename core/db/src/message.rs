@@ -25,7 +25,7 @@ impl DB {
         Ok(())
     }
 
-    pub async fn remove_message(&mut self, message_id: &str) -> Result<(), sqlx::Error> {
+    pub async fn delete_message(&mut self, message_id: &str) -> Result<(), sqlx::Error> {
         let query = sqlx::query!(r#"DELETE FROM messages WHERE id = ?"#, message_id);
 
         self.execute(query).await?;
@@ -109,9 +109,9 @@ mod test {
         migrations = "../../db/migrations",
         fixtures("user", "room", "message")
     )]
-    pub async fn remove_message_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
+    pub async fn delete_message_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
         let mut db = DB::from_pool(pool);
-        db.remove_message("0").await?;
+        db.delete_message("0").await?;
 
         Ok(())
     }
