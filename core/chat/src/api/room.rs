@@ -6,7 +6,7 @@ use axum::{
 };
 use chrono::Utc;
 use db::error::IntoStatusCode;
-use models::RoomUpdate;
+use models::{CreateRoomRequest, Participant, RoomUpdate};
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -17,6 +17,7 @@ use uuid::Uuid;
     path = "/rooms",
     summary = "Create room",
     description = "ルームを新規作成",
+    request_body = CreateRoomRequest,
     responses(
         (status = 200, description = "Success to create room", body = models::Room),
         (status = 404, description = "Room not found"),
@@ -28,25 +29,32 @@ use uuid::Uuid;
 pub async fn create_room(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
+    Json(request): Json<CreateRoomRequest>,
 ) -> Result<(StatusCode, HeaderMap, Json<models::Room>), StatusCode> {
     let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
     let room_id = Uuid::new_v4().to_string();
 
     let new_room = models::Room {
         id: room_id.clone(),
-        creator_id: Some(user_id),
+        room_name: request.room_name,
+        creator_id: Some(user_id.clone()),
         url: format!("/{room_id}"),
         expired_at: None,
         created_at: Utc::now(),
     };
 
-    state
-        .db
-        .lock()
-        .await
-        .add_room(new_room.clone())
+    {
+        let mut db = state.db.lock().await;
+        db.add_room(new_room.clone()).await.into_statuscode()?;
+
+        db.add_participant(Participant {
+            room_id: room_id.clone(),
+            user_id,
+            joined_at: Utc::now(),
+        })
         .await
         .into_statuscode()?;
+    }
 
     let mut response_headers = HeaderMap::new();
     response_headers.insert("Location", format!("/rooms/{}", room_id).parse().unwrap());
@@ -98,7 +106,7 @@ pub async fn delete_room(
     path = "/rooms/{room_id}",
     summary = "Update room",
     description = "ルームをアップデート",
-    request_body (content = RoomUpdate ),
+    request_body (content = RoomUpdate),
     responses(
         (status = 200, description = "Success to update room", body = models::Room),
         (status = 404, description = "Room not found"),
@@ -116,6 +124,7 @@ pub async fn update_room(
     VerifiedToken::from_headers(&headers)?.verify()?;
 
     let room_update = RoomUpdate {
+        name: room_update.name,
         creator_id: room_update.creator_id.clone(),
         expired_at: room_update.expired_at,
     };

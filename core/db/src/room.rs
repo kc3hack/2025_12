@@ -4,14 +4,16 @@ use models::RoomUpdate;
 impl DB {
     pub async fn add_room(&mut self, room: models::Room) -> Result<(), sqlx::Error> {
         let id = room.id;
+        let room_name = room.room_name;
         let creator_id = room.creator_id;
         let url = room.url;
         let expired_at = room.expired_at;
         let created_at = room.created_at;
 
         let query = sqlx::query!(
-            r#"INSERT INTO rooms (id, creator_id, url, expired_at, created_at) VALUES (?, ?, ?, ?, ?)"#,
+            r#"INSERT INTO rooms (id, room_name, creator_id, url, expired_at, created_at) VALUES (?, ?, ?, ?, ?, ?)"#,
             id,
+            room_name,
             creator_id,
             url,
             expired_at,
@@ -60,7 +62,7 @@ impl DB {
 
     pub async fn get_room(&self, room_id: &str) -> Result<models::Room, sqlx::Error> {
         let room = sqlx::query_as(
-            r#"SELECT id, creator_id, url, expired_at, created_at FROM rooms WHERE id = ?"#,
+            r#"SELECT id, room_name, creator_id, url, expired_at, created_at FROM rooms WHERE id = ?"#,
         )
         .bind(room_id)
         .fetch_one(&self.pool)
@@ -75,6 +77,7 @@ impl DB {
             r#"
             SELECT
                 r.id,
+                r.room_name,
                 r.creator_id,
                 r.url,
                 r.expired_at,
@@ -131,6 +134,7 @@ mod test {
 
         db.add_room(models::Room {
             id: "sample".to_owned(),
+            room_name: "sample".to_owned(),
             creator_id: Some("0".to_owned()),
             url: "url".to_owned(),
             expired_at: None,
@@ -164,6 +168,7 @@ mod test {
         db.update_room(
             "0",
             RoomUpdate {
+                name: None,
                 creator_id: None,
                 expired_at: Some(Some(date)),
             },
@@ -175,6 +180,7 @@ mod test {
         db.update_room(
             "0",
             RoomUpdate {
+                name: None,
                 creator_id: Some(None),
                 expired_at: None,
             },
