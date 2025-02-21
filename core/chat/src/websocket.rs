@@ -65,10 +65,13 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
         }
     };
 
-    EventFromServer::JoinedRoom(WSRoom { id: room.id })
-        .send(&mut sender)
-        .await
-        .unwrap();
+    EventFromServer::JoinedRoom(WSRoom {
+        id: room.id,
+        name: room.room_name,
+    })
+    .send(&mut sender)
+    .await
+    .unwrap();
 
     let state_cloned = state.clone();
     let room_id_clone = room_id.clone();

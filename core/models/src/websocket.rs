@@ -16,6 +16,7 @@ pub struct WSUserMessage {
 #[ts(export)]
 pub struct WSRoom {
     pub id: String,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, TS)]
