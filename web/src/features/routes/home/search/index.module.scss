@@ -1,14 +1,21 @@
-.search {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0em 1em;
-
-    .input {
-        width: 20em;
+.search_container {
+    .tag {
+        margin-left: 1em;
+        width: 5em;
     }
 
-    .drop {
-        width: 10em;
+    .search {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0em 1em;
+
+        .input {
+            width: 20em;
+        }
+
+        .drop {
+            width: 10em;
+        }
     }
 }
