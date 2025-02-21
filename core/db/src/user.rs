@@ -11,7 +11,7 @@ impl DB {
         let created_at = user.created_at;
 
         let query = sqlx::query!(
-            "INSERT INTO users (id, nickname, created_at) VALUES (?, ?, ?)",
+            r#"INSERT INTO users (id, nickname, created_at) VALUES (?, ?, ?)"#,
             id,
             nickname,
             created_at
@@ -23,7 +23,7 @@ impl DB {
     }
 
     pub async fn remove_user(&mut self, user_id: &str) -> Result<(), sqlx::Error> {
-        let query = sqlx::query!("DELETE FROM users WHERE id = ?", user_id);
+        let query = sqlx::query!(r#"DELETE FROM users WHERE id = ?"#, user_id);
 
         self.execute(query).await?;
 
@@ -39,7 +39,7 @@ impl DB {
 
         if let Some(nickname) = user_option.nickname {
             let query = sqlx::query!(
-                "UPDATE users SET nickname = ? WHERE id = ?",
+                r#"UPDATE users SET nickname = ? WHERE id = ?"#,
                 nickname,
                 user_id
             );
@@ -48,7 +48,7 @@ impl DB {
 
         if let Some(introduction) = user_option.introduction {
             let query = sqlx::query!(
-                "UPDATE users SET introduction = ? WHERE id = ?",
+                r#"UPDATE users SET introduction = ? WHERE id = ?"#,
                 introduction,
                 user_id
             );
@@ -59,11 +59,12 @@ impl DB {
     }
 
     pub async fn get_user(&self, user_id: &str) -> Result<models::User, sqlx::Error> {
-        let user =
-            sqlx::query_as("SELECT id, nickname, introduction, created_at FROM users WHERE id = ?")
-                .bind(user_id)
-                .fetch_one(&self.pool)
-                .await?;
+        let user = sqlx::query_as(
+            r#"SELECT id, nickname, introduction, created_at FROM users WHERE id = ?"#,
+        )
+        .bind(user_id)
+        .fetch_one(&self.pool)
+        .await?;
 
         Ok(user)
     }

@@ -5,8 +5,8 @@ mod webhook;
 mod websocket;
 
 use api::{
-    room::{create_room, delete_room, update_room},
-    user::{get_user, get_user_me},
+    room::{create_room, delete_room, get_room_users, update_room},
+    user::{get_user, get_user_me, get_user_rooms},
 };
 use axum::{
     routing::{delete, get, patch, post},
@@ -79,9 +79,11 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
         .route("/users/{id}", get(get_user))
+        .route("/users/{id}/rooms", get(get_user_rooms))
         .route("/rooms", post(create_room))
         .route("/rooms/{room_id}", delete(delete_room))
         .route("/rooms/{room_id}", patch(update_room))
+        .route("/rooms/{room_id}/users", get(get_room_users))
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
@@ -102,9 +104,11 @@ async fn main() {
     paths(
         api::user::get_user,
         api::user::get_user_me,
+        api::user::get_user_rooms,
         api::room::create_room,
         api::room::delete_room,
         api::room::update_room,
+        api::room::get_room_users,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
         webhook::webhook_user_updated,
