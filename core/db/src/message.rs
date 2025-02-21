@@ -11,7 +11,7 @@ impl DB {
         let created_at = message.created_at;
 
         let query = sqlx::query!(
-            "INSERT INTO messages (id, user_id, room_id, content, reply_to_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            r#"INSERT INTO messages (id, user_id, room_id, content, reply_to_id, created_at) VALUES (?, ?, ?, ?, ?, ?)"#,
             id,
             user_id,
             room_id,
@@ -26,7 +26,7 @@ impl DB {
     }
 
     pub async fn remove_message(&mut self, message_id: &str) -> Result<(), sqlx::Error> {
-        let query = sqlx::query!("DELETE FROM messages WHERE id = ?", message_id);
+        let query = sqlx::query!(r#"DELETE FROM messages WHERE id = ?"#, message_id);
 
         self.execute(query).await?;
 
@@ -39,12 +39,20 @@ impl DB {
         message_option: MessageUpdate,
     ) -> Result<(), sqlx::Error> {
         if let Some(user_id) = message_option.user_id {
-            let query = sqlx::query!("UPDATE messages SET user_id = ? WHERE id = ?", user_id, id);
+            let query = sqlx::query!(
+                r#"UPDATE messages SET user_id = ? WHERE id = ?"#,
+                user_id,
+                id
+            );
             self.execute(query).await?;
         }
 
         if let Some(content) = message_option.content {
-            let query = sqlx::query!("UPDATE messages SET content = ? WHERE id = ?", content, id);
+            let query = sqlx::query!(
+                r#"UPDATE messages SET content = ? WHERE id = ?"#,
+                content,
+                id
+            );
             self.execute(query).await?;
         }
 
@@ -53,7 +61,7 @@ impl DB {
 
     pub async fn get_message(&self, message_id: &str) -> Result<models::Message, sqlx::Error> {
         let message = sqlx::query_as(
-            "SELECT id, user_id, room_id, content, reply_to_id, created_at FROM messages WHERE id = ?",
+            r#"SELECT id, user_id, room_id, content, reply_to_id, created_at FROM messages WHERE id = ?"#,
         )
         .bind(message_id)
         .fetch_one(&self.pool)

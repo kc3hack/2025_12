@@ -10,7 +10,7 @@ impl DB {
         let joined_at = participant.joined_at;
 
         let query = sqlx::query!(
-            "INSERT INTO participants (room_id, user_id, joined_at) VALUES (?, ?, ?)",
+            r#"INSERT INTO participants (room_id, user_id, joined_at) VALUES (?, ?, ?)"#,
             room_id,
             user_id,
             joined_at
@@ -27,7 +27,7 @@ impl DB {
         user_id: &str,
     ) -> Result<(), sqlx::Error> {
         let query = sqlx::query!(
-            "DELETE FROM participants WHERE room_id = ? AND user_id = ?",
+            r#"DELETE FROM participants WHERE room_id = ? AND user_id = ?"#,
             room_id,
             user_id
         );
@@ -43,7 +43,7 @@ impl DB {
         user_id: &str,
     ) -> Result<models::Participant, sqlx::Error> {
         let participant = sqlx::query_as(
-            "SELECT room_id, user_id, joined_at FROM participants WHERE room_id = ? AND user_id = ?",
+            r#"SELECT room_id, user_id, joined_at FROM participants WHERE room_id = ? AND user_id = ?"#,
         )
         .bind(room_id)
         .bind(user_id)
