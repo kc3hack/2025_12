@@ -8,6 +8,7 @@ import { RoomType } from "@/features/room/type";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@clerk/nextjs";
 import style from "./index.module.scss";
+import Link from "next/link";
 
 type ChatProps = {
   items: RoomType[];
@@ -28,7 +29,7 @@ export const ChatContainer = ({ items, fetchRooms }: ChatProps) => {
   return (
     <div className={style.chat_container}>
       {items.map(item => (
-        <div className={style.chat} key={item.name}>
+        <Link href={`/room/${item.id}`} className={style.chat} key={item.name}>
           <ContextMenu>
             <ContextMenuTrigger>
               <p>{item.name}</p>
@@ -36,10 +37,17 @@ export const ChatContainer = ({ items, fetchRooms }: ChatProps) => {
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuItem>編集</ContextMenuItem>
-              <ContextMenuItem onClick={() => handleDelete(item.id)}>削除</ContextMenuItem>
+              <ContextMenuItem
+                onClick={e => {
+                  e.preventDefault();
+                  handleDelete(item.id);
+                }}
+              >
+                削除
+              </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
-        </div>
+        </Link>
       ))}
     </div>
   );
