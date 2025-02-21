@@ -1,5 +1,6 @@
 "use client";
 import { Chat } from "@/features/routes/home/chat";
+import { Createbutton } from "@/features/routes/home/create-button";
 import { Icon } from "@/features/routes/home/icon";
 import { Searchinput } from "@/features/routes/home/search";
 import { useState } from "react";
@@ -54,6 +55,7 @@ const home = () => {
     <div>
       <Icon />
       <Searchinput handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
+      <Createbutton />
       <Chat items={display} />
     </div>
   );
