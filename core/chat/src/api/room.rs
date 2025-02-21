@@ -144,7 +144,7 @@ pub async fn update_room(
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers))]
 #[utoipa::path(
-    post,
+    get,
     path = "/rooms/{room_id}/users",
     summary = "Get users in room",
     description = "ルーム内のユーザ一覧を取得",

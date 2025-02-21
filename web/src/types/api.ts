@@ -139,7 +139,7 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "post",
+    method: "get",
     path: "/rooms/:room_id/users",
     alias: "get_room_users",
     description: `ルーム内のユーザ一覧を取得`,
@@ -172,13 +172,13 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/users/:id",
+    path: "/users/:user_id",
     alias: "get_user",
     description: `IDからユーザーを取得`,
     requestFormat: "json",
     parameters: [
       {
-        name: "id",
+        name: "user_id",
         type: "Path",
         schema: z.string(),
       },
@@ -188,38 +188,6 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `User not found`,
-        schema: z.void(),
-      },
-      {
-        status: 500,
-        description: `Internal server error`,
-        schema: z.void(),
-      },
-      {
-        status: 503,
-        description: `Failed to communicate database`,
-        schema: z.void(),
-      },
-    ],
-  },
-  {
-    method: "post",
-    path: "/users/:user_id/rooms",
-    alias: "get_user_rooms",
-    description: `ユーザーが参加しているルームを取得`,
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "user_id",
-        type: "Path",
-        schema: z.string(),
-      },
-    ],
-    response: z.array(Room),
-    errors: [
-      {
-        status: 404,
-        description: `Room not found`,
         schema: z.void(),
       },
       {
@@ -245,6 +213,31 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `User not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/users/rooms",
+    alias: "get_user_rooms",
+    description: `ユーザーが参加しているルームを取得`,
+    requestFormat: "json",
+    response: z.array(Room),
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
         schema: z.void(),
       },
       {

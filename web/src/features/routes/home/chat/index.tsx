@@ -10,7 +10,7 @@ type ChatType = { name: string };
 type ChatProps = {
   items: ChatType[];
 };
-export const Chat = ({ items }: ChatProps) => {
+export const ChatContainer = ({ items }: ChatProps) => {
   return (
     <div className={style.chat_container}>
       {items.map(item => (

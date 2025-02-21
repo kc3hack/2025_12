@@ -1,33 +1,40 @@
 "use client";
-import { Chat } from "@/features/routes/home/chat";
-import { Createbutton } from "@/features/routes/home/create-button";
-import { Icon } from "@/features/routes/home/icon";
-import { Searchinput } from "@/features/routes/home/search";
-import { useState } from "react";
-
-type ChatType = { name: string };
-const groupData = [
-  { name: "a" },
-  { name: "b" },
-  { name: "p" },
-  { name: "g" },
-  { name: "n" },
-  { name: "t" },
-  { name: "d" },
-  { name: "m" },
-  { name: "21" },
-  { name: "1" },
-  { name: "2" },
-  { name: "12" }
-];
+import { roomsAtom } from "@/features/room/store";
+import { RoomType } from "@/features/room/type";
+import { ChatContainer } from "@/features/routes/home/chat";
+import { CreateButton } from "@/features/routes/home/create-button";
+import { IconContainer } from "@/features/routes/home/icon";
+import { SearchAndFilter } from "@/features/routes/home/search";
+import { apiClient } from "@/lib/apiClient";
+import { useAuth } from "@clerk/nextjs";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
 
 const home = () => {
-  const [display, setDisplay] = useState<ChatType[]>(groupData);
+  const { getToken } = useAuth();
+  const [rooms, setRooms] = useAtom(roomsAtom);
+  const [filterdRooms, setfilterdRooms] = useState<RoomType[]>([]);
   const [order, setOrder] = useState<string>("creation");
   const [search, setSearch] = useState<string>("");
 
+  useEffect(() => {
+    (async () => {
+      const feched_rooms = await apiClient.get_user_rooms({
+        headers: { Authorization: `Bearer ${await getToken()}` }
+      });
+      const rooms = feched_rooms.map(room => {
+        return {
+          id: room.id,
+          name: room.room_name
+        } as RoomType;
+      });
+      setRooms(rooms);
+      setfilterdRooms(rooms);
+    })();
+  }, [setRooms, getToken]);
+
   const updateDisplay = (order: string, search: string) => {
-    const displayOrdered = groupData.filter(item =>
+    const displayOrdered = rooms.filter(item =>
       item.name.toLowerCase().includes(search.toLowerCase())
     );
     let newDisplay = displayOrdered;
@@ -40,23 +47,25 @@ const home = () => {
     if (order === "creation") {
       newDisplay = [...displayOrdered];
     }
-    setDisplay(newDisplay);
+    setfilterdRooms(newDisplay);
   };
 
   const handleOrderChange = (newOrder: string) => {
     setOrder(newOrder);
     updateDisplay(newOrder, search);
   };
+
   const handleSearch = (newSearch: string) => {
     setSearch(newSearch);
     updateDisplay(order, newSearch);
   };
+
   return (
     <div>
-      <Icon />
-      <Searchinput handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
-      <Createbutton />
-      <Chat items={display} />
+      <IconContainer />
+      <SearchAndFilter handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
+      <CreateButton />
+      <ChatContainer items={filterdRooms} />
     </div>
   );
 };

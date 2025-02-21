@@ -10,7 +10,7 @@ const sampleData = [
   { name: "hayasi" }
 ];
 
-export const Icon = () => {
+export const IconContainer = () => {
   return (
     <div className={style.friends_container}>
       {sampleData.map(item => (
