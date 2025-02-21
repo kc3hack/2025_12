@@ -16,9 +16,9 @@ import { useAtom } from "jotai";
 import { useAuth } from "@clerk/nextjs";
 import { useRef, useState } from "react";
 
-export const Createbutton = () => {
-  const [rooms, setRooms] = useAtom(roomsAtom);
+export const CreateButton = () => {
   const { getToken } = useAuth();
+  const [rooms, setRooms] = useAtom(roomsAtom);
   const roomNameInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,7 +37,7 @@ export const Createbutton = () => {
         headers: { Authorization: `Bearer ${await getToken()}` }
       }
     );
-    setRooms([...rooms, { id: newRoom.id }]);
+    setRooms([...rooms, { id: newRoom.id, name: newRoom.room_name }]);
 
     setIsOpen(false);
 
