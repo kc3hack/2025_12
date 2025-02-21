@@ -7,8 +7,8 @@
         display: flex;
         flex-direction: column;
         flex-wrap: wrap;
-        justify-content: center;
         align-content: center;
+        justify-content: center;
         margin: 15px;
     }
 
@@ -19,8 +19,8 @@
     display: inline-block;
     width: 80px;
     height: 80px;
-    border-radius: 50%;
-    background: skyblue;
-    text-align: center;
     line-height: 80px;
+    text-align: center;
+    background: skyblue;
+    border-radius: 50%;
 }

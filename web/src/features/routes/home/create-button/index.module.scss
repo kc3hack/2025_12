@@ -1,0 +1,28 @@
+.create_button {
+  display: flex;
+  margin: 1em;
+
+  .dialog_content {
+
+    .input_container {
+      display: grid;
+      gap: 4;
+      padding: 4;
+
+      .input_content {
+        display: grid;
+        grid-template-columns: 4;
+        gap: 4;
+        align-items: center;
+
+        .input_title {
+          text-align: right;
+        }
+
+        .input {
+          grid-template-columns: 3;
+        }
+      }
+    }
+  }
+}
