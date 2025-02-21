@@ -1,7 +1,4 @@
-use crate::{
-    clerk::{self, ExtractPayload},
-    AppState,
-};
+use crate::{clerk::VerifiedToken, AppState};
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, StatusCode},
@@ -32,12 +29,7 @@ pub async fn create_room(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
 ) -> Result<(StatusCode, HeaderMap, Json<models::Room>), StatusCode> {
-    let mut db = state.db.lock().await;
-    let payload = headers
-        .extract_payload()
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let user_id =
-        clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
     let room_id = Uuid::new_v4().to_string();
 
     let new_room = models::Room {
@@ -48,7 +40,13 @@ pub async fn create_room(
         created_at: Utc::now(),
     };
 
-    db.add_room(new_room.clone()).await.into_statuscode()?;
+    state
+        .db
+        .lock()
+        .await
+        .add_room(new_room.clone())
+        .await
+        .into_statuscode()?;
 
     let mut response_headers = HeaderMap::new();
     response_headers.insert("Location", format!("/rooms/{}", room_id).parse().unwrap());
@@ -78,13 +76,15 @@ pub async fn delete_room(
     Path(room_id): Path<String>,
     headers: HeaderMap,
 ) -> Result<StatusCode, StatusCode> {
-    let payload = headers
-        .extract_payload()
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let _ = clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
+    VerifiedToken::from_headers(&headers)?.verify()?;
 
-    let mut db = state.db.lock().await;
-    db.remove_room(&room_id).await.into_statuscode()?;
+    state
+        .db
+        .lock()
+        .await
+        .remove_room(&room_id)
+        .await
+        .into_statuscode()?;
 
     tracing::info!("Room deleted with ID: {}", room_id);
 
@@ -113,19 +113,17 @@ pub async fn update_room(
     headers: HeaderMap,
     Json(room_update): Json<RoomUpdate>,
 ) -> Result<Json<models::Room>, StatusCode> {
-    let payload = headers
-        .extract_payload()
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let _ = clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
-
-    let mut db = state.db.lock().await;
+    VerifiedToken::from_headers(&headers)?.verify()?;
 
     let room_update = RoomUpdate {
         creator_id: room_update.creator_id.clone(),
         expired_at: room_update.expired_at,
     };
 
-    let updated_room = db
+    let updated_room = state
+        .db
+        .lock()
+        .await
         .update_room(&room_id, room_update)
         .await
         .into_statuscode()?;

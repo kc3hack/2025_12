@@ -1,7 +1,4 @@
-use crate::{
-    clerk::{self, ExtractPayload as _},
-    AppState,
-};
+use crate::{clerk::VerifiedToken, AppState};
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, StatusCode},
@@ -29,13 +26,15 @@ pub async fn get_user_me(
     headers: HeaderMap,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<models::User>, StatusCode> {
-    let payload = headers
-        .extract_payload()
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let user_id =
-        clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let db = state.db.lock().await;
-    let user = db.get_user(&user_id).await.into_statuscode()?;
+    let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
+
+    let user = state
+        .db
+        .lock()
+        .await
+        .get_user(&user_id)
+        .await
+        .into_statuscode()?;
 
     Ok(Json(user))
 }
@@ -60,12 +59,15 @@ pub async fn get_user(
     Path(user_id): Path<String>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<models::User>, StatusCode> {
-    let payload = headers
-        .extract_payload()
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let _ = clerk::get_authenticated_user_id(payload).map_err(|_| StatusCode::UNAUTHORIZED)?;
-    let db = state.db.lock().await;
-    let user = db.get_user(&user_id).await.into_statuscode()?;
+    VerifiedToken::from_headers(&headers)?.verify()?;
+
+    let user = state
+        .db
+        .lock()
+        .await
+        .get_user(&user_id)
+        .await
+        .into_statuscode()?;
 
     Ok(Json(user))
 }

@@ -1,7 +1,4 @@
-use crate::{
-    clerk::{get_authenticated_user_id, get_payload_from_token},
-    AppState,
-};
+use crate::{clerk::VerifiedToken, error::CoreError, AppState};
 use axum::{
     extract::{
         ws::{self, WebSocket},
@@ -10,10 +7,7 @@ use axum::{
     response::IntoResponse,
 };
 use chrono::Utc;
-use futures::{
-    stream::{SplitSink, SplitStream},
-    SinkExt as _, StreamExt as _,
-};
+use futures::{stream::SplitStream, StreamExt as _};
 use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessage};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -26,17 +20,16 @@ pub async fn websocket_handler(
     ws.on_upgrade(|socket| websocket(socket, state, room_id))
 }
 
-pub async fn check_auth(receiver: &mut SplitStream<WebSocket>) -> Result<String, ()> {
+pub async fn check_auth(receiver: &mut SplitStream<WebSocket>) -> Result<String, CoreError> {
     match receiver.next().await {
         Some(Ok(ws::Message::Text(text))) => match serde_json::from_str::<EventFromClient>(&text) {
             Ok(EventFromClient::JoinRoom { token }) => {
-                let payload = get_payload_from_token(&token)?;
-                let user_id = get_authenticated_user_id(payload)?;
+                let user_id = VerifiedToken::new(&token).user_id()?;
                 Ok(user_id)
             }
-            _ => Err(()),
+            _ => Err(CoreError::AuthError("Invalid token")),
         },
-        _ => Err(()),
+        _ => Err(CoreError::AuthError("Invalid token")),
     }
 }
 

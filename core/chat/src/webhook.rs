@@ -1,4 +1,4 @@
-use crate::{clerk::verify_webhook, AppState};
+use crate::{clerk::VerifiedWebhook, AppState};
 use axum::{
     body::Bytes,
     extract::State,
@@ -34,7 +34,7 @@ pub async fn webhook_user_signup(
 
     tracing::debug!("webhook 'user.created' received");
 
-    let verified_webhook = verify_webhook(body, headers, "SIGNING_SECRET_USER_SIGNUP")?;
+    let verified_webhook = VerifiedWebhook::new(body, headers, "SIGNING_SECRET_USER_SIGNUP")?;
     let user = verified_webhook.data::<clerk_rs::models::User>()?;
 
     user.id.clone().inspect(|id| {
@@ -77,7 +77,7 @@ pub async fn webhook_user_deleted(
 
     tracing::debug!("webhook received");
 
-    let verified_webhook = verify_webhook(body, headers, "SIGNING_SECRET_USER_DELETED")?;
+    let verified_webhook = VerifiedWebhook::new(body, headers, "SIGNING_SECRET_USER_DELETED")?;
     let user = verified_webhook.data::<clerk_rs::models::User>()?;
 
     user.id.clone().inspect(|id| {
@@ -122,7 +122,7 @@ pub async fn webhook_user_updated(
 
     tracing::debug!("webhook received");
 
-    let verified_webhook = verify_webhook(body, headers, "SIGNING_SECRET_USER_UPDATED")?;
+    let verified_webhook = VerifiedWebhook::new(body, headers, "SIGNING_SECRET_USER_UPDATED")?;
     let user = verified_webhook.data::<clerk_rs::models::User>()?;
 
     user.id.clone().inspect(|id| {
