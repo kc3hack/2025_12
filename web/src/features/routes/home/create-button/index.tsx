@@ -14,21 +14,39 @@ import { roomsAtom } from "@/features/room/store";
 import { apiClient } from "@/lib/apiClient";
 import { useAtom } from "jotai";
 import { useAuth } from "@clerk/nextjs";
+import { useRef, useState } from "react";
 
 export const Createbutton = () => {
   const [rooms, setRooms] = useAtom(roomsAtom);
   const { getToken } = useAuth();
+  const roomNameInputRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = async () => {
-    const newRoom = await apiClient.create_room(undefined, {
-      headers: { Authorization: `Bearer ${await getToken()}` }
-    });
+    if (!roomNameInputRef.current) {
+      return;
+    }
+
+    if (roomNameInputRef.current.value === "") {
+      return;
+    }
+
+    const newRoom = await apiClient.create_room(
+      { room_name: roomNameInputRef.current.value },
+      {
+        headers: { Authorization: `Bearer ${await getToken()}` }
+      }
+    );
     setRooms([...rooms, { id: newRoom.id }]);
+
+    setIsOpen(false);
+
+    roomNameInputRef.current.value = "";
   };
 
   return (
     <div className={style.create_button}>
-      <Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button>ルーム作成</Button>
         </DialogTrigger>
@@ -41,7 +59,7 @@ export const Createbutton = () => {
               <Label htmlFor="name" className={style.input_title}>
                 部屋名
               </Label>
-              <Input id="name" className={style.input} />
+              <Input id="name" className={style.input} ref={roomNameInputRef} />
             </div>
           </div>
           <DialogFooter>
