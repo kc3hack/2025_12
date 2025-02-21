@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -11,8 +10,22 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { roomsAtom } from "@/features/room/store";
+import { apiClient } from "@/lib/apiClient";
+import { useAtom } from "jotai";
+import { useAuth } from "@clerk/nextjs";
 
 export const Createbutton = () => {
+  const [rooms, setRooms] = useAtom(roomsAtom);
+  const { getToken } = useAuth();
+
+  const handleClick = async () => {
+    const newRoom = await apiClient.create_room(undefined, {
+      headers: { Authorization: `Bearer ${await getToken()}` }
+    });
+    setRooms([...rooms, { id: newRoom.id }]);
+  };
+
   return (
     <div className={style.create_button}>
       <Dialog>
@@ -32,7 +45,9 @@ export const Createbutton = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">ルーム作成</Button>
+            <Button type="submit" onClick={handleClick}>
+              ルーム作成
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
