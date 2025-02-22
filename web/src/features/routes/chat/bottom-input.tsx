@@ -63,6 +63,8 @@ export const BottomInput = memo((props: Props) => {
     ws?.send(JSON.stringify(event));
 
     props.bottomInputRef.current.value = "";
+
+    props.setInputMessage(null);
   };
 
   const changeInput = (inputMessage: string) => props.setInputMessage(inputMessage);
