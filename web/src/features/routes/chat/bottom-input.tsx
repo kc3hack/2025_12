@@ -24,7 +24,6 @@ type Props = {
 export const BottomInput = memo((props: Props) => {
   const [isComposing, setIsComposing] = useState(false);
   const [user] = useAtom(userAtom);
-
   const [ws] = useAtom(wsAtom);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -57,12 +56,17 @@ export const BottomInput = memo((props: Props) => {
       author_name: user.nickname,
       author_avatar_url: "",
       content: props.bottomInputRef.current.value,
-      reply_to_id: null
+      reply_to_id: props.replyingMessage?.id ?? null
     };
 
     ws?.send(JSON.stringify(event));
 
+    props.setReplyingMessage(null);
     props.bottomInputRef.current.value = "";
+
+    setInterval(() => {
+      props.latestMessagePositionRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 0);
   };
 
   const changeInput = (inputMessage: string) => props.setInputMessage(inputMessage);

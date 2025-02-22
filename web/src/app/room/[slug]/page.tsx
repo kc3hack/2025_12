@@ -17,7 +17,6 @@ const Room = () => {
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(null);
   const bottomInputRef = useRef<HTMLTextAreaElement>(null);
   const [inputMessage, setInputMessage] = useState<string | null>(null);
-  const [roomId] = useState("");
 
   const [ws] = useAtom(wsAtom);
 
@@ -48,7 +47,6 @@ const Room = () => {
 
   return (
     <div className={style.home_page}>
-      <p>{roomId ? roomId : "joining room..."}</p>
       <MessageContainer
         bottomInputRef={bottomInputRef}
         latestMessagePositionRef={latestMessagePositionRef}
