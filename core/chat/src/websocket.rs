@@ -11,12 +11,12 @@ use futures::{
     stream::{SplitSink, SplitStream},
     StreamExt as _,
 };
-use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessage};
+use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessageFromServer};
 use serde::Serialize;
 use std::sync::Arc;
 use uuid::Uuid;
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub enum InternalEvent {
     Response {
         target_id: String,
@@ -36,7 +36,7 @@ impl InternalEvent {
         match self {
             InternalEvent::Response { target_id, event } => {
                 if target_id == user_id {
-                    let _ = event.send(sender).await;
+                    event.send(sender).await.unwrap();
                 }
             }
             InternalEvent::Broadcast { event } => {
@@ -89,18 +89,18 @@ pub async fn sync_message(
 
     let messages = messages
         .iter()
-        .map(|m| WSUserMessage {
+        .map(|m| WSUserMessageFromServer {
             id: m.0.id.clone(),
             author_name: user.id.clone(),
             author_avatar_url: "".to_owned(),
             content: m.0.content.clone(),
             reply_to_id: m.0.reply_to_id.clone(),
         })
-        .collect::<Vec<WSUserMessage>>();
+        .collect::<Vec<WSUserMessageFromServer>>();
 
     let _ = tx.send(InternalEvent::Response {
         target_id: user_id.to_owned(),
-        event: EventFromServer::SyncMessage(messages),
+        event: EventFromServer::SyncMessage { messages },
     });
 
     Ok(())
@@ -173,7 +173,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                     let mut db = state_cloned.db.lock().await;
                     let message_id = Uuid::new_v4().to_string();
                     db.add_message(models::Message {
-                        id: message_id,
+                        id: message_id.clone(),
                         room_id: room_id_clone.clone(),
                         user_id: Some(user_id_cloned.clone()),
                         content: msg.content.clone(),
@@ -183,8 +183,8 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                     .await
                     .unwrap();
 
-                    let event_from_server = EventFromServer::Message(WSUserMessage {
-                        id: msg.id.clone(),
+                    let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
+                        id: message_id,
                         author_name: msg.author_name.clone(),
                         author_avatar_url: "".to_owned(), // TODO: Set avatar url
                         content: msg.content.clone(),
@@ -226,5 +226,5 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
         _ = &mut recv_task => send_task.abort(),
     };
 
-    tracing::info!("{user_id} disconnected")
+    tracing::info!("{user_id} disconnected");
 }
