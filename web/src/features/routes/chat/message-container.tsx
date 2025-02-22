@@ -38,7 +38,7 @@ export const MessageContainer = (props: Props) => {
           author_id: msg.author_id,
           author_name: msg.author_name,
           content: msg.content,
-          is_me: true,
+          is_me: msg.author_id === user?.id,
           icon: null,
           reply_to_id: msg.reply_to_id,
           reactions: null
