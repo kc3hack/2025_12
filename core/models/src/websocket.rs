@@ -5,7 +5,18 @@ use ts_rs::TS;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
-pub struct WSUserMessage {
+pub struct WSUserMessageFromServer {
+    pub id: String,
+    pub author_id: Option<String>,
+    pub author_name: Option<String>,
+    pub author_avatar_url: String,
+    pub content: String,
+    pub reply_to_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export)]
+pub struct WSUserMessageFromClient {
     pub author_id: String,
     pub author_name: String,
     pub author_avatar_url: String,
@@ -13,7 +24,7 @@ pub struct WSUserMessage {
     pub reply_to_id: Option<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize, TS)]
+#[derive(Clone, Debug, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct WSRoom {
     pub id: String,
@@ -24,18 +35,24 @@ pub struct WSRoom {
 #[serde(tag = "type", rename_all = "PascalCase")]
 #[ts(export)]
 pub enum EventFromClient {
-    UserMessage(WSUserMessage),
+    RequestSyncMessage { limit: u32 },
+    UserMessage(WSUserMessageFromClient),
     JoinRoom { token: String },
     AddReaction,
 }
 
-#[derive(Clone, Serialize, Deserialize, TS)]
+#[derive(Clone, Debug, Serialize, Deserialize, TS)]
 #[serde(tag = "type", rename_all = "PascalCase")]
 #[ts(export)]
 pub enum EventFromServer {
-    Message(WSUserMessage),
+    SyncMessage {
+        messages: Vec<WSUserMessageFromServer>,
+    },
+    Message(WSUserMessageFromServer),
     JoinedRoom(WSRoom),
-    FailedToJoinRoom { message: String },
+    FailedToJoinRoom {
+        message: String,
+    },
     AddReaction,
 }
 

@@ -2,8 +2,8 @@
 
 import { ReactNode, useEffect } from "react";
 import style from "../../features/routes/settings-scss/page.module.scss";
-import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button"
 
 const SettingsSidebar = () => {
   const Router = useRouter();
@@ -14,33 +14,33 @@ const SettingsSidebar = () => {
   }, [PathName]);
   return (
     <div className={style.setting_container}>
-      <button type="button" className={style.setting1} onClick={() => Router.push("./profile")}>
+      <Button type="button"  variant="ghost"   className={style.setting1} onClick={() => Router.push("./profile")}>
         Profile
-      </button>
-      <button type="button" className={style.setting2} onClick={() => Router.push("./account")}>
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2} onClick={() => Router.push("./account")}>
         Account
-      </button>
-      <button type="button" className={style.setting2}>
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2}>
+        項目1
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2}>
+        項目2
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2}>
         項目3
-      </button>
-      <button type="button" className={style.setting2}>
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2}>
         項目4
-      </button>
-      <button type="button" className={style.setting2}>
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2}>
         項目5
-      </button>
-      <button type="button" className={style.setting2}>
-        項目2
-      </button>
-      <button type="button" className={style.setting2}>
-        項目2
-      </button>
-      <button type="button" className={style.setting2}>
-        項目2
-      </button>
-      <button type="button" className={style.setting2}>
-        項目2
-      </button>
+      </Button>
+      <Button type="button"  variant="ghost"  className={style.setting2}>
+        項目6
+      </Button>
+      <Button type="button"  variant="ghost" className={style.setting2}>
+        項目7
+      </Button>
     </div>
   );
 };

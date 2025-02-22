@@ -7,10 +7,45 @@ use axum::{
     response::IntoResponse,
 };
 use chrono::Utc;
-use futures::{stream::SplitStream, StreamExt as _};
-use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessage};
+use futures::{
+    stream::{SplitSink, SplitStream},
+    StreamExt as _,
+};
+use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessageFromServer};
+use serde::Serialize;
 use std::sync::Arc;
 use uuid::Uuid;
+
+#[derive(Clone, Debug, Serialize)]
+pub enum InternalEvent {
+    Response {
+        target_id: String,
+        event: EventFromServer,
+    },
+    Broadcast {
+        event: EventFromServer,
+    },
+}
+
+impl InternalEvent {
+    async fn handle(
+        self,
+        user_id: &str,
+        sender: &mut SplitSink<WebSocket, ws::Message>,
+    ) -> Result<(), serde_json::Error> {
+        match self {
+            InternalEvent::Response { target_id, event } => {
+                if target_id == user_id {
+                    let _ = event.send(sender).await;
+                }
+            }
+            InternalEvent::Broadcast { event } => {
+                let _ = event.send(sender).await;
+            }
+        };
+        Ok(())
+    }
+}
 
 pub async fn websocket_handler(
     ws: WebSocketUpgrade,
@@ -33,7 +68,51 @@ pub async fn check_auth(receiver: &mut SplitStream<WebSocket>) -> Result<String,
     }
 }
 
-// TODO: Handling errors without unwrap
+pub async fn sync_message(
+    state: Arc<AppState>,
+    user_id: &str,
+    room_id: &str,
+    limit: u32,
+) -> Result<(), ()> {
+    let room_tx = state.room_tx.lock().await;
+    let tx = match room_tx.get(room_id) {
+        Some(v) => v,
+        None => {
+            tracing::info!("Room not found");
+            return Err(());
+        }
+    };
+
+    let (messages, user) = {
+        let db = state.db.lock().await;
+        let messages = db
+            .get_latest_messages(room_id, limit)
+            .await
+            .map_err(|_| ())?;
+        let user = db.get_user(user_id).await.map_err(|_| ())?;
+        (messages, user)
+    };
+
+    let messages = messages
+        .iter()
+        .map(|m| WSUserMessageFromServer {
+            id: m.0.id.clone(),
+            author_id: m.0.user_id.clone(),
+            author_name: user.nickname.clone(),
+            author_avatar_url: "".to_owned(),
+            content: m.0.content.clone(),
+            reply_to_id: m.0.reply_to_id.clone(),
+        })
+        .collect::<Vec<WSUserMessageFromServer>>();
+
+    let _ = tx.send(InternalEvent::Response {
+        target_id: user_id.to_owned(),
+        event: EventFromServer::SyncMessage { messages },
+    });
+
+    Ok(())
+}
+
 async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     let (mut sender, mut receiver) = stream.split();
 
@@ -65,16 +144,14 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
         }
     };
 
-    EventFromServer::JoinedRoom(WSRoom {
-        id: room.id,
-        name: room.room_name,
+    let _ = EventFromServer::JoinedRoom(WSRoom {
+        id: room.id.clone(),
+        name: room.room_name.clone(),
     })
     .send(&mut sender)
-    .await
-    .unwrap();
+    .await;
 
     let state_cloned = state.clone();
-    let room_id_clone = room_id.clone();
 
     let user_id_cloned = user_id.clone();
     let mut recv_task = tokio::spawn(async move {
@@ -88,54 +165,28 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                 }
             };
 
-            // WARN: Do not log FailedToJoinRoom events. It includes user's token;
-
-            match event {
-                EventFromClient::UserMessage(msg) => {
-                    let mut db = state_cloned.db.lock().await;
-                    let message_id = Uuid::new_v4().to_string();
-                    db.add_message(models::Message {
-                        id: message_id,
-                        room_id: room_id_clone.clone(),
-                        user_id: Some(user_id_cloned.clone()),
-                        content: msg.content.clone(),
-                        reply_to_id: msg.reply_to_id.clone(),
-                        created_at: Utc::now(),
-                    })
-                    .await
-                    .unwrap();
-
-                    let event_from_server = EventFromServer::Message(WSUserMessage {
-                        author_id: msg.author_id.clone(),
-                        author_name: msg.author_name.clone(),
-                        author_avatar_url: "".to_owned(), // TODO: Set avatar url
-                        content: msg.content.clone(),
-                        reply_to_id: None,
-                    });
-
-                    let room_tx = state_cloned.room_tx.lock().await;
-                    let tx = room_tx.get(&room_id_clone).unwrap();
-                    let _ = tx.send(event_from_server);
-
-                    tracing::info!("Message: {msg:?}");
-                }
-
-                EventFromClient::AddReaction => {}
-                _ => {}
-            }
+            event_from_client_handle(event, state_cloned.clone(), &user_id_cloned, &room).await;
         }
     });
 
-    let room_id_clone = room_id.clone();
     let mut rx = {
         let room_tx = state.room_tx.lock().await;
-        let tx = room_tx.get(&room_id_clone).unwrap();
+
+        let tx = match room_tx.get(&room_id) {
+            Some(v) => v,
+            None => {
+                tracing::info!("Room not found");
+                return;
+            }
+        };
+
         tx.subscribe()
     };
 
+    let user_id_cloned = user_id.clone();
     let mut send_task = tokio::spawn(async move {
-        while let Ok(event_from_server) = rx.recv().await {
-            let _ = event_from_server.send(&mut sender).await;
+        while let Ok(internal_event) = rx.recv().await {
+            let _ = internal_event.handle(&user_id_cloned, &mut sender).await;
         }
     });
 
@@ -144,5 +195,66 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
         _ = &mut recv_task => send_task.abort(),
     };
 
-    tracing::info!("{user_id} disconnected")
+    tracing::info!("{user_id} disconnected");
+}
+
+async fn event_from_client_handle(
+    event: EventFromClient,
+    state: Arc<AppState>,
+    user_id: &str,
+    room: &models::Room,
+) {
+    // WARN: Do not log JoinedRoom events. It includes user's token;
+
+    match event {
+        EventFromClient::RequestSyncMessage { limit } => {
+            let _ = sync_message(state.clone(), user_id, &room.id, limit).await;
+        }
+
+        EventFromClient::UserMessage(msg) => {
+            let mut db = state.db.lock().await;
+            let message_id = Uuid::new_v4().to_string();
+
+            db.add_message(models::Message {
+                id: message_id.clone(),
+                room_id: room.id.clone(),
+                user_id: Some(msg.author_id.clone()),
+                content: msg.content.clone(),
+                reply_to_id: msg.reply_to_id.clone(),
+                created_at: Utc::now(),
+            })
+            .await
+            .unwrap_or_else(|e| {
+                tracing::error!("Failed to add message: {e:?}");
+            });
+
+            let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
+                id: message_id,
+                author_id: Some(msg.author_id.clone()),
+                author_name: Some(msg.author_name.clone()),
+                author_avatar_url: "".to_owned(), // TODO: Set avatar url
+                content: msg.content.clone(),
+                reply_to_id: None,
+            });
+
+            let room_tx = state.room_tx.lock().await;
+            let tx = match room_tx.get(&room.id) {
+                Some(v) => v,
+                None => {
+                    tracing::info!("Room not found");
+                    return;
+                }
+            };
+
+            let _ = tx.send(InternalEvent::Broadcast {
+                event: event_from_server,
+            });
+
+            tracing::info!("Message: {msg:?}");
+        }
+
+        EventFromClient::AddReaction => {}
+
+        _ => {}
+    }
 }

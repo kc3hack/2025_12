@@ -28,12 +28,17 @@ const Room = () => {
         return;
       }
 
-      const event: EventFromClient = {
+      const join_event: EventFromClient = {
         type: "JoinRoom",
         token: token
       };
+      ws.send(JSON.stringify(join_event));
 
-      ws.send(JSON.stringify(event));
+      const request_sync_message_event: EventFromClient = {
+        type: "RequestSyncMessage",
+        limit: 10
+      };
+      ws.send(JSON.stringify(request_sync_message_event));
     });
 
     return () => {

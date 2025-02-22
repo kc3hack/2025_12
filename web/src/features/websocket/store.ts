@@ -24,7 +24,7 @@ wsAtom.onMount = setState => {
   };
 
   ws.onerror = error => {
-    console.error("WebSocket error:", error);
+    console.debug("WebSocket error:", error);
   };
 
   setState(ws);
