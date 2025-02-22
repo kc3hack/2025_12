@@ -1,7 +1,17 @@
-import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { SignedIn, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
 
-const Home = () => {
-  redirect("/home");
+const Root = () => {
+  return (
+    <div>
+      <Link href="/home">
+        <Button>Go Home</Button>
+      </Link>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+    </div>
+  );
 };
-
-export default Home;
+export default Root;
