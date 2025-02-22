@@ -17,6 +17,7 @@ type Props = {
   replyingMessage: ReplyMessage | null;
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   latestMessagePositionRef: RefObject<HTMLDivElement | null>;
+  setInputMessage: (inputMessage: string | null) => void;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
@@ -64,6 +65,8 @@ export const BottomInput = memo((props: Props) => {
     props.bottomInputRef.current.value = "";
   };
 
+  const changeInput = (inputMessage: string) => props.setInputMessage(inputMessage);
+
   return (
     <div className={style.input_area}>
       <Textarea
@@ -73,6 +76,7 @@ export const BottomInput = memo((props: Props) => {
         onKeyDown={handleKeyDown}
         onCompositionStart={() => setIsComposing(true)}
         onCompositionEnd={() => setIsComposing(false)}
+        onChange={e => changeInput(e.target.value)}
         ref={props.bottomInputRef}
       />
       <Button onClick={handleSubmit} className={style.send_button}>

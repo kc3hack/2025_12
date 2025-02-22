@@ -16,6 +16,7 @@ const Room = () => {
   const replyingToRef = useRef<HTMLDivElement | null>(null);
   const [replyingMessage, setReplyingMessage] = useState<ReplyMessage | null>(null);
   const bottomInputRef = useRef<HTMLTextAreaElement>(null);
+  const [inputMessage, setInputMessage] = useState<string | null>(null);
   const [roomId] = useState("");
 
   const [ws] = useAtom(wsAtom);
@@ -56,6 +57,8 @@ const Room = () => {
         setReplyingMessage={setReplyingMessage}
       />
       <Footer
+        inputMessage={inputMessage}
+        setInputMessage={setInputMessage}
         bottomInputRef={bottomInputRef}
         latestMessagePositionRef={latestMessagePositionRef}
         replyingToRef={replyingToRef}
