@@ -30,7 +30,7 @@ export const ChatContainer = ({ items: rooms, fetchRooms }: ChatProps) => {
   return (
     <div className={style.chat_container}>
       {rooms.map(room => (
-        <Link href={`/room/${room.id}`} className={style.chat} key={room.name}>
+        <Link href={`/room/${room.id}`} className={style.chat} key={room.id}>
           <ContextMenu>
             <ContextMenuTrigger>
               <p>{room.name}</p>
