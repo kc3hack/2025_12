@@ -1,0 +1,21 @@
+@use "@/style/theme";
+
+@mixin sm() {
+  box-shadow: theme.$shadow-sm;
+}
+
+@mixin default() {
+  box-shadow: theme.$shadow-default;
+}
+
+@mixin md() {
+  box-shadow: theme.$shadow-md;
+}
+
+@mixin lg() {
+  box-shadow: theme.$shadow-lg;
+}
+
+@mixin xl() {
+  box-shadow: theme.$shadow-xl;
+}

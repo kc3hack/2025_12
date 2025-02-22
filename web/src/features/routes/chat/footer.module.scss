@@ -1,3 +1,5 @@
+@use "@/style/theme";
+
 .footer {
   position: relative;
   margin: 1em;
@@ -5,16 +7,23 @@
   .kansai_bar {
     width: 100%;
     padding: 0.2em;
+    color: theme.$background;
     text-align: center;
     word-break: break-all;
-    background-color: pink;
+    background-color: theme.$primary;
+    border-radius: 0.5em 0.5em 0 0;
+
+    &[data-is-replying-now="true"] {
+      border-radius: 0;
+    }
   }
 
   .reply_bar {
     width: 100%;
     padding: 0.2em;
     text-align: center;
-    background-color: #f0f0f0;
+    background-color: theme.$muted;
+    border-radius: 0.5em 0.5em 0 0;
   }
 
   .cancel {
@@ -30,6 +39,7 @@
 
     .text_area {
       padding-right: 6em;
+      background: theme.$card;
     }
 
     .text_area[data-replying-message] {

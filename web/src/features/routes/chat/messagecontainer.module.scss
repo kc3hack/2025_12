@@ -1,4 +1,6 @@
 @use "@/style/utils";
+@use "@/style/theme";
+@use "@/style/shadow";
 
 .message_container {
   display: flex;
@@ -9,21 +11,30 @@
 
   .message_wrapper {
     display: flex;
-    width: 100%;
     padding: 1em;
-    margin: 0.5em 0;
+    margin: 0.5em 0.5em;
+    border-radius: 1em;
 
 
     &[data-is-me="true"] {
       flex-direction: row-reverse;
-      padding-left: 10em;
       margin-left: auto;
       text-align: right;
 
       .message {
+        color: theme.$background;
         text-align: left;
-        background-color: #ffc0cb;
-        border-radius: 1em 0.4em 1em 1em;
+        background: theme.$primary;
+        border-radius: 1em 0.2em 1em 1em;
+
+        .message_reply_area {
+          background: transparent;
+          border-color: theme.$background;
+
+          &:hover {
+            color: theme.$background;
+          }
+        }
       }
 
       .message_reactions {
@@ -42,18 +53,30 @@
     }
 
     &[data-is-me="false"] {
-      padding-right: 10em;
       margin-right: auto;
 
       .message {
-        background-color: #e2e8f0;
-        border-radius: 0.4em 1em 1em 1em;
+        color: theme.$foreground;
+        background-color: theme.$card;
+        border: solid theme.$muted;
+        border-width: 1px;
+        border-radius: 0.2em 1em 1em 1em;
+      }
+
+
+      .message_reply_area {
+        background-color: theme.$card;
+
+        &:hover {
+          color: theme.$foreground;
+        }
       }
 
       .message_reactions {
         display: flex;
-        @include utils.space-x(0.3em);
         text-align: left;
+        @include utils.space-x(0.3em);
+
 
         .reaction {
           border-radius: 20em;
@@ -66,7 +89,8 @@
     }
 
     &[data-is-replying="true"] {
-      background-color: lightblue;
+      background-color: theme.$card;
+      @include shadow.default;
     }
 
 
@@ -86,8 +110,7 @@
         width: 100%;
         height: auto;
         text-align: left;
-        background: transparent;
-        border-color: black;
+        @include shadow.sm;
       }
     }
   }
@@ -99,7 +122,7 @@
 
 @keyframes fadeOut {
   from {
-    background-color: green;
+    background-color: theme.$accent;
   }
 
   to {

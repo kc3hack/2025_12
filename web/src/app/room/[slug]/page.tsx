@@ -46,7 +46,7 @@ const Room = () => {
   }, [ws, getToken]);
 
   return (
-    <div className={style.home_page}>
+    <div className={style.room_page}>
       <MessageContainer
         bottomInputRef={bottomInputRef}
         latestMessagePositionRef={latestMessagePositionRef}

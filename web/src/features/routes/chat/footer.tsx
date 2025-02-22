@@ -26,7 +26,12 @@ export const Footer = (props: Props) => {
           setReplyingMessage={props.setReplyingMessage}
         />
       )}
-      {props.inputMessage && <BottomKansaiTranslateArea inputMessage={props.inputMessage} />}
+      {props.inputMessage && (
+        <BottomKansaiTranslateArea
+          inputMessage={props.inputMessage}
+          isReplyingNow={!!props.replyingMessage}
+        />
+      )}
       <BottomInput
         setInputMessage={props.setInputMessage}
         bottomInputRef={props.bottomInputRef}

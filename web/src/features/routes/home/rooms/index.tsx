@@ -11,11 +11,12 @@ import style from "./index.module.scss";
 import Link from "next/link";
 import { MiniChat } from "@/features/mini-chat";
 
-type ChatProps = {
+type RoomContainerProps = {
   items: RoomType[];
   fetchRooms: () => void;
 };
-export const ChatContainer = ({ items: rooms, fetchRooms }: ChatProps) => {
+
+export const RoomContainer = ({ items: rooms, fetchRooms }: RoomContainerProps) => {
   const { getToken } = useAuth();
 
   const handleDelete = async (room_id: string) => {
@@ -28,13 +29,15 @@ export const ChatContainer = ({ items: rooms, fetchRooms }: ChatProps) => {
   };
 
   return (
-    <div className={style.chat_container}>
+    <div className={style.room_container}>
       {rooms.map(room => (
-        <Link href={`/room/${room.id}`} className={style.chat} key={room.id}>
+        <Link href={`/room/${room.id}`} className={style.room} key={room.id}>
           <ContextMenu>
             <ContextMenuTrigger>
-              <p>{room.name}</p>
-              <MiniChat room_id={room.id} />
+              <div className={style.room_content}>
+                <MiniChat room_id={room.id} className={style.chat} />
+                <p className={style.room_name}>{room.name}</p>
+              </div>
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuItem>編集</ContextMenuItem>
