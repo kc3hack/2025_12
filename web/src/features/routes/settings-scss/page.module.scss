@@ -1,3 +1,5 @@
+/* stylelint-disable CssSyntaxError */
+/* stylelint-disable order/properties-order */
 body {
   background-color: rgb(255, 255, 255);
 }
@@ -5,23 +7,24 @@ body {
 .setting_container {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 1em;
   display: flex;
   flex-direction: column;
-  width: 30%;
+  width: 20%;
   height: 100vh;
   overflow: scroll;
-  background: rgb(91, 91, 91);
 
   .setting1 {
-    padding: 2em 0em;
-    font-size: 150%;
+    padding-left: 3em;
+    padding-right: 3em;
+    font-size: 120%;
     text-align: center;
   }
 
   .setting2 {
-    padding: 2em;
-    font-size: 150%;
+    padding-left: 3em;
+    padding-right: 3em;
+    font-size: 120%;
   }
 }
 
@@ -29,7 +32,7 @@ body {
   .container {
     .contents {
       width: 70%;
-      margin-left: 30%;
+      margin-left: 20%;
     }
   }
 }
@@ -44,8 +47,12 @@ body {
     margin-top: 0em;
     font-size: 2em;
   }
-
+  .my_profile {
+    width: 5em;
+  }
   .image {
+    width: 4em;
+    height: 4em;
     margin-top: 1em;
   }
 
@@ -54,7 +61,7 @@ body {
     flex-direction: column;
     margin-top: 10em;
     margin-bottom: auto;
-    margin-left: 0em;
+    margin-left: -3em;
 
     .namebox {
       height: 2em;
@@ -76,13 +83,30 @@ body {
   }
 }
 
-.account_container {
-  display: flex;
+.account_card_container {
+  margin-top: 10em;
+  margin-left: 7em;
+  .textbox {
+    display: flex;
+    flex-direction: row;
 
-  .account {
-    padding: 3em 1em;
-    margin-top: -38em;
-    margin-left: 1em;
-    font-size: 2em;
+    .left_container {
+      .image {
+        width: 5em;
+        height: 5em;
+      }
+    }
+    .right_container {
+      width: 30em;
+      margin-left: 3em;
+      .intro {
+        height: 8em;
+      }
+
+      .changes {
+        margin-left: 10em;
+        margin-top: 3em;
+      }
+    }
   }
 }
