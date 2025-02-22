@@ -5,7 +5,7 @@ import style from "./footer.module.scss";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
-import type { KeyboardEvent } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Message } from "@/features/message/type";
 import { messagesAtom } from "@/features/message/store";
@@ -21,6 +21,7 @@ type Props = {
   replyingMessage: ReplyMessage | null;
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   latestMessagePositionRef: RefObject<HTMLDivElement | null>;
+  setInputMessage: (inputMessage: string | null) => void;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
 
@@ -90,6 +91,8 @@ export const BottomInput = memo((props: Props) => {
     props.bottomInputRef.current.value = "";
   };
 
+  const changeInput = (inputMessage: string) => props.setInputMessage(inputMessage);
+
   return (
     <div className={style.input_area}>
       <Textarea
@@ -99,6 +102,7 @@ export const BottomInput = memo((props: Props) => {
         onKeyDown={handleKeyDown}
         onCompositionStart={() => setIsComposing(true)}
         onCompositionEnd={() => setIsComposing(false)}
+        onChange={e => changeInput(e.target.value)}
         ref={props.bottomInputRef}
       />
       <Button onClick={handleSubmit} className={style.send_button}>

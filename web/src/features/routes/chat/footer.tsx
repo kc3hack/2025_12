@@ -4,8 +4,11 @@ import style from "./footer.module.scss";
 import { ReplyMessage } from "./message-container";
 import { BottomInput } from "./bottom-input";
 import { BottomReplyButton } from "./bottom-reply-button";
+import { BottomKansaiTranslateArea } from "./bottom-kansai-translate-area";
 
 type Props = {
+  inputMessage: string | null;
+  setInputMessage: (inputMessage: string | null) => void;
   latestMessagePositionRef: RefObject<HTMLDivElement | null>;
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   replyingToRef: RefObject<HTMLDivElement | null>;
@@ -23,7 +26,9 @@ export const Footer = (props: Props) => {
           setReplyingMessage={props.setReplyingMessage}
         />
       )}
+      {props.inputMessage && <BottomKansaiTranslateArea inputMessage={props.inputMessage} />}
       <BottomInput
+        setInputMessage={props.setInputMessage}
         bottomInputRef={props.bottomInputRef}
         latestMessagePositionRef={props.latestMessagePositionRef}
         replyingMessage={props.replyingMessage}
