@@ -8,6 +8,7 @@ import { wsAtom } from "@/features/websocket/store";
 import { EventFromServer } from "@/types/EventFromServer";
 import { Message } from "@/features/message/type";
 import { userAtom } from "@/features/account/store";
+import { redirect } from "next/navigation";
 
 export type ReplyMessage = {
   id: string;
@@ -42,6 +43,13 @@ export const MessageContainer = (props: Props) => {
         messageContainerRef.current.scrollTop -
         messageContainerRef.current.clientHeight;
       const isBottom = Math.abs(calcBottom) < 10; // TODO: 数値はいい感じに変えといて
+
+      if (msg.type === "FailedToJoinRoom") {
+        if (msg.reason.type === "NotParticipated") {
+          redirect(`/room/${msg.reason.room_id}/invite`);
+          // TODO: Redirect Invite page
+        }
+      }
 
       if (msg.type === "Message") {
         const newMessage: Message = {

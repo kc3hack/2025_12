@@ -9,9 +9,11 @@ use axum::{
 use chrono::Utc;
 use futures::{
     stream::{SplitSink, SplitStream},
-    StreamExt as _,
+    SinkExt as _, StreamExt as _,
 };
-use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessageFromServer};
+use models::websocket::{
+    EventFromClient, EventFromServer, FailedToJoinRoomReason, WSRoom, WSUserMessageFromServer,
+};
 use serde::Serialize;
 use std::sync::Arc;
 use uuid::Uuid;
@@ -131,7 +133,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
             tracing::info!("Unauthorized connection");
 
             let _ = EventFromServer::FailedToJoinRoom {
-                message: "Unauthorized error".to_owned(),
+                reason: FailedToJoinRoomReason::Unauthorized,
             }
             .send(&mut sender)
             .await;
@@ -142,13 +144,42 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     tracing::info!("{user_id} connected");
 
     let room = match state.join(&room_id).await {
-        Ok(v) => v,
+        Ok(v) => {
+            let db = state.db.lock().await;
+            let users = match db.get_room_participants(&room_id).await {
+                Ok(v) => v,
+                Err(_) => {
+                    let _ = EventFromServer::FailedToJoinRoom {
+                        reason: FailedToJoinRoomReason::RoomNotFound,
+                    }
+                    .send(&mut sender)
+                    .await;
+                    tracing::info!("{user_id} disconnected");
+                    return;
+                }
+            };
+
+            if users.iter().any(|u| u.id == user_id) {
+                v
+            } else {
+                let _ = EventFromServer::FailedToJoinRoom {
+                    reason: FailedToJoinRoomReason::NotParticipated {
+                        room_id: room_id.clone(),
+                    },
+                }
+                .send(&mut sender)
+                .await;
+                tracing::info!("{user_id} disconnected");
+                return;
+            }
+        }
         Err(_) => {
             let _ = EventFromServer::FailedToJoinRoom {
-                message: "Room not found".to_owned(),
+                reason: FailedToJoinRoomReason::RoomNotFound,
             }
             .send(&mut sender)
             .await;
+            tracing::info!("{user_id} disconnected");
             return;
         }
     };
@@ -185,6 +216,10 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
             Some(v) => v,
             None => {
                 tracing::info!("Room not found");
+                sender.close().await.unwrap_or_else(|e| {
+                    tracing::error!("Failed to close sender: {e:?}");
+                });
+                tracing::info!("{user_id} disconnected");
                 return;
             }
         };

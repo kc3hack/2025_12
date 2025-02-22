@@ -51,9 +51,19 @@ pub enum EventFromServer {
     Message(WSUserMessageFromServer),
     JoinedRoom(WSRoom),
     FailedToJoinRoom {
-        message: String,
+        reason: FailedToJoinRoomReason,
     },
     AddReaction,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, TS)]
+#[serde(tag = "type", rename_all = "PascalCase")]
+#[ts(export)]
+pub enum FailedToJoinRoomReason {
+    Unauthorized,
+    RoomNotFound,
+    NotParticipated { room_id: String },
+    InternalError,
 }
 
 impl EventFromServer {
