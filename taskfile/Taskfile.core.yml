@@ -1,0 +1,20 @@
+version: '3'
+silent: true
+
+tasks:
+  default:
+    desc: List for core
+    cmd: "task -l | grep core:"
+
+  dev:
+    desc: Start core server
+    cmd: "{{.DOPPLER_CMD}} cargo run"
+
+  test:
+    desc: Run core test
+    cmd: "{{.DOPPLER_CMD}} cargo test --workspace"
+
+  gen-types:
+    desc: Generate types from backend
+    cmds:
+      - export TS_RS_EXPORT_DIR="../../web/src/types/" && cargo test -p models

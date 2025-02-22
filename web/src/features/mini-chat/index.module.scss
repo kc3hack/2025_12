@@ -1,0 +1,41 @@
+@use "@/style/utils";
+
+.mini_chat_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  height: 20em;
+  padding: 0.4em 0.9em;
+  overflow-y: scroll;
+  border: solid;
+  border-width: 1px;
+  @include utils.space-y(2em);
+
+  .mini_chat {
+    display: flex;
+    flex-direction: column;
+    padding: 0.4em;
+    @include utils.space-y(0.2em);
+
+    &[data-is-me="true"] {
+      margin-left: auto;
+
+      .message {
+        border-radius: 1em 1em 0 1em;
+      }
+    }
+
+    &[data-is-me="false"] {
+      .message {
+        border-radius: 1em 1em 1em 0;
+      }
+    }
+
+    .message {
+      padding: 0.4em 0.9em;
+      border: solid;
+      border-width: 1px;
+    }
+  }
+}

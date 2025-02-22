@@ -28,9 +28,9 @@ includes:
     dir: ./web
     taskfile: ./taskfile/Taskfile.web.yml
 
-  server:
-    dir: ./server
-    taskfile: ./taskfile/Taskfile.server.yml
+  core:
+    dir: ./core
+    taskfile: ./taskfile/Taskfile.core.yml
 
   db:
     dir: ./db
@@ -55,13 +55,21 @@ tasks:
 
   test:
     deps:
-      - task: server:test
+      - task: core:test
 
   dev:
-    desc: Start dev server
+    desc: Start web and core server
     deps:
       - task: web:dev
-      - task: server:dev
+      - task: core:dev
+
+  add:
+    deps:
+      - task: web:add
+
+  remove:
+    deps:
+      - task: web:remove
 
   install:
     desc: Install dependencies
@@ -76,6 +84,7 @@ tasks:
     desc: Nvim with env
     cmd: "{{.DOPPLER_CMD}} nvim"
 
-  zodios-gen:
-    desc: Generate API
-    cmd: pnpm openapi-zod-client http://localhost:3050/api-docs/openapi.json -o src/zodios/api.ts 
+  gen-types:
+    deps:
+      - core:gen-types
+      - web:gen-types
