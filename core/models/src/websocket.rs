@@ -6,6 +6,7 @@ use ts_rs::TS;
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct WSUserMessage {
+    pub author_id: String,
     pub author_name: String,
     pub author_avatar_url: String,
     pub content: String,

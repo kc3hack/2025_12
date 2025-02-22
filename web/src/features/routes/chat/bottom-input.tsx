@@ -15,6 +15,7 @@ import { ReplyMessage } from "./message-container";
 import { wsAtom } from "@/features/websocket/store";
 import { EventFromServer } from "@/types/EventFromServer";
 import { EventFromClient } from "@/types/EventFromClient";
+import { userAtom } from "@/features/account/store";
 
 type Props = {
   replyingMessage: ReplyMessage | null;
@@ -26,6 +27,7 @@ type Props = {
 export const BottomInput = memo((props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
   const [isComposing, setIsComposing] = useState(false);
+  const [user] = useAtom(userAtom);
 
   const [ws] = useAtom(wsAtom);
 
@@ -48,26 +50,18 @@ export const BottomInput = memo((props: Props) => {
         return;
       }
 
-      const event: EventFromClient = {
-        type: "UserMessage",
-        author_name: msg.author_name,
-        author_avatar_url: msg.author_avatar_url,
-        content: msg.content,
-        reply_to_id: null
-      };
-
       const newMessage: Message = {
         id: uuidv4(),
         author: msg.author_name,
         content: msg.content,
-        is_me: true,
+        is_me: msg.author_id === user?.id,
         icon: null,
         reply_to_id: null,
         reactions: null
       };
       setMessages([...messages, newMessage]);
     });
-  }, [ws, messages, setMessages]);
+  }, [ws, messages, setMessages, user]);
 
   const handleSubmit = () => {
     if (!props.bottomInputRef.current) {
@@ -78,8 +72,13 @@ export const BottomInput = memo((props: Props) => {
       return;
     }
 
+    if (!user) {
+      return;
+    }
+
     const event: EventFromClient = {
       type: "UserMessage",
+      author_id: user.id,
       author_name: "sample user",
       author_avatar_url: "",
       content: props.bottomInputRef.current.value,
