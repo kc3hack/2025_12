@@ -37,52 +37,6 @@ body {
   }
 }
 
-.profile_container {
-  display: flex;
-
-  .profile {
-    display: flex;
-    flex-direction: column;
-    padding: 2em;
-    margin-top: 0em;
-    font-size: 2em;
-  }
-  .my_profile {
-    width: 5em;
-  }
-  .image {
-    width: 4em;
-    height: 4em;
-    margin-top: 1em;
-  }
-
-  .namebox_container {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10em;
-    margin-bottom: auto;
-    margin-left: -3em;
-
-    .namebox {
-      height: 2em;
-      padding-right: 20em;
-      background: rgb(165, 165, 165);
-      border-radius: 8px;
-    }
-  }
-
-  .intro_container {
-    margin-top: 2em;
-
-    .intro {
-      height: 8em;
-      padding-right: 20em;
-      background: rgb(165, 165, 165);
-      border-radius: 8px;
-    }
-  }
-}
-
 .account_card_container {
   margin-top: 10em;
   margin-left: 7em;
