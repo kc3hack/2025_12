@@ -34,15 +34,17 @@ export const MiniChat = ({ room_id }: { room_id: string }) => {
         }
       });
 
-      const minichat_messages: MiniChatMessageType[] = fetched_messages.map(message => {
-        return {
-          id: message.id,
-          is_me: false,
-          author_name: "",
-          author_avatar_url: "",
-          message: message.content
-        };
-      });
+      const minichat_messages: MiniChatMessageType[] = fetched_messages
+        .map(message => {
+          return {
+            id: message.id,
+            is_me: false,
+            author_name: "",
+            author_avatar_url: "",
+            message: message.content
+          };
+        })
+        .reverse();
 
       setMessages(minichat_messages);
     });
