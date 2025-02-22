@@ -64,10 +64,6 @@ export const BottomInput = memo((props: Props) => {
     props.setReplyingMessage(null);
     props.bottomInputRef.current.value = "";
     props.setInputMessage(null);
-
-    setTimeout(() => {
-      props.latestMessagePositionRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 10);
   };
 
   const changeInput = (inputMessage: string) => props.setInputMessage(inputMessage);
