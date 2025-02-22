@@ -70,14 +70,14 @@ pub struct CreateRoomRequest {
     pub room_name: String,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Debug, sqlx::FromRow)]
 pub struct Participant {
     pub room_id: String,
     pub user_id: String,
     pub joined_at: DateTime<Utc>,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Debug, sqlx::FromRow)]
 pub struct Message {
     pub id: String,
     pub room_id: String,
