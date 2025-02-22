@@ -41,7 +41,7 @@ export const MessageCell = (props: Props) => {
     setMessages(messages.filter(message => message.id !== id));
   };
 
-  const handleReply = (id: string, author_name: string, content: string) => {
+  const handleReply = (id: string, author_name: string | null, content: string) => {
     const replyMessage: ReplyMessage = {
       id: id,
       author_name: author_name,
