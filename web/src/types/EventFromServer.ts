@@ -2,4 +2,4 @@
 import type { WSRoom } from "./WSRoom";
 import type { WSUserMessage } from "./WSUserMessage";
 
-export type EventFromServer = { "type": "Message" } & WSUserMessage | { "type": "JoinedRoom" } & WSRoom | { "type": "FailedToJoinRoom", message: string, } | { "type": "AddReaction" };
+export type EventFromServer = { "type": "SyncMessage" } & Array<WSUserMessage> | { "type": "Message" } & WSUserMessage | { "type": "JoinedRoom" } & WSRoom | { "type": "FailedToJoinRoom", message: string, } | { "type": "AddReaction" };

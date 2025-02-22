@@ -15,19 +15,19 @@ use axum::{
 };
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
-use models::{websocket::EventFromServer, Room};
+use models::Room;
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::sync::{broadcast, Mutex};
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
-use websocket::websocket_handler;
+use websocket::{websocket_handler, InternalEvent};
 
 #[derive(Debug)]
 struct AppState {
     db: Mutex<DB>,
-    room_tx: Mutex<HashMap<String, broadcast::Sender<EventFromServer>>>,
+    room_tx: Mutex<HashMap<String, broadcast::Sender<InternalEvent>>>,
 }
 
 impl AppState {

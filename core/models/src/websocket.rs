@@ -6,6 +6,7 @@ use ts_rs::TS;
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct WSUserMessage {
+    pub id: String,
     pub author_name: String,
     pub author_avatar_url: String,
     pub content: String,
@@ -23,6 +24,7 @@ pub struct WSRoom {
 #[serde(tag = "type", rename_all = "PascalCase")]
 #[ts(export)]
 pub enum EventFromClient {
+    RequestSyncMessage { limit: u32 },
     UserMessage(WSUserMessage),
     JoinRoom { token: String },
     AddReaction,
@@ -32,6 +34,7 @@ pub enum EventFromClient {
 #[serde(tag = "type", rename_all = "PascalCase")]
 #[ts(export)]
 pub enum EventFromServer {
+    SyncMessage(Vec<WSUserMessage>),
     Message(WSUserMessage),
     JoinedRoom(WSRoom),
     FailedToJoinRoom { message: String },
