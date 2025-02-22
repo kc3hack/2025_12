@@ -8,21 +8,23 @@ use utoipa::ToSchema;
 pub struct User {
     pub id: String,
     pub nickname: Option<String>,
+    pub image_url: Option<String>,
     pub introduction: Option<String>,
     pub created_at: DateTime<Utc>,
-    // TODO: Add avatar_url
 }
 
 #[derive(Default)]
 pub struct UserUpdate {
     pub nickname: Option<Option<String>>,
+    pub image_url: Option<String>,
     pub introduction: Option<Option<String>>,
 }
 
 impl From<clerk_rs::models::User> for UserUpdate {
-    fn from(_user: clerk_rs::models::User) -> Self {
+    fn from(user: clerk_rs::models::User) -> Self {
         UserUpdate {
             nickname: None,
+            image_url: user.image_url,
             introduction: None,
         }
     }
@@ -38,6 +40,7 @@ impl From<clerk_rs::models::User> for User {
         User {
             id: user.id.unwrap_or_default(),
             nickname: None,
+            image_url: user.image_url,
             introduction: None,
             created_at,
         }

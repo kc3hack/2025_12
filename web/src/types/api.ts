@@ -34,6 +34,7 @@ const User = z
   .object({
     created_at: z.string().datetime({ offset: true }),
     id: z.string(),
+    image_url: z.union([z.string(), z.null()]).optional(),
     introduction: z.union([z.string(), z.null()]).optional(),
     nickname: z.union([z.string(), z.null()]).optional(),
   })

@@ -86,9 +86,9 @@ export const MessageCell = (props: Props) => {
       data-is-me={props.message.is_me}
       data-is-replying={props.replyingMessage?.id === props.message.id}
     >
-      {!props.message.is_me && props.message.icon && (
+      {!props.message.is_me && props.message.author_image_url && (
         <Avatar className={style.avatar}>
-          <AvatarImage src={props.message.icon} />
+          <AvatarImage src={props.message.author_image_url} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       )}

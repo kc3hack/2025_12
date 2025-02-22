@@ -45,9 +45,9 @@ export const MessageContent = (props: Props) => {
         >
           {replyMesage ? (
             <div>
-              {replyMesage?.icon && (
+              {replyMesage?.author_image_url && (
                 <Avatar className={style.avatar}>
-                  <AvatarImage src={replyMesage.icon} />
+                  <AvatarImage src={replyMesage.author_image_url} />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               )}
