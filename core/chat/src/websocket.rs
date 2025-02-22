@@ -106,6 +106,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                     .unwrap();
 
                     let event_from_server = EventFromServer::Message(WSUserMessage {
+                        author_id: msg.author_id.clone(),
                         author_name: msg.author_name.clone(),
                         author_avatar_url: "".to_owned(), // TODO: Set avatar url
                         content: msg.content.clone(),
