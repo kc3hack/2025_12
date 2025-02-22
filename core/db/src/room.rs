@@ -104,6 +104,7 @@ impl DB {
             SELECT
                 u.id,
                 u.nickname,
+                u.image_url,
                 u.introduction,
                 u.created_at
             FROM users u

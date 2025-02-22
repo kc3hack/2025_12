@@ -97,16 +97,17 @@ pub async fn sync_message(
     let messages = messages
         .iter()
         .map(|m| {
-            let author_name = users
+            let (author_name, author_image_url) = users
                 .iter()
                 .find(|u| Some(&u.id) == m.0.user_id.as_ref())
-                .and_then(|u| u.nickname.clone());
+                .map(|u| (u.nickname.clone(), u.image_url.clone()))
+                .unwrap_or((None, None));
 
             WSUserMessageFromServer {
                 id: m.0.id.clone(),
                 author_id: m.0.user_id.clone(),
                 author_name,
-                author_avatar_url: "".to_owned(),
+                author_image_url: author_image_url.clone(),
                 content: m.0.content.clone(),
                 reply_to_id: m.0.reply_to_id.clone(),
             }
@@ -220,6 +221,8 @@ async fn event_from_client_handle(
         }
 
         EventFromClient::UserMessage(msg) => {
+            tracing::info!("Message: {msg:?}");
+
             let mut db = state.db.lock().await;
             let message_id = Uuid::new_v4().to_string();
 
@@ -238,11 +241,11 @@ async fn event_from_client_handle(
 
             let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
                 id: message_id,
-                author_id: Some(msg.author_id.clone()),
-                author_name: Some(msg.author_name.clone()),
-                author_avatar_url: "".to_owned(), // TODO: Set avatar url
-                content: msg.content.clone(),
-                reply_to_id: msg.reply_to_id.clone(),
+                author_id: Some(msg.author_id),
+                author_name: Some(msg.author_name),
+                author_image_url: msg.author_image_url,
+                content: msg.content,
+                reply_to_id: msg.reply_to_id,
             });
 
             let room_tx = state.room_tx.lock().await;
@@ -257,8 +260,6 @@ async fn event_from_client_handle(
             let _ = tx.send(InternalEvent::Broadcast {
                 event: event_from_server,
             });
-
-            tracing::info!("Message: {msg:?}");
         }
 
         EventFromClient::AddReaction => {}

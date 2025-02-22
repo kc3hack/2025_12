@@ -50,7 +50,7 @@ export const MessageContainer = (props: Props) => {
           author_name: msg.author_name,
           content: msg.content,
           is_me: msg.author_id === user?.id,
-          icon: null,
+          author_image_url: msg.author_image_url,
           reply_to_id: msg.reply_to_id,
           reactions: null
         };
@@ -68,6 +68,7 @@ export const MessageContainer = (props: Props) => {
               id: m.id,
               author_id: m.author_id,
               author_name: m.author_name,
+              author_image_url: m.author_image_url,
               content: m.content,
               is_me: m.author_id === user?.id,
               icon: null,
