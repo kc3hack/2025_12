@@ -2,8 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, SignInButton, useAuth, UserButton } from "@clerk/nextjs";
-import { apiClient } from "../zodios/apiclient";
-import { MiniChat } from "@/features/mini-chat";
+import { apiClient } from "@/lib/apiClient";
 
 const Home = () => {
   const { getToken } = useAuth();
@@ -24,9 +23,6 @@ const Home = () => {
       >
         Push me
       </Button>
-      <div style={{ width: "30em" }}>
-        <MiniChat />
-      </div>
     </div>
   );
 };

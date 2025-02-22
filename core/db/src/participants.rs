@@ -10,7 +10,7 @@ impl DB {
         let joined_at = participant.joined_at;
 
         let query = sqlx::query!(
-            "INSERT INTO participants (room_id, user_id, joined_at) VALUES (?, ?, ?)",
+            r#"INSERT INTO participants (room_id, user_id, joined_at) VALUES (?, ?, ?)"#,
             room_id,
             user_id,
             joined_at
@@ -21,13 +21,13 @@ impl DB {
         Ok(())
     }
 
-    pub async fn remove_participant(
+    pub async fn delete_participant(
         &mut self,
         room_id: &str,
         user_id: &str,
     ) -> Result<(), sqlx::Error> {
         let query = sqlx::query!(
-            "DELETE FROM participants WHERE room_id = ? AND user_id = ?",
+            r#"DELETE FROM participants WHERE room_id = ? AND user_id = ?"#,
             room_id,
             user_id
         );
@@ -43,7 +43,7 @@ impl DB {
         user_id: &str,
     ) -> Result<models::Participant, sqlx::Error> {
         let participant = sqlx::query_as(
-            "SELECT room_id, user_id, joined_at FROM participants WHERE room_id = ? AND user_id = ?",
+            r#"SELECT room_id, user_id, joined_at FROM participants WHERE room_id = ? AND user_id = ?"#,
         )
         .bind(room_id)
         .bind(user_id)
@@ -85,9 +85,9 @@ mod test {
     }
 
     #[sqlx::test(migrations = "../../db/migrations", fixtures("user", "room"))]
-    pub async fn remove_participant_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
+    pub async fn delete_participant_test(pool: MySqlPool) -> Result<(), sqlx::Error> {
         let mut db = DB::from_pool(pool);
-        db.remove_participant("0", "0").await?;
+        db.delete_participant("0", "0").await?;
 
         Ok(())
     }

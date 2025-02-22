@@ -1,4 +1,4 @@
-use crate::{clerk::verify_webhook, AppState};
+use crate::{clerk::VerifiedWebhook, AppState};
 use axum::{
     body::Bytes,
     extract::State,
@@ -23,7 +23,7 @@ use std::sync::Arc;
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "User"
+    tag = "Clerk Webhook"
 )]
 pub async fn webhook_user_signup(
     State(state): State<Arc<AppState>>,
@@ -34,7 +34,7 @@ pub async fn webhook_user_signup(
 
     tracing::debug!("webhook 'user.created' received");
 
-    let verified_webhook = verify_webhook(body, headers, "SIGNING_SECRET_USER_SIGNUP")?;
+    let verified_webhook = VerifiedWebhook::new(body, headers, "SIGNING_SECRET_USER_SIGNUP")?;
     let user = verified_webhook.data::<clerk_rs::models::User>()?;
 
     user.id.clone().inspect(|id| {
@@ -66,7 +66,7 @@ pub async fn webhook_user_signup(
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "User"
+    tag = "Clerk Webhook"
 )]
 pub async fn webhook_user_deleted(
     State(state): State<Arc<AppState>>,
@@ -77,7 +77,7 @@ pub async fn webhook_user_deleted(
 
     tracing::debug!("webhook received");
 
-    let verified_webhook = verify_webhook(body, headers, "SIGNING_SECRET_USER_DELETED")?;
+    let verified_webhook = VerifiedWebhook::new(body, headers, "SIGNING_SECRET_USER_DELETED")?;
     let user = verified_webhook.data::<clerk_rs::models::User>()?;
 
     user.id.clone().inspect(|id| {
@@ -85,7 +85,7 @@ pub async fn webhook_user_deleted(
     });
 
     if let Some(user_id) = user.id {
-        db.remove_user(&user_id).await.map_err(|e| {
+        db.delete_user(&user_id).await.map_err(|e| {
             tracing::debug!("{e}");
             StatusCode::INTERNAL_SERVER_ERROR
         })?;
@@ -111,7 +111,7 @@ pub async fn webhook_user_deleted(
         (status = 400, description = "Bad Request"),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "User"
+    tag = "Clerk Webhook"
 )]
 pub async fn webhook_user_updated(
     State(state): State<Arc<AppState>>,
@@ -122,7 +122,7 @@ pub async fn webhook_user_updated(
 
     tracing::debug!("webhook received");
 
-    let verified_webhook = verify_webhook(body, headers, "SIGNING_SECRET_USER_UPDATED")?;
+    let verified_webhook = VerifiedWebhook::new(body, headers, "SIGNING_SECRET_USER_UPDATED")?;
     let user = verified_webhook.data::<clerk_rs::models::User>()?;
 
     user.id.clone().inspect(|id| {

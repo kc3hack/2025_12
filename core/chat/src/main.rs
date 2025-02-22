@@ -1,11 +1,13 @@
 mod api;
 mod clerk;
+mod error;
 mod webhook;
 mod websocket;
 
 use api::{
-    room::{create_room, delete_room, update_room},
-    user::{get_user, get_user_me},
+    message::get_room_messages,
+    room::{create_room, delete_room, get_room_users, update_room},
+    user::{get_user, get_user_me, get_user_rooms},
 };
 use axum::{
     routing::{delete, get, patch, post},
@@ -20,12 +22,12 @@ use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use webhook::{webhook_user_deleted, webhook_user_signup, webhook_user_updated};
-use websocket::{websocket_handler, EventFromServer};
+use websocket::{websocket_handler, InternalEvent};
 
 #[derive(Debug)]
 struct AppState {
     db: Mutex<DB>,
-    room_tx: Mutex<HashMap<String, broadcast::Sender<EventFromServer>>>,
+    room_tx: Mutex<HashMap<String, broadcast::Sender<InternalEvent>>>,
 }
 
 impl AppState {
@@ -57,8 +59,7 @@ impl AppState {
 async fn main() {
     tracing_subscriber::registry()
         .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "trace".into()),
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
         .with(tracing_subscriber::fmt::layer().pretty())
         .init();
@@ -78,10 +79,13 @@ async fn main() {
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .route("/users/me", get(get_user_me))
-        .route("/users/{id}", get(get_user))
+        .route("/users/{user_id}", get(get_user))
+        .route("/users/rooms", get(get_user_rooms))
         .route("/rooms", post(create_room))
         .route("/rooms/{room_id}", delete(delete_room))
         .route("/rooms/{room_id}", patch(update_room))
+        .route("/rooms/{room_id}/users", get(get_room_users))
+        .route("/rooms/{room_id}/messages", get(get_room_messages))
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
@@ -102,9 +106,12 @@ async fn main() {
     paths(
         api::user::get_user,
         api::user::get_user_me,
+        api::user::get_user_rooms,
         api::room::create_room,
         api::room::delete_room,
         api::room::update_room,
+        api::room::get_room_users,
+        api::message::get_room_messages,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
         webhook::webhook_user_updated,

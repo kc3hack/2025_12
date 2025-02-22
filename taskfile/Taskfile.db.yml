@@ -24,7 +24,7 @@ tasks:
 
   db:refresh:
     desc: Refresh database
-    cmds:
+    deps:
       - task: db:drop
       - task: db:create
       - task: migrate:run

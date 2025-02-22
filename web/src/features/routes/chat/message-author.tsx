@@ -1,9 +1,9 @@
 import style from "./messagecontainer.module.scss";
 
 type Props = {
-  messageAuther: string | null;
+  messageName: string | null;
 };
 
 export const MessageAuther = (props: Props) => {
-  return <div className={style.messsage_author}>{props.messageAuther}</div>;
+  return <div className={style.messsage_author}>{props.messageName}</div>;
 };

@@ -41,10 +41,10 @@ export const MessageCell = (props: Props) => {
     setMessages(messages.filter(message => message.id !== id));
   };
 
-  const handleReply = (id: string, author: string, content: string) => {
+  const handleReply = (id: string, author_name: string, content: string) => {
     const replyMessage: ReplyMessage = {
       id: id,
-      author_name: author,
+      author_name: author_name,
       content: content
     };
 
@@ -95,7 +95,7 @@ export const MessageCell = (props: Props) => {
       <ContextMenu>
         <ContextMenuTrigger>
           <div>
-            <MessageAuther messageAuther={props.message.author} />
+            <MessageAuther messageName={props.message.author_name} />
             <MessageContent message={props.message} />
             <MessageReaction message={props.message} />
           </div>
@@ -104,7 +104,7 @@ export const MessageCell = (props: Props) => {
           <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
           <ContextMenuItem
             onClick={() =>
-              handleReply(props.message.id, props.message.author, props.message.content)
+              handleReply(props.message.id, props.message.author_name, props.message.content)
             }
           >
             返信

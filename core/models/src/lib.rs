@@ -1,6 +1,8 @@
+pub mod websocket;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use utoipa::{PartialSchema, ToSchema};
+use utoipa::ToSchema;
 
 #[derive(sqlx::FromRow, Serialize, Deserialize, ToSchema, Debug)]
 pub struct User {
@@ -45,6 +47,7 @@ impl From<clerk_rs::models::User> for User {
 #[derive(Debug, Clone, sqlx::FromRow, Serialize, Deserialize, ToSchema)]
 pub struct Room {
     pub id: String,
+    pub room_name: String,
     pub creator_id: Option<String>,
     pub url: String,
     pub expired_at: Option<DateTime<Utc>>,
@@ -53,21 +56,28 @@ pub struct Room {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct RoomUpdate {
-    #[schema(nullable = true, format = DateTime )]
+    pub name: Option<String>,
+
+    #[schema(nullable = true, format = DateTime)]
     pub creator_id: Option<Option<String>>,
 
     #[schema(nullable = true, format = DateTime)]
     pub expired_at: Option<Option<DateTime<Utc>>>,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct CreateRoomRequest {
+    pub room_name: String,
+}
+
+#[derive(Debug, sqlx::FromRow)]
 pub struct Participant {
     pub room_id: String,
     pub user_id: String,
     pub joined_at: DateTime<Utc>,
 }
 
-#[derive(sqlx::FromRow)]
+#[derive(ToSchema, Debug, Serialize, sqlx::FromRow)]
 pub struct Message {
     pub id: String,
     pub room_id: String,

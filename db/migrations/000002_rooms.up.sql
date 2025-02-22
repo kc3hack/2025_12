@@ -1,5 +1,6 @@
 CREATE TABLE rooms (
     id VARCHAR(36) NOT NULL,
+    room_name VARCHAR(36) NOT NULL,
     creator_id VARCHAR(36) NULL,
     url VARCHAR(255) UNIQUE NOT NULL,
     expired_at TIMESTAMP NULL,

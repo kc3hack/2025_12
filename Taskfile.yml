@@ -84,6 +84,7 @@ tasks:
     desc: Nvim with env
     cmd: "{{.DOPPLER_CMD}} nvim"
 
-  zodios-gen:
+  gen-types:
     deps:
-      - web:zodios-gen
+      - core:gen-types
+      - web:gen-types

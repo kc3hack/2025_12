@@ -1,49 +1,54 @@
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger
+} from "@/components/ui/context-menu";
+import { RoomType } from "@/features/room/type";
+import { apiClient } from "@/lib/apiClient";
+import { useAuth } from "@clerk/nextjs";
 import style from "./index.module.scss";
+import Link from "next/link";
+import { MiniChat } from "@/features/mini-chat";
 
-const sampleData = [
-  { name: "group1" },
-  { name: "group2" },
-  { name: "group3" },
-  { name: "group4" },
-  { name: "group5" },
-  { name: "group6" },
-  { name: "group7" },
-  { name: "group8" },
-  { name: "group9" },
-  { name: "group10" },
-  { name: "group11" },
-  { name: "group12" },
-  { name: "group13" },
-  { name: "group14" },
-  { name: "group15" },
-  { name: "group16" },
-  { name: "group17" },
-  { name: "group18" },
-  { name: "group19" },
-  { name: "group20" },
-  { name: "group21" },
-  { name: "group22" },
-  { name: "group23" },
-  { name: "group24" },
-  { name: "group25" },
-  { name: "group26" },
-  { name: "group27" },
-  { name: "group28" },
-  { name: "group29" },
-  { name: "group30" },
-  { name: "group31" },
-  { name: "group32" },
-  { name: "group33" }
-];
+type ChatProps = {
+  items: RoomType[];
+  fetchRooms: () => void;
+};
+export const ChatContainer = ({ items: rooms, fetchRooms }: ChatProps) => {
+  const { getToken } = useAuth();
 
-export const Chat = () => {
+  const handleDelete = async (room_id: string) => {
+    await apiClient.delete_room(undefined, {
+      params: { room_id: room_id },
+      headers: { Authorization: `Bearer ${await getToken()}` }
+    });
+
+    fetchRooms();
+  };
+
   return (
     <div className={style.chat_container}>
-      {sampleData.map(item => (
-        <div className={style.chat} key={item.name}>
-          <p>{item.name}</p>
-          <div className={style.icon} key={item.name} />
-        </div>
+      {rooms.map(room => (
+        <Link href={`/room/${room.id}`} className={style.chat} key={room.name}>
+          <ContextMenu>
+            <ContextMenuTrigger>
+              <p>{room.name}</p>
+              <MiniChat room_id={room.id} />
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem>編集</ContextMenuItem>
+              <ContextMenuItem
+                onClick={e => {
+                  e.preventDefault();
+                  handleDelete(room.id);
+                }}
+              >
+                削除
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
+        </Link>
       ))}
     </div>
   );

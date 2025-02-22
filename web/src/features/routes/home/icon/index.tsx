@@ -10,14 +10,14 @@ const sampleData = [
   { name: "hayasi" }
 ];
 
-export const Icon = () => {
+export const IconContainer = () => {
   return (
     <div className={style.friends_container}>
       {sampleData.map(item => (
         <div className={style.item_container} key={item.name}>
           <div className={style.item_container}>
             <Avatar>
-              <AvatarImage src="https://iconbu.com/wp-content/uploads/2023/10/%E5%93%8002.png" />
+              <AvatarImage src="https://img.freepik.com/free-photo/fuji-mountain-kawaguchiko-lake-morning-autumn-seasons-fuji-mountain-yamanachi-japan_335224-102.jpg" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </div>
