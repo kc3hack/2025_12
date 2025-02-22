@@ -9,12 +9,13 @@ import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@clerk/nextjs";
 import style from "./index.module.scss";
 import Link from "next/link";
+import { MiniChat } from "@/features/mini-chat";
 
 type ChatProps = {
   items: RoomType[];
   fetchRooms: () => void;
 };
-export const ChatContainer = ({ items, fetchRooms }: ChatProps) => {
+export const ChatContainer = ({ items: rooms, fetchRooms }: ChatProps) => {
   const { getToken } = useAuth();
 
   const handleDelete = async (room_id: string) => {
@@ -28,19 +29,19 @@ export const ChatContainer = ({ items, fetchRooms }: ChatProps) => {
 
   return (
     <div className={style.chat_container}>
-      {items.map(item => (
-        <Link href={`/room/${item.id}`} className={style.chat} key={item.name}>
+      {rooms.map(room => (
+        <Link href={`/room/${room.id}`} className={style.chat} key={room.name}>
           <ContextMenu>
             <ContextMenuTrigger>
-              <p>{item.name}</p>
-              <div className={style.icon} key={item.name} />
+              <p>{room.name}</p>
+              <MiniChat room_id={room.id} />
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuItem>編集</ContextMenuItem>
               <ContextMenuItem
                 onClick={e => {
                   e.preventDefault();
-                  handleDelete(item.id);
+                  handleDelete(room.id);
                 }}
               >
                 削除
