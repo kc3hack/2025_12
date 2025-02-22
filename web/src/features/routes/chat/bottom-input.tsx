@@ -6,14 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
 import type { KeyboardEvent } from "react";
-import { v4 as uuidv4 } from "uuid";
-import type { Message } from "@/features/message/type";
-import { messagesAtom } from "@/features/message/store";
 import { useAtom } from "jotai";
-import { memo, type RefObject, useEffect, useState } from "react";
+import { memo, type RefObject, useState } from "react";
 import { ReplyMessage } from "./message-container";
 import { wsAtom } from "@/features/websocket/store";
-import { EventFromServer } from "@/types/EventFromServer";
 import { EventFromClient } from "@/types/EventFromClient";
 import { userAtom } from "@/features/account/store";
 
@@ -25,7 +21,6 @@ type Props = {
 };
 
 export const BottomInput = memo((props: Props) => {
-  const [messages, setMessages] = useAtom(messagesAtom);
   const [isComposing, setIsComposing] = useState(false);
   const [user] = useAtom(userAtom);
 
@@ -41,27 +36,6 @@ export const BottomInput = memo((props: Props) => {
       handleSubmit();
     }
   };
-
-  useEffect(() => {
-    ws?.addEventListener("message", e => {
-      const msg: EventFromServer = JSON.parse(e.data);
-
-      if (msg.type !== "Message") {
-        return;
-      }
-
-      const newMessage: Message = {
-        id: uuidv4(),
-        author: msg.author_name,
-        content: msg.content,
-        is_me: msg.author_id === user?.id,
-        icon: null,
-        reply_to_id: null,
-        reactions: null
-      };
-      setMessages([...messages, newMessage]);
-    });
-  }, [ws, messages, setMessages, user]);
 
   const handleSubmit = () => {
     if (!props.bottomInputRef.current) {
