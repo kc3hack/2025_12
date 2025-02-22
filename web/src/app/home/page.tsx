@@ -18,12 +18,11 @@ const home = () => {
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    (async () => {
-      const rooms = await fetchRooms();
+    fetchRooms().then(rooms => {
       updateDisplay(rooms);
       setRooms(rooms);
       setfilterdRooms(rooms);
-    })();
+    });
   }, [setRooms]);
 
   const fetchRooms = async () => {

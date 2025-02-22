@@ -20,6 +20,16 @@ const RoomUpdate = z
   })
   .partial()
   .passthrough();
+const Message = z
+  .object({
+    content: z.string(),
+    created_at: z.string().datetime({ offset: true }),
+    id: z.string(),
+    reply_to_id: z.union([z.string(), z.null()]).optional(),
+    room_id: z.string(),
+    user_id: z.union([z.string(), z.null()]).optional(),
+  })
+  .passthrough();
 const User = z
   .object({
     created_at: z.string().datetime({ offset: true }),
@@ -33,6 +43,7 @@ export const schemas = {
   CreateRoomRequest,
   Room,
   RoomUpdate,
+  Message,
   User,
 };
 
@@ -120,6 +131,48 @@ const endpoints = makeApi([
       },
     ],
     response: Room,
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/rooms/:room_id/messages",
+    alias: "get_room_messages",
+    description: `ルーム内のメッセージ一覧を取得。指定された時刻以前のメッセージを取得することも可能。`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "room_id",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "limit",
+        type: "Query",
+        schema: z.number().int().gte(0),
+      },
+      {
+        name: "last_created_at",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }).optional(),
+      },
+    ],
+    response: z.array(Message),
     errors: [
       {
         status: 404,

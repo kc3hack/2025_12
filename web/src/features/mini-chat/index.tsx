@@ -1,7 +1,9 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import style from "./index.module.scss";
+import { useAuth } from "@clerk/nextjs";
+import { apiClient } from "@/lib/apiClient";
 
-export type MiniChatType = {
+export type MiniChatMessageType = {
   id: string;
   is_me: boolean;
   author_name: string;
@@ -9,52 +11,7 @@ export type MiniChatType = {
   message: string;
 };
 
-const samples: MiniChatType[] = [
-  {
-    id: "1",
-    is_me: false,
-    author_name: "John Doe",
-    author_avatar_url: "https://example.com/avatar1.jpg",
-    message: "Hello, this is a sample message."
-  },
-  {
-    id: "2",
-    is_me: false,
-    author_name: "Jane Smith",
-    author_avatar_url: "https://example.com/avatar2.jpg",
-    message: "Hi there! This is another sample message."
-  },
-  {
-    id: "3",
-    is_me: true,
-    author_name: "Alice Johnson",
-    author_avatar_url: "https://example.com/avatar3.jpg",
-    message: "Hey! How are you?"
-  },
-  {
-    id: "4",
-    is_me: false,
-    author_name: "Bob Brown",
-    author_avatar_url: "https://example.com/avatar4.jpg",
-    message: "I'm good, thanks! How about you?"
-  },
-  {
-    id: "5",
-    is_me: true,
-    author_name: "Alice Johnson",
-    author_avatar_url: "https://example.com/avatar3.jpg",
-    message: "I'm doing well, thank you!"
-  },
-  {
-    id: "6",
-    is_me: false,
-    author_name: "Jane Smith",
-    author_avatar_url: "https://example.com/avatar2.jpg",
-    message: "That's great to hear!"
-  }
-];
-
-const Chat = (miniChat: MiniChatType) => {
+const Chat = (miniChat: MiniChatMessageType) => {
   return (
     <div className={style.mini_chat} data-is-me={miniChat.is_me}>
       <p className={style.name}>{miniChat.author_name}</p>
@@ -63,7 +20,34 @@ const Chat = (miniChat: MiniChatType) => {
   );
 };
 
-export const MiniChat = () => {
+export const MiniChat = ({ room_id }: { room_id: string }) => {
+  const { getToken } = useAuth();
+  const [mesasges, setMessages] = useState<MiniChatMessageType[]>([]);
+
+  useEffect(() => {
+    getToken().then(async token => {
+      const fetched_messages = await apiClient.get_room_messages({
+        params: { room_id: room_id },
+        queries: { limit: 10 },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const minichat_messages: MiniChatMessageType[] = fetched_messages.map(message => {
+        return {
+          id: message.id,
+          is_me: false,
+          author_name: "",
+          author_avatar_url: "",
+          message: message.content
+        };
+      });
+
+      setMessages(minichat_messages);
+    });
+  }, [room_id, getToken]);
+
   const bottomPositionRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -72,8 +56,8 @@ export const MiniChat = () => {
 
   return (
     <div className={style.mini_chat_container}>
-      {samples.map(item => (
-        <Chat key={item.id} {...item} />
+      {mesasges.map(message => (
+        <Chat key={message.id} {...message} />
       ))}
       <div ref={bottomPositionRef} />
     </div>
