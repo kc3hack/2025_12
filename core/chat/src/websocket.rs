@@ -13,7 +13,7 @@ use futures::{
 };
 use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessageFromServer};
 use serde::Serialize;
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Serialize)]
