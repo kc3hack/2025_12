@@ -167,8 +167,8 @@ impl DB {
     pub async fn get_older_messages(
         &self,
         room_id: &str,
-        last_created_at: DateTime<Utc>,
         limit: u32,
+        last_created_at: DateTime<Utc>,
     ) -> Result<Vec<(models::Message, Option<models::Message>)>, sqlx::Error> {
         let messages_with_reply = sqlx::query_as!(
             MessageWithReply,
@@ -314,7 +314,7 @@ mod test {
         let latest_message = &latest_messages.last().unwrap().0;
 
         let older_messages = db
-            .get_older_messages(room_id, latest_message.created_at, 2)
+            .get_older_messages(room_id, 2, latest_message.created_at)
             .await?;
 
         assert_eq!(older_messages.len(), 2);

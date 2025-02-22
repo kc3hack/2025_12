@@ -77,7 +77,7 @@ pub struct Participant {
     pub joined_at: DateTime<Utc>,
 }
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(ToSchema, Debug, Serialize, sqlx::FromRow)]
 pub struct Message {
     pub id: String,
     pub room_id: String,
