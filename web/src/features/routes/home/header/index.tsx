@@ -13,7 +13,7 @@ type SearchInputProps = {
   handleOrderChange: (order: string) => void;
   handleSearch: (search: string) => void;
 };
-export const SearchAndFilter = (props: SearchInputProps) => {
+export const Header = (props: SearchInputProps) => {
   const { handleOrderChange, handleSearch } = props;
   return (
     <div className={style.search_container}>
