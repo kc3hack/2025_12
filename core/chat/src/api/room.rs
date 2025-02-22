@@ -69,6 +69,9 @@ pub async fn create_room(
 #[utoipa::path(
     delete,
     path = "/rooms/{room_id}",
+    params(
+        ("room_id" = String, Path)
+    ),
     summary = "Delete room",
     description = "ルームを削除",
     responses(
@@ -105,6 +108,9 @@ pub async fn delete_room(
     path = "/rooms/{room_id}",
     summary = "Update room",
     description = "ルームをアップデート",
+    params(
+        ("room_id" = String, Path)
+    ),
     request_body (content = RoomUpdate),
     responses(
         (status = 200, description = "Success to update room", body = models::Room),
@@ -148,6 +154,9 @@ pub async fn update_room(
     path = "/rooms/{room_id}/users",
     summary = "Get users in room",
     description = "ルーム内のユーザ一覧を取得",
+    params(
+        ("room_id" = String, Path)
+    ),
     responses(
         (status = 200, description = "Success to get users", body = Vec<models::User>),
         (status = 404, description = "Room not found"),

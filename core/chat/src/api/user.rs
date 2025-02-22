@@ -46,6 +46,9 @@ pub async fn get_user_me(
     path = "/users/{user_id}",
     summary = "Get user by id",
     description = "IDからユーザーを取得",
+    params(
+        ("user_id" = String, Path)
+    ),
     responses(
         (status = 200, description = "Found user", body = models::User),
         (status = 404, description = "User not found"),

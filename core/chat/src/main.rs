@@ -5,6 +5,7 @@ mod webhook;
 mod websocket;
 
 use api::{
+    message::get_room_messages,
     room::{create_room, delete_room, get_room_users, update_room},
     user::{get_user, get_user_me, get_user_rooms},
 };
@@ -85,6 +86,7 @@ async fn main() {
         .route("/rooms/{room_id}", delete(delete_room))
         .route("/rooms/{room_id}", patch(update_room))
         .route("/rooms/{room_id}/users", get(get_room_users))
+        .route("/rooms/{room_id}/messages", get(get_room_messages))
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
@@ -110,6 +112,7 @@ async fn main() {
         api::room::delete_room,
         api::room::update_room,
         api::room::get_room_users,
+        api::message::get_room_messages,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
         webhook::webhook_user_updated,
