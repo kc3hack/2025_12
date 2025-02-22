@@ -53,7 +53,7 @@ export const CreateButton = ({ updateDisplay }: Props) => {
     <div className={style.create_button}>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button>ルーム作成</Button>
+          <Button>作成</Button>
         </DialogTrigger>
         <DialogContent className={style.dialog_content}>
           <DialogHeader>

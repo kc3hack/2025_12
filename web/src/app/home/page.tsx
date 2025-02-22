@@ -1,10 +1,13 @@
 "use client";
+
+import style from "@routes/home/index.module.scss";
+
 import { roomsAtom } from "@/features/room/store";
 import { RoomType } from "@/features/room/type";
-import { ChatContainer } from "@/features/routes/home/chat";
+import { RoomContainer } from "@/features/routes/home/rooms";
 import { CreateButton } from "@/features/routes/home/create-button";
 import { IconContainer } from "@/features/routes/home/icon";
-import { SearchAndFilter } from "@/features/routes/home/search";
+import { Header } from "@/features/routes/home/header";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@clerk/nextjs";
 import { useAtom } from "jotai";
@@ -72,11 +75,11 @@ const home = () => {
   };
 
   return (
-    <div>
+    <div className={style.home_page}>
       <IconContainer />
-      <SearchAndFilter handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
+      <Header handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
       <CreateButton updateDisplay={updateDisplay} />
-      <ChatContainer items={filterdRooms} fetchRooms={fetchRooms} />
+      <RoomContainer items={filterdRooms} fetchRooms={fetchRooms} />
     </div>
   );
 };

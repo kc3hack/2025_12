@@ -4,3 +4,10 @@
   padding: 0;
   margin: 0;
 }
+
+
+body {
+  min-height: 100lvh;
+  color: theme.$foreground;
+  background: theme.$background;
+}

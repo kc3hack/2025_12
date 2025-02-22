@@ -2,6 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import style from "./index.module.scss";
 import { useAuth } from "@clerk/nextjs";
 import { apiClient } from "@/lib/apiClient";
+import { cn } from "@/lib/utils";
+import { useAtom } from "jotai";
+import { userAtom } from "../account/store";
 
 export type MiniChatMessageType = {
   id: string;
@@ -20,8 +23,9 @@ const Chat = (miniChat: MiniChatMessageType) => {
   );
 };
 
-export const MiniChat = ({ room_id }: { room_id: string }) => {
+export const MiniChat = ({ room_id, className }: { room_id: string; className: string }) => {
   const { getToken } = useAuth();
+  const [user] = useAtom(userAtom);
   const [mesasges, setMessages] = useState<MiniChatMessageType[]>([]);
 
   useEffect(() => {
@@ -38,7 +42,7 @@ export const MiniChat = ({ room_id }: { room_id: string }) => {
         .map(message => {
           return {
             id: message.id,
-            is_me: false,
+            is_me: message.user_id === user?.id,
             author_name: "",
             author_avatar_url: "",
             message: message.content
@@ -48,7 +52,7 @@ export const MiniChat = ({ room_id }: { room_id: string }) => {
 
       setMessages(minichat_messages);
     });
-  }, [room_id, getToken]);
+  }, [room_id, getToken, user]);
 
   const bottomPositionRef = useRef<HTMLDivElement>(null);
 
@@ -57,7 +61,7 @@ export const MiniChat = ({ room_id }: { room_id: string }) => {
   });
 
   return (
-    <div className={style.mini_chat_container}>
+    <div className={cn(className, style.mini_chat_container)}>
       {mesasges.map(message => (
         <Chat key={message.id} {...message} />
       ))}

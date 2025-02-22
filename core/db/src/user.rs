@@ -1,6 +1,5 @@
-use models::UserUpdate;
-
 use crate::DB;
+use models::UserUpdate;
 
 impl DB {
     pub async fn add_user(&mut self, user: impl Into<models::User>) -> Result<(), sqlx::Error> {
@@ -11,9 +10,10 @@ impl DB {
         let created_at = user.created_at;
 
         let query = sqlx::query!(
-            r#"INSERT INTO users (id, nickname, created_at) VALUES (?, ?, ?)"#,
+            r#"INSERT INTO users (id, nickname, image_url, created_at) VALUES (?, ?, ?, ?)"#,
             id,
             nickname,
+            user.image_url,
             created_at
         );
 
@@ -35,12 +35,21 @@ impl DB {
         user_id: &str,
         user_option: impl Into<UserUpdate>,
     ) -> Result<(), sqlx::Error> {
-        let user_option = user_option.into();
+        let user_option: UserUpdate = user_option.into();
 
         if let Some(nickname) = user_option.nickname {
             let query = sqlx::query!(
                 r#"UPDATE users SET nickname = ? WHERE id = ?"#,
                 nickname,
+                user_id
+            );
+            self.execute(query).await?;
+        }
+
+        if let Some(image_url) = user_option.image_url {
+            let query = sqlx::query!(
+                r#"UPDATE users SET image_url = ? WHERE id = ?"#,
+                image_url,
                 user_id
             );
             self.execute(query).await?;
@@ -60,7 +69,7 @@ impl DB {
 
     pub async fn get_user(&self, user_id: &str) -> Result<models::User, sqlx::Error> {
         let user = sqlx::query_as(
-            r#"SELECT id, nickname, introduction, created_at FROM users WHERE id = ?"#,
+            r#"SELECT id, nickname, image_url, introduction, created_at FROM users WHERE id = ?"#,
         )
         .bind(user_id)
         .fetch_one(&self.pool)
@@ -83,6 +92,7 @@ mod test {
         db.add_user(models::User {
             id: "sample".to_owned(),
             nickname: Some("sample_user".to_owned()),
+            image_url: None,
             introduction: Some("hello".to_owned()),
             created_at: Utc::now(),
         })
@@ -114,6 +124,7 @@ mod test {
             "0",
             UserUpdate {
                 nickname: Some(Some("changed-user".to_owned())),
+                image_url: None,
                 introduction: None,
             },
         )

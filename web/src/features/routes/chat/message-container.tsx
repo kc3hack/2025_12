@@ -1,6 +1,6 @@
 "use client";
 import style from "./messagecontainer.module.scss";
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { MessageCell } from "./message";
 import { messagesAtom } from "@/features/message/store";
 import { useAtom } from "jotai";
@@ -27,10 +27,21 @@ export const MessageContainer = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
   const [ws] = useAtom(wsAtom);
   const [user] = useAtom(userAtom);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ws?.addEventListener("message", e => {
+    const handleWebSocketMessage = (e: MessageEvent) => {
+      if (!messageContainerRef.current) {
+        return;
+      }
+
       const msg: EventFromServer = JSON.parse(e.data);
+
+      const calcBottom =
+        messageContainerRef.current.scrollHeight -
+        messageContainerRef.current.scrollTop -
+        messageContainerRef.current.clientHeight;
+      const isBottom = Math.abs(calcBottom) < 10; // TODO: 数値はいい感じに変えといて
 
       if (msg.type === "Message") {
         const newMessage: Message = {
@@ -39,10 +50,16 @@ export const MessageContainer = (props: Props) => {
           author_name: msg.author_name,
           content: msg.content,
           is_me: msg.author_id === user?.id,
-          icon: null,
+          author_image_url: msg.author_image_url,
           reply_to_id: msg.reply_to_id,
           reactions: null
         };
+        setTimeout(() => {
+          if (msg.author_id === user?.id || isBottom) {
+            props.latestMessagePositionRef.current?.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 10);
+
         setMessages([...messages, newMessage]);
       } else if (msg.type === "SyncMessage") {
         const newMessages = msg.messages
@@ -51,6 +68,7 @@ export const MessageContainer = (props: Props) => {
               id: m.id,
               author_id: m.author_id,
               author_name: m.author_name,
+              author_image_url: m.author_image_url,
               content: m.content,
               is_me: m.author_id === user?.id,
               icon: null,
@@ -61,15 +79,20 @@ export const MessageContainer = (props: Props) => {
           .reverse();
         setMessages(newMessages);
       }
-    });
+    };
+    ws?.addEventListener("message", handleWebSocketMessage);
 
     ws?.addEventListener("close", () => {
       setMessages([]);
     });
-  }, [ws, messages, setMessages, user]);
+
+    return () => {
+      ws?.removeEventListener("message", handleWebSocketMessage);
+    };
+  }, [ws, setMessages, messages, props.latestMessagePositionRef.current?.scrollIntoView, user?.id]);
 
   return (
-    <div className={style.message_container}>
+    <div className={style.message_container} ref={messageContainerRef}>
       {messages.map(message => (
         <MessageCell
           key={message.id}
