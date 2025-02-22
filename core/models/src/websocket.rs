@@ -7,6 +7,7 @@ use ts_rs::TS;
 #[ts(export)]
 pub struct WSUserMessageFromServer {
     pub id: String,
+    pub author_id: Option<String>,
     pub author_name: String,
     pub author_avatar_url: String,
     pub content: String,
@@ -16,6 +17,7 @@ pub struct WSUserMessageFromServer {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct WSUserMessageFromClient {
+    pub author_id: String,
     pub author_name: String,
     pub author_avatar_url: String,
     pub content: String,

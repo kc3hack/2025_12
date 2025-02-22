@@ -91,6 +91,7 @@ pub async fn sync_message(
         .iter()
         .map(|m| WSUserMessageFromServer {
             id: m.0.id.clone(),
+            author_id: m.0.user_id.clone(),
             author_name: user.id.clone(),
             author_avatar_url: "".to_owned(),
             content: m.0.content.clone(),
@@ -185,6 +186,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
 
                     let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
                         id: message_id,
+                        author_id: Some(msg.author_id.clone()),
                         author_name: msg.author_name.clone(),
                         author_avatar_url: "".to_owned(), // TODO: Set avatar url
                         content: msg.content.clone(),

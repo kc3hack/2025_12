@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "@/style/global.scss";
 import "@/style/theme-tailwind.css";
 import { jaJP } from "@clerk/localizations";
+import { UserInitialyzer } from "@/features/account/user-initialyzer";
 
 export const metadata: Metadata = {
   title: "Occha",
@@ -17,7 +18,10 @@ const RootLayout = ({
   return (
     <ClerkProvider localization={jaJP}>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          <UserInitialyzer />
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );

@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import { wsAtom } from "@/features/websocket/store";
 import { EventFromServer } from "@/types/EventFromServer";
 import { Message } from "@/features/message/type";
+import { userAtom } from "@/features/account/store";
 
 export type ReplyMessage = {
   id: string;
@@ -25,6 +26,7 @@ type Props = {
 export const MessageContainer = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
   const [ws] = useAtom(wsAtom);
+  const [user] = useAtom(userAtom);
 
   useEffect(() => {
     ws?.addEventListener("message", e => {
@@ -47,7 +49,7 @@ export const MessageContainer = (props: Props) => {
             id: m.id,
             author: m.author_name,
             content: m.content,
-            is_me: true,
+            is_me: m.author_id === user?.id,
             icon: null,
             reply_to_id: m.reply_to_id,
             reactions: null
@@ -60,7 +62,7 @@ export const MessageContainer = (props: Props) => {
     ws?.addEventListener("close", () => {
       setMessages([]);
     });
-  }, [ws, messages, setMessages]);
+  }, [ws, messages, setMessages, user]);
 
   return (
     <div className={style.message_container}>

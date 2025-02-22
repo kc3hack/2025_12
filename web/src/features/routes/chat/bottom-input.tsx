@@ -11,6 +11,7 @@ import { memo, type RefObject, useState } from "react";
 import { ReplyMessage } from "./message-container";
 import { wsAtom } from "@/features/websocket/store";
 import { EventFromClient } from "@/types/EventFromClient";
+import { userAtom } from "@/features/account/store";
 
 type Props = {
   replyingMessage: ReplyMessage | null;
@@ -21,6 +22,7 @@ type Props = {
 
 export const BottomInput = memo((props: Props) => {
   const [isComposing, setIsComposing] = useState(false);
+  const [user] = useAtom(userAtom);
 
   const [ws] = useAtom(wsAtom);
 
@@ -44,8 +46,13 @@ export const BottomInput = memo((props: Props) => {
       return;
     }
 
+    if (!user) {
+      return;
+    }
+
     const event: EventFromClient = {
       type: "UserMessage",
+      author_id: user.id,
       author_name: "sample user",
       author_avatar_url: "",
       content: props.bottomInputRef.current.value,
