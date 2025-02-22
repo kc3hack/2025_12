@@ -40,7 +40,7 @@ export const MessageContainer = (props: Props) => {
           content: msg.content,
           is_me: true,
           icon: null,
-          reply_to_id: null,
+          reply_to_id: msg.reply_to_id,
           reactions: null
         };
         setMessages([...messages, newMessage]);

@@ -242,7 +242,7 @@ async fn event_from_client_handle(
                 author_name: Some(msg.author_name.clone()),
                 author_avatar_url: "".to_owned(), // TODO: Set avatar url
                 content: msg.content.clone(),
-                reply_to_id: None,
+                reply_to_id: msg.reply_to_id.clone(),
             });
 
             let room_tx = state.room_tx.lock().await;
