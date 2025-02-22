@@ -13,7 +13,7 @@ use futures::{
 };
 use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessageFromServer};
 use serde::Serialize;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Serialize)]
@@ -83,25 +83,33 @@ pub async fn sync_message(
         }
     };
 
-    let (messages, user) = {
+    let (messages, users) = {
         let db = state.db.lock().await;
         let messages = db
             .get_latest_messages(room_id, limit)
             .await
             .map_err(|_| ())?;
-        let user = db.get_user(user_id).await.map_err(|_| ())?;
-        (messages, user)
+
+        let users = db.get_room_participants(room_id).await.map_err(|_| ())?;
+        (messages, users)
     };
 
     let messages = messages
         .iter()
-        .map(|m| WSUserMessageFromServer {
-            id: m.0.id.clone(),
-            author_id: m.0.user_id.clone(),
-            author_name: user.nickname.clone(),
-            author_avatar_url: "".to_owned(),
-            content: m.0.content.clone(),
-            reply_to_id: m.0.reply_to_id.clone(),
+        .map(|m| {
+            let author_name = users
+                .iter()
+                .find(|u| Some(&u.id) == m.0.user_id.as_ref())
+                .and_then(|u| u.nickname.clone());
+
+            WSUserMessageFromServer {
+                id: m.0.id.clone(),
+                author_id: m.0.user_id.clone(),
+                author_name,
+                author_avatar_url: "".to_owned(),
+                content: m.0.content.clone(),
+                reply_to_id: m.0.reply_to_id.clone(),
+            }
         })
         .collect::<Vec<WSUserMessageFromServer>>();
 
