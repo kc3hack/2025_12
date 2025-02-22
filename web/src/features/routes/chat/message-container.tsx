@@ -35,7 +35,8 @@ export const MessageContainer = (props: Props) => {
       if (msg.type === "Message") {
         const newMessage: Message = {
           id: msg.id,
-          author: msg.author_name,
+          author_id: msg.author_id,
+          author_name: msg.author_name,
           content: msg.content,
           is_me: true,
           icon: null,
@@ -44,17 +45,20 @@ export const MessageContainer = (props: Props) => {
         };
         setMessages([...messages, newMessage]);
       } else if (msg.type === "SyncMessage") {
-        const newMessages = msg.messages.map(m => {
-          return {
-            id: m.id,
-            author: m.author_name,
-            content: m.content,
-            is_me: m.author_id === user?.id,
-            icon: null,
-            reply_to_id: m.reply_to_id,
-            reactions: null
-          };
-        });
+        const newMessages = msg.messages
+          .map(m => {
+            return {
+              id: m.id,
+              author_id: m.author_id,
+              author_name: m.author_name,
+              content: m.content,
+              is_me: m.author_id === user?.id,
+              icon: null,
+              reply_to_id: m.reply_to_id,
+              reactions: null
+            } as Message;
+          })
+          .reverse();
         setMessages(newMessages);
       }
     });

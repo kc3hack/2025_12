@@ -13,13 +13,73 @@
     padding: 1em;
     margin: 0.5em 0;
 
+
+    &[data-is-me="true"] {
+      flex-direction: row-reverse;
+      padding-left: 10em;
+      margin-left: auto;
+      text-align: right;
+
+      .message {
+        text-align: left;
+        background-color: #ffc0cb;
+        border-radius: 1em 0.4em 1em 1em;
+      }
+
+      .message_reactions {
+        display: flex;
+        @include utils.space-x(0.3em);
+
+        .reaction {
+          border-radius: 20em;
+        }
+      }
+
+      .messsage_author {
+        margin-bottom: 0.5em;
+        text-align: right;
+      }
+    }
+
+    &[data-is-me="false"] {
+      padding-right: 10em;
+      margin-right: auto;
+
+      .message {
+        background-color: #e2e8f0;
+        border-radius: 0.4em 1em 1em 1em;
+      }
+
+      .message_reactions {
+        display: flex;
+        @include utils.space-x(0.3em);
+        text-align: left;
+
+        .reaction {
+          border-radius: 20em;
+        }
+      }
+
+      .messsage_author {
+        margin-bottom: 0.5em;
+      }
+    }
+
+    &[data-is-replying="true"] {
+      background-color: lightblue;
+    }
+
+
     .avatar {
+      margin-top: 0.5em;
       margin-right: 1.0em;
     }
 
     .message {
       box-sizing: border-box;
+      display: inline-block;
       padding: 0.7em 1em;
+      margin-bottom: 0.3em;
       line-break: anywhere;
 
       .message_reply_area {
@@ -29,55 +89,6 @@
         background: transparent;
         border-color: black;
       }
-    }
-
-    &[data-is-me="true"] {
-      flex-direction: row-reverse;
-      padding-left: 10em;
-      margin-left: auto;
-      text-align: right;
-
-      .message {
-        display: inline-block;
-        margin-bottom: 0.3em;
-        background-color: #ffc0cb;
-        border-radius: 1em 1em 0.4em 1em;
-      }
-
-      .message_reactions {
-        display: flex;
-        @include utils.space-x(0.3em);
-
-        .reaction {
-          border-radius: 20em;
-        }
-      }
-    }
-
-    &[data-is-me="false"] {
-      padding-right: 10em;
-      margin-right: auto;
-
-      .message {
-        display: inline-block;
-        margin-bottom: 0.3em;
-        background-color: #e2e8f0;
-        border-radius: 1em 1em 1em 0.4em;
-      }
-
-      .message_reactions {
-        display: flex;
-        flex-direction: row-reverse;
-        @include utils.space-x(0.3em);
-
-        .reaction {
-          border-radius: 20em;
-        }
-      }
-    }
-
-    &[data-is-replying="true"] {
-      background-color: lightblue;
     }
   }
 }

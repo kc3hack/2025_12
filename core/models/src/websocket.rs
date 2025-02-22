@@ -8,7 +8,7 @@ use ts_rs::TS;
 pub struct WSUserMessageFromServer {
     pub id: String,
     pub author_id: Option<String>,
-    pub author_name: String,
+    pub author_name: Option<String>,
     pub author_avatar_url: String,
     pub content: String,
     pub reply_to_id: Option<String>,

@@ -51,7 +51,7 @@ export const MessageContent = (props: Props) => {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               )}
-              <p>{replyMesage?.author}</p>
+              <p>{replyMesage?.author_name}</p>
               <p>{replyMesage?.content}</p>
             </div>
           ) : (

@@ -53,7 +53,7 @@ export const BottomInput = memo((props: Props) => {
     const event: EventFromClient = {
       type: "UserMessage",
       author_id: user.id,
-      author_name: "sample user",
+      author_name: user.nickname,
       author_avatar_url: "",
       content: props.bottomInputRef.current.value,
       reply_to_id: null

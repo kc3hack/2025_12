@@ -20,7 +20,9 @@ export const UserInitialyzer = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setUser({ id: me.id });
+      const nickname = me.nickname === undefined ? "" : me.nickname === null ? "" : me.nickname;
+
+      setUser({ id: me.id, nickname: nickname });
     });
   }, [getToken, setUser]);
   return null;

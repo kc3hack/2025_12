@@ -1,6 +1,7 @@
 export type Message = {
   id: string;
-  author: string;
+  author_id: string | null;
+  author_name: string | null;
   content: string;
   is_me: boolean;
   icon: string | null;

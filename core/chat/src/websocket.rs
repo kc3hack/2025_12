@@ -92,7 +92,7 @@ pub async fn sync_message(
         .map(|m| WSUserMessageFromServer {
             id: m.0.id.clone(),
             author_id: m.0.user_id.clone(),
-            author_name: user.id.clone(),
+            author_name: user.nickname.clone(),
             author_avatar_url: "".to_owned(),
             content: m.0.content.clone(),
             reply_to_id: m.0.reply_to_id.clone(),
@@ -173,10 +173,11 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                 EventFromClient::UserMessage(msg) => {
                     let mut db = state_cloned.db.lock().await;
                     let message_id = Uuid::new_v4().to_string();
+
                     db.add_message(models::Message {
                         id: message_id.clone(),
                         room_id: room_id_clone.clone(),
-                        user_id: Some(user_id_cloned.clone()),
+                        user_id: Some(msg.author_id.clone()),
                         content: msg.content.clone(),
                         reply_to_id: msg.reply_to_id.clone(),
                         created_at: Utc::now(),
@@ -187,7 +188,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                     let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
                         id: message_id,
                         author_id: Some(msg.author_id.clone()),
-                        author_name: msg.author_name.clone(),
+                        author_name: Some(msg.author_name.clone()),
                         author_avatar_url: "".to_owned(), // TODO: Set avatar url
                         content: msg.content.clone(),
                         reply_to_id: None,
