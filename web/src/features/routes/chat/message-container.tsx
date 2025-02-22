@@ -11,7 +11,7 @@ import { userAtom } from "@/features/account/store";
 
 export type ReplyMessage = {
   id: string;
-  author_name: string;
+  author_name: string | null;
   content: string;
 };
 

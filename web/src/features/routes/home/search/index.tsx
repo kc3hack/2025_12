@@ -17,10 +17,10 @@ export const SearchAndFilter = (props: SearchInputProps) => {
   const { handleOrderChange, handleSearch } = props;
   return (
     <div className={style.search_container}>
-      <div className={style.tag}>グループ名</div>
       <div className={style.search}>
         <Input
           className={style.input}
+          placeholder="検索"
           onChange={e => {
             handleSearch(e.target.value);
           }}
