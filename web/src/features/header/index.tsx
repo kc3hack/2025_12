@@ -5,10 +5,9 @@ import style from "./index.module.scss";
 
 export const Header = () => {
   return (
-    // TODO: ロゴは変えといて
     <div className={style.header_inner}>
       <Link href="/home" className={style.logo}>
-        <img src="https://see-ss.com/img/logo@2x.png" alt="ロゴ" />
+        <p>Occha</p>
       </Link>
       <div>
         <SignedIn>

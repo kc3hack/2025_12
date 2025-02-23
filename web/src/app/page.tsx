@@ -1,14 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { SignedIn, UserButton } from "@clerk/nextjs";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const Root = () => {
-  return (
-    <main>
-      <Link href="/home">
-        <Button>Go Home</Button>
-      </Link>
-    </main>
-  );
+  redirect("/home");
 };
 export default Root;
