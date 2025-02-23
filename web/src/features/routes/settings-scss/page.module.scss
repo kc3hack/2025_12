@@ -1,9 +1,3 @@
-/* stylelint-disable CssSyntaxError */
-/* stylelint-disable order/properties-order */
-body {
-  background-color: rgb(255, 255, 255);
-}
-
 .setting_container {
   position: fixed;
   top: 0;
@@ -15,15 +9,15 @@ body {
   overflow: scroll;
 
   .setting1 {
-    padding-left: 3em;
     padding-right: 3em;
+    padding-left: 3em;
     font-size: 120%;
     text-align: center;
   }
 
   .setting2 {
-    padding-left: 3em;
     padding-right: 3em;
+    padding-left: 3em;
     font-size: 120%;
   }
 }
@@ -40,6 +34,7 @@ body {
 .account_card_container {
   margin-top: 10em;
   margin-left: 7em;
+
   .textbox {
     display: flex;
     flex-direction: row;
@@ -50,16 +45,18 @@ body {
         height: 5em;
       }
     }
+
     .right_container {
       width: 30em;
       margin-left: 3em;
+
       .intro {
         height: 8em;
       }
 
       .changes {
-        margin-left: 10em;
         margin-top: 3em;
+        margin-left: 10em;
       }
     }
   }
