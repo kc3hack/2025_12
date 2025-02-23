@@ -82,6 +82,38 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "get",
+    path: "/rooms/:room_id",
+    alias: "get_room",
+    description: `ルームの情報を取得`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "room_id",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: Room,
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "delete",
     path: "/rooms/:room_id",
     alias: "delete_room",

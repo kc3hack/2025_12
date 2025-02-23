@@ -7,8 +7,8 @@ mod websocket;
 use api::{
     message::get_room_messages,
     room::{
-        add_user_to_room, create_room, delete_room, delete_user_from_room, get_room_users,
-        update_room,
+        add_user_to_room, create_room, delete_room, delete_user_from_room, get_room,
+        get_room_users, update_room,
     },
     user::{get_user, get_user_me, get_user_rooms},
 };
@@ -88,6 +88,7 @@ async fn main() {
         .route("/rooms", post(create_room))
         .route("/rooms/{room_id}", delete(delete_room))
         .route("/rooms/{room_id}", patch(update_room))
+        .route("/rooms/{room_id}", get(get_room))
         .route("/rooms/{room_id}/users", post(add_user_to_room))
         .route("/rooms/{room_id}/users", get(get_room_users))
         .route("/rooms/{room_id}/users", delete(delete_user_from_room))
@@ -114,6 +115,7 @@ async fn main() {
         api::user::get_user_me,
         api::user::get_user_rooms,
         api::room::create_room,
+        api::room::get_room,
         api::room::delete_room,
         api::room::update_room,
         api::room::get_room_users,
