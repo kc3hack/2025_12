@@ -85,8 +85,8 @@ impl VerifiedWebhook {
         let signing_secret =
             env::var(signing_secret_name).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-        let wh = svix::webhooks::Webhook::new(&signing_secret)
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        let wh =
+            svix::webhooks::Webhook::new(&signing_secret).map_err(|_| StatusCode::BAD_REQUEST)?;
 
         if wh.verify(&body, &headers).is_err() {
             return Err(StatusCode::BAD_REQUEST);
