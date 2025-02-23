@@ -23,7 +23,11 @@ pub struct UserUpdate {
 impl From<clerk_rs::models::User> for UserUpdate {
     fn from(user: clerk_rs::models::User) -> Self {
         UserUpdate {
-            nickname: None,
+            nickname: Some(Some(format!(
+                "{} {}",
+                user.last_name.flatten().unwrap_or("".to_owned()),
+                user.first_name.flatten().unwrap_or("".to_owned())
+            ))),
             image_url: user.image_url,
             introduction: None,
         }
