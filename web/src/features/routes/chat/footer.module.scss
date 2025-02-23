@@ -1,7 +1,6 @@
 @use "@/style/theme";
 
 .footer {
-  position: relative;
   margin: 1em;
 
   .kansai_bar {
@@ -9,6 +8,7 @@
     justify-content: center;
     width: 100%;
     padding: 0.2em;
+    overflow: hidden;
     color: theme.$background;
     text-align: center;
     word-break: break-all;
@@ -21,17 +21,22 @@
   }
 
   .reply_bar {
+    position: relative;
     width: 100%;
     padding: 0.2em;
     text-align: center;
     background-color: theme.$muted;
     border-radius: 0.5em 0.5em 0 0;
+
+    .cancel {
+      position: absolute;
+      top: 0.35em;
+      right: 0.7em;
+      text-align: center;
+      opacity: 70%;
+    }
   }
 
-  .cancel {
-    position: absolute;
-    right: 1em;
-  }
 
   .input_area {
     display: flex;
@@ -52,7 +57,7 @@
 
     .send_button {
       position: absolute;
-      right: 1em;
+      right: 2em;
     }
   }
 }

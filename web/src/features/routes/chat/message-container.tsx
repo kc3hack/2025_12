@@ -42,7 +42,7 @@ export const MessageContainer = (props: Props) => {
         messageContainerRef.current.scrollHeight -
         messageContainerRef.current.scrollTop -
         messageContainerRef.current.clientHeight;
-      const isBottom = Math.abs(calcBottom) < 10; // TODO: 数値はいい感じに変えといて
+      const isBottom = Math.abs(calcBottom) < 200; // TODO: 数値はいい感じに変えといて
 
       if (msg.type === "FailedToJoinRoom") {
         if (msg.reason.type === "NotParticipated") {
