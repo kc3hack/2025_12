@@ -75,12 +75,14 @@ const home = () => {
   };
 
   return (
-    <div className={style.home_page}>
-      <IconContainer />
-      <Header handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
-      <CreateButton updateDisplay={updateDisplay} />
-      <RoomContainer items={filterdRooms} fetchRooms={fetchRooms} />
-    </div>
+    <main>
+      <div className={style.home_page}>
+        {/* <IconContainer /> */}
+        <Header handleOrderChange={handleOrderChange} handleSearch={handleSearch} />
+        <CreateButton updateDisplay={updateDisplay} />
+        <RoomContainer items={filterdRooms} fetchRooms={fetchRooms} />
+      </div>
+    </main>
   );
 };
 export default home;

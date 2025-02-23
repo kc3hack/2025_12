@@ -1,7 +1,7 @@
 @use "@/style/utils";
 
 .home_page {
-  padding: 3em;
+  padding: 0 3em;
 
   @include utils.space-y(1em);
 }

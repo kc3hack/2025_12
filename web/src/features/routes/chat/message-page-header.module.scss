@@ -1,4 +1,5 @@
 @use "@/style/theme";
+@use "@/style/shadow";
 
 .header_inner {
   position: sticky;
@@ -9,16 +10,6 @@
   height: 3.3em;
   padding: 0 2em;
   background-color: theme.$background;
-
-
-  .logo img {
-    width: 70px;
-  }
-
-  .header_login {
-    font-size: 1em;
-    color: #999;
-    text-decoration: none;
-    user-select: none;
-  }
+  border: solid theme.$muted;
+  border-width: 0 0 1px 0;
 }

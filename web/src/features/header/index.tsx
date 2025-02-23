@@ -1,22 +1,21 @@
 import { Button } from "@/components/ui/button";
-import style from "./index.module.scss";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import style from "./index.module.scss";
+import Link from "next/link";
 
 export const Header = () => {
   return (
     // TODO: ロゴは変えといて
     <div className={style.header_inner}>
-      <div className={style.logo}>
+      <Link href="/home" className={style.logo}>
         <img src="https://see-ss.com/img/logo@2x.png" alt="ロゴ" />
-      </div>
+      </Link>
       <div>
         <SignedIn>
-          <div className={style.header_login}>
-            <UserButton />
-          </div>
+          <UserButton />
         </SignedIn>
         <SignedOut>
-          <Button className={style.header_login}>
+          <Button className={style.login_button}>
             <p>ログイン</p>
           </Button>
         </SignedOut>
