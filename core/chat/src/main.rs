@@ -13,6 +13,8 @@ use api::{
     user::{get_user, get_user_me, get_user_rooms},
 };
 use axum::{
+    http::header,
+    http::Method,
     routing::{delete, get, patch, post},
     Extension, Router,
 };
@@ -20,6 +22,7 @@ use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::sync::{broadcast, Mutex};
+use tower_http::cors::{AllowOrigin, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -72,6 +75,21 @@ async fn main() {
     let config = ClerkConfiguration::new(None, None, Some(clerk_secret_key), None);
     let clerk = Clerk::new(config);
 
+    let cors = CorsLayer::new()
+        .allow_origin(AllowOrigin::exact(
+            env::var("FRONTEND_URL")
+                .expect("FRONTEND_URL not found")
+                .parse()
+                .unwrap(),
+        ))
+        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers(vec![
+            header::ACCEPT,
+            header::CONTENT_TYPE,
+            header::AUTHORIZATION,
+        ])
+        .allow_credentials(true);
+
     let db = DB::from_option(DBOption {
         max_connections: 5,
         acquire_timeout: Duration::from_secs(3),
@@ -97,6 +115,7 @@ async fn main() {
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
         .route("/webhooks/user_updated", post(webhook_user_updated))
         .route("/websocket/{room_id}", get(websocket_handler))
+        .layer(cors)
         .layer(Extension(clerk))
         .with_state(app_state);
 
