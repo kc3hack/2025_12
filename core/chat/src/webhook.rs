@@ -10,7 +10,7 @@ use std::sync::Arc;
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
     post,
-    path = "/webhook/user_signup",
+    path = "/webhooks/user_signup",
     summary = "Webhook for clerk user.created",
     request_body(
         content = String,
@@ -53,7 +53,7 @@ pub async fn webhook_user_signup(
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
     post,
-    path = "/webhook/user_deleted",
+    path = "/webhooks/user_deleted",
     summary = "Webhook for clerk user.deleted",
     request_body(
         content = String,
@@ -98,7 +98,7 @@ pub async fn webhook_user_deleted(
 #[tracing::instrument(skip(headers, body))]
 #[utoipa::path(
     post,
-    path = "/webhook/user_updated",
+    path = "/webhooks/user_updated",
     summary = "Webhook for clerk user.updated",
     request_body(
         content = String,

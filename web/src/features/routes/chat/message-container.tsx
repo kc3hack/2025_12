@@ -1,14 +1,14 @@
 "use client";
-import style from "./messagecontainer.module.scss";
-import { useEffect, useRef, type RefObject } from "react";
-import { MessageCell } from "./message";
+import { userAtom } from "@/features/account/store";
 import { messagesAtom } from "@/features/message/store";
-import { useAtom } from "jotai";
+import { Message } from "@/features/message/type";
 import { wsAtom } from "@/features/websocket/store";
 import { EventFromServer } from "@/types/EventFromServer";
-import { Message } from "@/features/message/type";
-import { userAtom } from "@/features/account/store";
+import { useAtom } from "jotai";
 import { redirect } from "next/navigation";
+import { type RefObject, useEffect, useRef } from "react";
+import { MessageCell } from "./message";
+import style from "./messagecontainer.module.scss";
 
 export type ReplyMessage = {
   id: string;

@@ -32,9 +32,10 @@ pub struct WSRoom {
 #[serde(tag = "type", rename_all = "PascalCase")]
 #[ts(export)]
 pub enum EventFromClient {
-    RequestSyncMessage { limit: u32 },
-    UserMessage(WSUserMessageFromClient),
     JoinRoom { token: String },
+    RequestSyncMessage { limit: u32 },
+    RequestTranslateMessage { message: String },
+    UserMessage(WSUserMessageFromClient),
     AddReaction,
 }
 
@@ -42,13 +43,16 @@ pub enum EventFromClient {
 #[serde(tag = "type", rename_all = "PascalCase")]
 #[ts(export)]
 pub enum EventFromServer {
+    JoinedRoom(WSRoom),
+    FailedToJoinRoom {
+        reason: FailedToJoinRoomReason,
+    },
     SyncMessage {
         messages: Vec<WSUserMessageFromServer>,
     },
     Message(WSUserMessageFromServer),
-    JoinedRoom(WSRoom),
-    FailedToJoinRoom {
-        reason: FailedToJoinRoomReason,
+    TranslatedMessage {
+        message: String,
     },
     AddReaction,
 }
