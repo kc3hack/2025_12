@@ -60,7 +60,6 @@ const Room = () => {
         inputMessage={inputMessage}
         setInputMessage={setInputMessage}
         bottomInputRef={bottomInputRef}
-        latestMessagePositionRef={latestMessagePositionRef}
         replyingToRef={replyingToRef}
         replyingMessage={replyingMessage}
         setReplyingMessage={setReplyingMessage}

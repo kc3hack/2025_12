@@ -9,7 +9,6 @@ import { ReplyMessage } from "./message-container";
 type Props = {
   inputMessage: string | null;
   setInputMessage: (inputMessage: string | null) => void;
-  latestMessagePositionRef: RefObject<HTMLDivElement | null>;
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   replyingToRef: RefObject<HTMLDivElement | null>;
   replyingMessage: ReplyMessage | null;
@@ -38,7 +37,6 @@ export const Footer = (props: Props) => {
       <BottomInput
         setInputMessage={props.setInputMessage}
         bottomInputRef={props.bottomInputRef}
-        latestMessagePositionRef={props.latestMessagePositionRef}
         replyingMessage={props.replyingMessage}
         setReplyingMessage={props.setReplyingMessage}
         setTranslatedMessage={setTranslatedMesasge}

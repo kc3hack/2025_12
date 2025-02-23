@@ -16,7 +16,6 @@ import { ReplyMessage } from "./message-container";
 type Props = {
   replyingMessage: ReplyMessage | null;
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
-  latestMessagePositionRef: RefObject<HTMLDivElement | null>;
   translatedMessage: string;
   setTranslatedMessage: (state: string) => void;
   setInputMessage: (inputMessage: string | null) => void;

@@ -372,7 +372,7 @@ const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/webhooks/user_deleted",
+    path: "/webhook/user_deleted",
     alias: "webhook_user_deleted",
     description: `ユーザーがアカウントを削除したときにClerkから呼ばれるWebhook`,
     requestFormat: "binary",
@@ -400,7 +400,7 @@ const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/webhooks/user_signup",
+    path: "/webhook/user_signup",
     alias: "webhook_user_signup",
     description: `ユーザーがアカウントを登録したときにClerkから呼ばれるWebhook`,
     requestFormat: "binary",
@@ -428,7 +428,7 @@ const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/webhooks/user_updated",
+    path: "/webhook/user_updated",
     alias: "webhook_user_updated",
     description: `ユーザーがアカウント情報を更新したときにClerkから呼ばれるWebhook`,
     requestFormat: "binary",

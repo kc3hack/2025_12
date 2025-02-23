@@ -29,6 +29,13 @@ export const MessageContainer = (props: Props) => {
   const [ws] = useAtom(wsAtom);
   const [user] = useAtom(userAtom);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  if (isFirstRender.current) {
+    myInitializationFunction();
+
+    isFirstRender.current = false;
+  }
 
   useEffect(() => {
     const handleWebSocketMessage = (e: MessageEvent) => {
@@ -42,7 +49,7 @@ export const MessageContainer = (props: Props) => {
         messageContainerRef.current.scrollHeight -
         messageContainerRef.current.scrollTop -
         messageContainerRef.current.clientHeight;
-      const isBottom = Math.abs(calcBottom) < 200; // TODO: 数値はいい感じに変えといて
+      const isBottom = Math.abs(calcBottom) < 200;
 
       if (msg.type === "FailedToJoinRoom") {
         if (msg.reason.type === "NotParticipated") {
@@ -115,4 +122,10 @@ export const MessageContainer = (props: Props) => {
       <div ref={props.latestMessagePositionRef} />
     </div>
   );
+
+  function myInitializationFunction() {
+    setTimeout(() => {
+      props.latestMessagePositionRef.current?.scrollIntoView();
+    }, 1000);
+  }
 };
