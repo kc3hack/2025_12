@@ -19,17 +19,22 @@
   }
 
   .reply_bar {
+    position: relative;
     width: 100%;
     padding: 0.2em;
     text-align: center;
     background-color: theme.$muted;
     border-radius: 0.5em 0.5em 0 0;
+
+    .cancel {
+      position: absolute;
+      top: 0.35em;
+      right: 0.7em;
+      text-align: center;
+      opacity: 70%;
+    }
   }
 
-  .cancel {
-    position: absolute;
-    right: 1em;
-  }
 
   .input_area {
     display: flex;

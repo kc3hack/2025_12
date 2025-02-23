@@ -48,7 +48,7 @@ export const schemas = {
   User,
 };
 
-export const endpoints = makeApi([
+const endpoints = makeApi([
   {
     method: "post",
     path: "/rooms",
