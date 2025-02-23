@@ -17,9 +17,6 @@ pub struct WSUserMessageFromServer {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct WSUserMessageFromClient {
-    pub author_id: String,
-    pub author_name: String,
-    pub author_image_url: Option<String>,
     pub content: String,
     pub reply_to_id: Option<String>,
 }
