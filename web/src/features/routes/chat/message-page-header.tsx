@@ -58,13 +58,6 @@ export const MessagePageHeader = () => {
             </div>
           </PopoverContent>
         </Popover>
-
-        <Popover>
-          <PopoverTrigger>
-            <Settings size={17} />
-          </PopoverTrigger>
-          <PopoverContent>設定は未実装です</PopoverContent>
-        </Popover>
       </div>
     </div>
   );
