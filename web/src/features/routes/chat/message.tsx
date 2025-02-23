@@ -19,6 +19,7 @@ import { ReplyMessage } from "./message-container";
 import { MessageContent } from "./message-content";
 import { MessageReaction } from "./message-reaction";
 import { MessageAuther } from "./message-author";
+import { userAtom } from "@/features/account/store";
 
 type Props = {
   message: Message;
@@ -33,6 +34,7 @@ const reactionList = [":App1e:", ":Smile:", ":Money:"];
 
 export const MessageCell = (props: Props) => {
   const [messages, setMessages] = useAtom(messagesAtom);
+  const [user] = useAtom(userAtom);
 
   const deleteMessage = (id: string) => {
     if (id === props.replyingMessage?.id) {
@@ -101,7 +103,9 @@ export const MessageCell = (props: Props) => {
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
-          <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
+          {props.message.author_id === user?.id && (
+            <ContextMenuItem onClick={() => deleteMessage(props.message.id)}>削除</ContextMenuItem>
+          )}
           <ContextMenuItem
             onClick={() =>
               handleReply(props.message.id, props.message.author_name, props.message.content)
