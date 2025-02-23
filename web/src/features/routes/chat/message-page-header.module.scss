@@ -1,4 +1,5 @@
 @use "@/style/theme";
+@use "@/style/utils";
 @use "@/style/shadow";
 
 .header_inner {
@@ -8,8 +9,27 @@
   justify-content: space-between;
   width: 100%;
   height: 3.3em;
-  padding: 0 2em;
+  padding: 0 2em 0 2em;
   background-color: theme.$background;
   border: solid theme.$muted;
   border-width: 0 0 1px 0;
+
+  .option_container {
+    @include utils.space-x(1.5em);
+  }
+}
+
+.popover_container {
+  width: 30em;
+  margin-right: 2em;
+
+  .popover_content {
+    @include utils.space-y(1em);
+
+    .link {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
 }
