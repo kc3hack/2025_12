@@ -1,5 +1,8 @@
 .room_page {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  min-height: 100lvh;
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: 100vh;
+  padding-top: 3.3em;
+  overflow: hidden;
 }

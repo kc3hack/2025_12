@@ -9,6 +9,7 @@ import { useAtom } from "jotai";
 import { wsAtom } from "@/features/websocket/store";
 import { useAuth } from "@clerk/nextjs";
 import { EventFromClient } from "@/types/EventFromClient";
+import { MessagePageHeader } from "@/features/routes/chat/message-page-header";
 
 const Room = () => {
   const { getToken } = useAuth();
@@ -47,6 +48,7 @@ const Room = () => {
 
   return (
     <div className={style.room_page}>
+      <MessagePageHeader />
       <MessageContainer
         bottomInputRef={bottomInputRef}
         latestMessagePositionRef={latestMessagePositionRef}

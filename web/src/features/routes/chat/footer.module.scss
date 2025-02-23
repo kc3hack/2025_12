@@ -1,12 +1,12 @@
 @use "@/style/theme";
 
 .footer {
-  position: relative;
   margin: 1em;
 
   .kansai_bar {
     width: 100%;
     padding: 0.2em;
+    overflow: hidden;
     color: theme.$background;
     text-align: center;
     word-break: break-all;
@@ -50,7 +50,7 @@
 
     .send_button {
       position: absolute;
-      right: 1em;
+      right: 2em;
     }
   }
 }
