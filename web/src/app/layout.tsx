@@ -5,6 +5,7 @@ import "@/style/theme-tailwind.css";
 import { UserInitialyzer } from "@/features/account/user-initialyzer";
 import { jaJP } from "@clerk/localizations";
 import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/features/header";
 
 export const metadata: Metadata = {
   title: "Occha",
@@ -20,6 +21,7 @@ const RootLayout = ({
     <ClerkProvider localization={jaJP}>
       <html lang="en">
         <body>
+          <Header />
           <UserInitialyzer />
           {children}
           <Toaster />

@@ -1,0 +1,19 @@
+.header_inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  height: 4em;
+  padding: 0 2em;
+
+  .logo img {
+    width: 70px;
+  }
+
+  .header_login {
+    font-size: 1em;
+    color: #999;
+    text-decoration: none;
+    user-select: none;
+  }
+}
