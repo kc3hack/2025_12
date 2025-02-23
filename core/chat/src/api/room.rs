@@ -104,6 +104,42 @@ pub async fn delete_room(
 #[axum::debug_handler]
 #[tracing::instrument(skip(headers))]
 #[utoipa::path(
+    get,
+    path = "/rooms/{room_id}",
+    summary = "Get room information",
+    description = "ルームの情報を取得",
+    params(
+        ("room_id" = String, Path)
+    ),
+    responses(
+        (status = 200, description = "Success to get room", body = models::Room),
+        (status = 404, description = "Room not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Failed to communicate database"),
+    ),
+    tag = "Room"
+)]
+pub async fn get_room(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+    Path(room_id): Path<String>,
+) -> Result<Json<models::Room>, StatusCode> {
+    VerifiedToken::from_headers(&headers)?.verify()?;
+
+    let room = state
+        .db
+        .lock()
+        .await
+        .get_room(&room_id)
+        .await
+        .into_statuscode()?;
+
+    Ok(Json(room))
+}
+
+#[axum::debug_handler]
+#[tracing::instrument(skip(headers))]
+#[utoipa::path(
     patch,
     path = "/rooms/{room_id}",
     summary = "Update room",
