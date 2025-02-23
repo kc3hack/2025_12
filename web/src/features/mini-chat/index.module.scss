@@ -17,6 +17,10 @@
     padding: 0.4em;
     @include utils.space-y(0.2em);
 
+    &:first-child {
+      margin-top: auto;
+    }
+
     &[data-is-me="true"] {
       margin-left: auto;
 
