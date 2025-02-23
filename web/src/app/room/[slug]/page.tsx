@@ -36,7 +36,7 @@ const Room = () => {
 
       const request_sync_message_event: EventFromClient = {
         type: "RequestSyncMessage",
-        limit: 10
+        limit: 30
       };
       ws.send(JSON.stringify(request_sync_message_event));
     });
