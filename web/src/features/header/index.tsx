@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import style from "./index.module.scss";
 import Link from "next/link";
+import style from "./index.module.scss";
 
 export const Header = () => {
   return (
@@ -15,9 +15,11 @@ export const Header = () => {
           <UserButton />
         </SignedIn>
         <SignedOut>
-          <Button className={style.login_button}>
-            <p>ログイン</p>
-          </Button>
+          <Link href="/sign-in">
+            <Button className={style.login_button}>
+              <p>ログイン</p>
+            </Button>
+          </Link>
         </SignedOut>
       </div>
     </div>
