@@ -28,3 +28,4 @@ derive_more = { version = "2", features = ["deref", "display"] }
 reqwest = "0.12.12"
 scraper = "0.22.0"
 encoding_rs = "0.8.35"
+tower-http = { version = "0.6.2", features = ["full"] }
