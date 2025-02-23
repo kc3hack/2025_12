@@ -16,9 +16,7 @@ export const Header = () => {
           </div>
         </SignedIn>
         <SignedOut>
-          <Button className={style.header_login}>
-            <p>ログイン</p>
-          </Button>
+          <Button className={style.header_login}>ログイン</Button>
         </SignedOut>
       </div>
     </div>
