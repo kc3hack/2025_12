@@ -48,7 +48,7 @@ export const schemas = {
   User,
 };
 
-const endpoints = makeApi([
+export const endpoints = makeApi([
   {
     method: "post",
     path: "/rooms",
@@ -206,6 +206,70 @@ const endpoints = makeApi([
       },
     ],
     response: z.array(User),
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/rooms/:room_id/users",
+    alias: "add_user_to_room",
+    description: `ルームにユーザーを追加`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "room_id",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 404,
+        description: `Room not found`,
+        schema: z.void(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.void(),
+      },
+      {
+        status: 503,
+        description: `Failed to communicate database`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "delete",
+    path: "/rooms/:room_id/users",
+    alias: "delete_user_from_room",
+    description: `ルームからユーザーを退出`,
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "room_id",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
     errors: [
       {
         status: 404,

@@ -1,4 +1,4 @@
-use crate::{clerk::VerifiedToken, error::CoreError, AppState};
+use crate::{api::room::get_room_users, clerk::VerifiedToken, error::CoreError, AppState};
 use axum::{
     extract::{
         ws::{self, WebSocket},
@@ -9,9 +9,11 @@ use axum::{
 use chrono::Utc;
 use futures::{
     stream::{SplitSink, SplitStream},
-    StreamExt as _,
+    SinkExt as _, StreamExt as _,
 };
-use models::websocket::{EventFromClient, EventFromServer, WSRoom, WSUserMessageFromServer};
+use models::websocket::{
+    EventFromClient, EventFromServer, FailedToJoinRoomReason, WSRoom, WSUserMessageFromServer,
+};
 use serde::Serialize;
 use std::sync::Arc;
 use uuid::Uuid;
@@ -131,7 +133,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
             tracing::info!("Unauthorized connection");
 
             let _ = EventFromServer::FailedToJoinRoom {
-                message: "Unauthorized error".to_owned(),
+                reason: FailedToJoinRoomReason::Unauthorized,
             }
             .send(&mut sender)
             .await;
@@ -142,15 +144,55 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     tracing::info!("{user_id} connected");
 
     let room = match state.join(&room_id).await {
-        Ok(v) => v,
+        Ok(v) => {
+            let db = state.db.lock().await;
+            let users = match db.get_room_participants(&room_id).await {
+                Ok(v) => v,
+                Err(_) => {
+                    let _ = EventFromServer::FailedToJoinRoom {
+                        reason: FailedToJoinRoomReason::RoomNotFound,
+                    }
+                    .send(&mut sender)
+                    .await;
+                    tracing::info!("{user_id} disconnected");
+                    return;
+                }
+            };
+
+            if users.iter().any(|u| u.id == user_id) {
+                v
+            } else {
+                let _ = EventFromServer::FailedToJoinRoom {
+                    reason: FailedToJoinRoomReason::NotParticipated {
+                        room_id: room_id.clone(),
+                    },
+                }
+                .send(&mut sender)
+                .await;
+                tracing::info!("{user_id} disconnected");
+                return;
+            }
+        }
         Err(_) => {
             let _ = EventFromServer::FailedToJoinRoom {
-                message: "Room not found".to_owned(),
+                reason: FailedToJoinRoomReason::RoomNotFound,
             }
             .send(&mut sender)
             .await;
+            tracing::info!("{user_id} disconnected");
             return;
         }
+    };
+
+    let (author_name, author_image_url) = {
+        let db = state.db.lock().await;
+        let users = db.get_room_participants(&room.id).await.unwrap();
+        let author = users.iter().find(|u| u.id == user_id);
+
+        let author_name = author.and_then(|f| f.nickname.clone());
+        let author_image_url = author.and_then(|f| f.image_url.clone());
+
+        (author_name, author_image_url)
     };
 
     let _ = EventFromServer::JoinedRoom(WSRoom {
@@ -174,7 +216,15 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                 }
             };
 
-            event_from_client_handle(event, state_cloned.clone(), &user_id_cloned, &room).await;
+            event_from_client_handle(
+                event,
+                state_cloned.clone(),
+                &room,
+                &user_id_cloned,
+                &author_name,
+                &author_image_url,
+            )
+            .await;
         }
     });
 
@@ -185,6 +235,10 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
             Some(v) => v,
             None => {
                 tracing::info!("Room not found");
+                sender.close().await.unwrap_or_else(|e| {
+                    tracing::error!("Failed to close sender: {e:?}");
+                });
+                tracing::info!("{user_id} disconnected");
                 return;
             }
         };
@@ -210,40 +264,45 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
 async fn event_from_client_handle(
     event: EventFromClient,
     state: Arc<AppState>,
-    user_id: &str,
     room: &models::Room,
+    author_id: &str,
+    author_name: &Option<String>,
+    author_image_url: &Option<String>,
 ) {
     // WARN: Do not log JoinedRoom events. It includes user's token;
 
     match event {
         EventFromClient::RequestSyncMessage { limit } => {
-            let _ = sync_message(state.clone(), user_id, &room.id, limit).await;
+            let _ = sync_message(state.clone(), author_id, &room.id, limit).await;
         }
 
         EventFromClient::UserMessage(msg) => {
             tracing::info!("Message: {msg:?}");
 
-            let mut db = state.db.lock().await;
             let message_id = Uuid::new_v4().to_string();
 
-            db.add_message(models::Message {
-                id: message_id.clone(),
-                room_id: room.id.clone(),
-                user_id: Some(msg.author_id.clone()),
-                content: msg.content.clone(),
-                reply_to_id: msg.reply_to_id.clone(),
-                created_at: Utc::now(),
-            })
-            .await
-            .unwrap_or_else(|e| {
-                tracing::error!("Failed to add message: {e:?}");
-            });
+            {
+                let mut db = state.db.lock().await;
+
+                db.add_message(models::Message {
+                    id: message_id.clone(),
+                    room_id: room.id.clone(),
+                    user_id: Some(author_id.to_owned()),
+                    content: msg.content.clone(),
+                    reply_to_id: msg.reply_to_id.clone(),
+                    created_at: Utc::now(),
+                })
+                .await
+                .unwrap_or_else(|e| {
+                    tracing::error!("Failed to add message: {e:?}");
+                });
+            }
 
             let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
                 id: message_id,
-                author_id: Some(msg.author_id),
-                author_name: Some(msg.author_name),
-                author_image_url: msg.author_image_url,
+                author_id: Some(author_id.to_owned()),
+                author_name: author_name.clone(),
+                author_image_url: author_image_url.clone(),
                 content: msg.content,
                 reply_to_id: msg.reply_to_id,
             });

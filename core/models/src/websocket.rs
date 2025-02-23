@@ -17,9 +17,6 @@ pub struct WSUserMessageFromServer {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct WSUserMessageFromClient {
-    pub author_id: String,
-    pub author_name: String,
-    pub author_image_url: Option<String>,
     pub content: String,
     pub reply_to_id: Option<String>,
 }
@@ -51,9 +48,19 @@ pub enum EventFromServer {
     Message(WSUserMessageFromServer),
     JoinedRoom(WSRoom),
     FailedToJoinRoom {
-        message: String,
+        reason: FailedToJoinRoomReason,
     },
     AddReaction,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, TS)]
+#[serde(tag = "type", rename_all = "PascalCase")]
+#[ts(export)]
+pub enum FailedToJoinRoomReason {
+    Unauthorized,
+    RoomNotFound,
+    NotParticipated { room_id: String },
+    InternalError,
 }
 
 impl EventFromServer {

@@ -182,3 +182,79 @@ pub async fn get_room_users(
 
     Ok(Json(users))
 }
+
+#[axum::debug_handler]
+#[tracing::instrument(skip(headers))]
+#[utoipa::path(
+    post,
+    path = "/rooms/{room_id}/users",
+    summary = "Add users to room",
+    description = "ルームにユーザーを追加",
+    params(
+        ("room_id" = String, Path)
+    ),
+    responses(
+        (status = 200, description = "Success to add user"),
+        (status = 404, description = "Room not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Failed to communicate database"),
+    ),
+    tag = "Room"
+)]
+pub async fn add_user_to_room(
+    State(state): State<Arc<AppState>>,
+    Path(room_id): Path<String>,
+    headers: HeaderMap,
+) -> Result<StatusCode, StatusCode> {
+    let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
+
+    state
+        .db
+        .lock()
+        .await
+        .add_participant(Participant {
+            room_id,
+            user_id,
+            joined_at: Utc::now(),
+        })
+        .await
+        .into_statuscode()?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[axum::debug_handler]
+#[tracing::instrument(skip(headers))]
+#[utoipa::path(
+    delete,
+    path = "/rooms/{room_id}/users",
+    summary = "Delete users from room",
+    description = "ルームからユーザーを退出",
+    params(
+        ("room_id" = String, Path)
+    ),
+    responses(
+        (status = 200, description = "Success to delete user"),
+        (status = 404, description = "Room not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Failed to communicate database"),
+    ),
+    tag = "Room"
+)]
+pub async fn delete_user_from_room(
+    State(state): State<Arc<AppState>>,
+    Path(room_id): Path<String>,
+    headers: HeaderMap,
+) -> Result<StatusCode, StatusCode> {
+    let user_id = VerifiedToken::from_headers(&headers)?.user_id()?;
+
+    state
+        .db
+        .lock()
+        .await
+        .delete_participant(&room_id, &user_id)
+        .await
+        .into_statuscode()?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
