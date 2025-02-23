@@ -6,7 +6,10 @@ mod websocket;
 
 use api::{
     message::get_room_messages,
-    room::{create_room, delete_room, get_room_users, update_room},
+    room::{
+        add_user_to_room, create_room, delete_room, delete_user_from_room, get_room_users,
+        update_room,
+    },
     user::{get_user, get_user_me, get_user_rooms},
 };
 use axum::{
@@ -84,7 +87,9 @@ async fn main() {
         .route("/rooms", post(create_room))
         .route("/rooms/{room_id}", delete(delete_room))
         .route("/rooms/{room_id}", patch(update_room))
+        .route("/rooms/{room_id}/users", post(add_user_to_room))
         .route("/rooms/{room_id}/users", get(get_room_users))
+        .route("/rooms/{room_id}/users", delete(delete_user_from_room))
         .route("/rooms/{room_id}/messages", get(get_room_messages))
         .route("/webhooks/user_signup", post(webhook_user_signup))
         .route("/webhooks/user_deleted", post(webhook_user_deleted))
@@ -111,6 +116,8 @@ async fn main() {
         api::room::delete_room,
         api::room::update_room,
         api::room::get_room_users,
+        api::room::add_user_to_room,
+        api::room::delete_user_from_room,
         api::message::get_room_messages,
         webhook::webhook_user_signup,
         webhook::webhook_user_deleted,
