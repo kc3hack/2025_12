@@ -4,22 +4,26 @@ import style from "./footer.module.scss";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { SendHorizontal } from "lucide-react";
-import type { KeyboardEvent } from "react";
-import { useAtom } from "jotai";
-import { memo, type RefObject, useState } from "react";
-import { ReplyMessage } from "./message-container";
+import { userAtom } from "@/features/account/store";
 import { wsAtom } from "@/features/websocket/store";
 import { EventFromClient } from "@/types/EventFromClient";
-import { userAtom } from "@/features/account/store";
+import { useAtom } from "jotai";
+import { SendHorizontal } from "lucide-react";
+import type { KeyboardEvent } from "react";
+import { type RefObject, memo, useEffect, useState } from "react";
+import { ReplyMessage } from "./message-container";
 
 type Props = {
   replyingMessage: ReplyMessage | null;
   bottomInputRef: RefObject<HTMLTextAreaElement | null>;
   latestMessagePositionRef: RefObject<HTMLDivElement | null>;
+  translatedMessage: string;
+  setTranslatedMessage: (state: string) => void;
   setInputMessage: (inputMessage: string | null) => void;
   setReplyingMessage: (message: ReplyMessage | null) => void;
 };
+
+const TRANSLATE_INTERVAL_MS = 1000;
 
 export const BottomInput = memo((props: Props) => {
   const [isComposing, setIsComposing] = useState(false);
@@ -41,8 +45,7 @@ export const BottomInput = memo((props: Props) => {
     if (!props.bottomInputRef.current) {
       return;
     }
-
-    if (props.bottomInputRef.current.value === "") {
+    if (props.translatedMessage === "") {
       return;
     }
 
@@ -52,7 +55,7 @@ export const BottomInput = memo((props: Props) => {
 
     const event: EventFromClient = {
       type: "UserMessage",
-      content: props.bottomInputRef.current.value,
+      content: props.translatedMessage,
       reply_to_id: props.replyingMessage?.id ?? null
     };
 
@@ -63,7 +66,33 @@ export const BottomInput = memo((props: Props) => {
     props.setInputMessage(null);
   };
 
-  const changeInput = (inputMessage: string) => props.setInputMessage(inputMessage);
+  const changeInput = (inputMessage: string) => {
+    props.setTranslatedMessage("");
+    props.setInputMessage(inputMessage);
+  };
+
+  useEffect(() => {
+    let buffer = "";
+
+    const intervalId = setInterval(() => {
+      const current_text = props.bottomInputRef.current?.value;
+
+      if (props.bottomInputRef.current && current_text !== "" && current_text !== buffer) {
+        const currentInput = props.bottomInputRef.current.value;
+        const event: EventFromClient = {
+          type: "RequestTranslateMessage",
+          message: currentInput
+        };
+        ws?.send(JSON.stringify(event));
+
+        buffer = current_text ?? "";
+      }
+    }, TRANSLATE_INTERVAL_MS);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [ws, props.bottomInputRef]);
 
   return (
     <div className={style.input_area}>

@@ -1,4 +1,7 @@
-use crate::{api::room::get_room_users, clerk::VerifiedToken, error::CoreError, AppState};
+mod event;
+mod translate;
+
+use crate::{clerk::VerifiedToken, error::CoreError, AppState};
 use axum::{
     extract::{
         ws::{self, WebSocket},
@@ -6,17 +9,14 @@ use axum::{
     },
     response::IntoResponse,
 };
-use chrono::Utc;
+use event::event_from_client_handle;
 use futures::{
     stream::{SplitSink, SplitStream},
-    SinkExt as _, StreamExt as _,
+    StreamExt as _,
 };
-use models::websocket::{
-    EventFromClient, EventFromServer, FailedToJoinRoomReason, WSRoom, WSUserMessageFromServer,
-};
+use models::websocket::{EventFromClient, EventFromServer, FailedToJoinRoomReason, WSRoom};
 use serde::Serialize;
 use std::sync::Arc;
-use uuid::Uuid;
 
 #[derive(Clone, Debug, Serialize)]
 pub enum InternalEvent {
@@ -68,60 +68,6 @@ pub async fn check_auth(receiver: &mut SplitStream<WebSocket>) -> Result<String,
         },
         _ => Err(CoreError::AuthError("Invalid token")),
     }
-}
-
-pub async fn sync_message(
-    state: Arc<AppState>,
-    user_id: &str,
-    room_id: &str,
-    limit: u32,
-) -> Result<(), ()> {
-    let room_tx = state.room_tx.lock().await;
-    let tx = match room_tx.get(room_id) {
-        Some(v) => v,
-        None => {
-            tracing::info!("Room not found");
-            return Err(());
-        }
-    };
-
-    let (messages, users) = {
-        let db = state.db.lock().await;
-        let messages = db
-            .get_latest_messages(room_id, limit)
-            .await
-            .map_err(|_| ())?;
-
-        let users = db.get_room_participants(room_id).await.map_err(|_| ())?;
-        (messages, users)
-    };
-
-    let messages = messages
-        .iter()
-        .map(|m| {
-            let (author_name, author_image_url) = users
-                .iter()
-                .find(|u| Some(&u.id) == m.0.user_id.as_ref())
-                .map(|u| (u.nickname.clone(), u.image_url.clone()))
-                .unwrap_or((None, None));
-
-            WSUserMessageFromServer {
-                id: m.0.id.clone(),
-                author_id: m.0.user_id.clone(),
-                author_name,
-                author_image_url: author_image_url.clone(),
-                content: m.0.content.clone(),
-                reply_to_id: m.0.reply_to_id.clone(),
-            }
-        })
-        .collect::<Vec<WSUserMessageFromServer>>();
-
-    let _ = tx.send(InternalEvent::Response {
-        target_id: user_id.to_owned(),
-        event: EventFromServer::SyncMessage { messages },
-    });
-
-    Ok(())
 }
 
 async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
@@ -184,6 +130,16 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
         }
     };
 
+    let tx = {
+        let room_tx = state.room_tx.lock().await;
+        match room_tx.get(&room.id) {
+            Some(v) => v.clone(),
+            None => {
+                return;
+            }
+        }
+    };
+
     let (author_name, author_image_url) = {
         let db = state.db.lock().await;
         let users = db.get_room_participants(&room.id).await.unwrap();
@@ -203,8 +159,8 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     .await;
 
     let state_cloned = state.clone();
-
     let user_id_cloned = user_id.clone();
+    let tx_cloned = tx.clone();
     let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(ws::Message::Text(text))) = receiver.next().await {
             let event = match serde_json::from_str(&text) {
@@ -216,37 +172,25 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
                 }
             };
 
-            event_from_client_handle(
+            if let Err(e) = event_from_client_handle(
                 event,
+                tx_cloned.clone(),
                 state_cloned.clone(),
                 &room,
                 &user_id_cloned,
                 &author_name,
                 &author_image_url,
             )
-            .await;
+            .await
+            {
+                tracing::info!("{e}");
+            }
         }
     });
 
-    let mut rx = {
-        let room_tx = state.room_tx.lock().await;
-
-        let tx = match room_tx.get(&room_id) {
-            Some(v) => v,
-            None => {
-                tracing::info!("Room not found");
-                sender.close().await.unwrap_or_else(|e| {
-                    tracing::error!("Failed to close sender: {e:?}");
-                });
-                tracing::info!("{user_id} disconnected");
-                return;
-            }
-        };
-
-        tx.subscribe()
-    };
-
+    let mut rx = tx.subscribe();
     let user_id_cloned = user_id.clone();
+
     let mut send_task = tokio::spawn(async move {
         while let Ok(internal_event) = rx.recv().await {
             let _ = internal_event.handle(&user_id_cloned, &mut sender).await;
@@ -259,70 +203,4 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, room_id: String) {
     };
 
     tracing::info!("{user_id} disconnected");
-}
-
-async fn event_from_client_handle(
-    event: EventFromClient,
-    state: Arc<AppState>,
-    room: &models::Room,
-    author_id: &str,
-    author_name: &Option<String>,
-    author_image_url: &Option<String>,
-) {
-    // WARN: Do not log JoinedRoom events. It includes user's token;
-
-    match event {
-        EventFromClient::RequestSyncMessage { limit } => {
-            let _ = sync_message(state.clone(), author_id, &room.id, limit).await;
-        }
-
-        EventFromClient::UserMessage(msg) => {
-            tracing::info!("Message: {msg:?}");
-
-            let message_id = Uuid::new_v4().to_string();
-
-            {
-                let mut db = state.db.lock().await;
-
-                db.add_message(models::Message {
-                    id: message_id.clone(),
-                    room_id: room.id.clone(),
-                    user_id: Some(author_id.to_owned()),
-                    content: msg.content.clone(),
-                    reply_to_id: msg.reply_to_id.clone(),
-                    created_at: Utc::now(),
-                })
-                .await
-                .unwrap_or_else(|e| {
-                    tracing::error!("Failed to add message: {e:?}");
-                });
-            }
-
-            let event_from_server = EventFromServer::Message(WSUserMessageFromServer {
-                id: message_id,
-                author_id: Some(author_id.to_owned()),
-                author_name: author_name.clone(),
-                author_image_url: author_image_url.clone(),
-                content: msg.content,
-                reply_to_id: msg.reply_to_id,
-            });
-
-            let room_tx = state.room_tx.lock().await;
-            let tx = match room_tx.get(&room.id) {
-                Some(v) => v,
-                None => {
-                    tracing::info!("Room not found");
-                    return;
-                }
-            };
-
-            let _ = tx.send(InternalEvent::Broadcast {
-                event: event_from_server,
-            });
-        }
-
-        EventFromClient::AddReaction => {}
-
-        _ => {}
-    }
 }
