@@ -4,14 +4,11 @@ import Link from "next/link";
 
 const Root = () => {
   return (
-    <div>
+    <main>
       <Link href="/home">
         <Button>Go Home</Button>
       </Link>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-    </div>
+    </main>
   );
 };
 export default Root;

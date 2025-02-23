@@ -7,7 +7,14 @@
 
 
 body {
+  display: grid;
+  grid-template-rows: 1fr auto;
   min-height: 100lvh;
   color: theme.$foreground;
   background: theme.$background;
+}
+
+
+main {
+  margin-top: 5em;
 }

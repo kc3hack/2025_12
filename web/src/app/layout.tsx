@@ -18,16 +18,16 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <ClerkProvider localization={jaJP}>
-      <html lang="en">
-        <body>
+    <html lang="en">
+      <body>
+        <ClerkProvider localization={jaJP}>
           <Header />
           <UserInitialyzer />
           {children}
           <Toaster />
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 };
 
