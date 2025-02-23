@@ -1,10 +1,10 @@
 "use client";
-import { type RefObject } from "react";
+import { useState, type RefObject } from "react";
+import { BottomInput } from "./bottom-input";
+import { BottomKansaiTranslateArea } from "./bottom-kansai-translate-area";
+import { BottomReplyButton } from "./bottom-reply-button";
 import style from "./footer.module.scss";
 import { ReplyMessage } from "./message-container";
-import { BottomInput } from "./bottom-input";
-import { BottomReplyButton } from "./bottom-reply-button";
-import { BottomKansaiTranslateArea } from "./bottom-kansai-translate-area";
 
 type Props = {
   inputMessage: string | null;
@@ -17,6 +17,8 @@ type Props = {
 };
 
 export const Footer = (props: Props) => {
+  const [translatedMessage, setTranslatedMesasge] = useState("");
+
   return (
     <div className={style.footer}>
       {props.replyingMessage && (
@@ -28,7 +30,8 @@ export const Footer = (props: Props) => {
       )}
       {props.inputMessage && (
         <BottomKansaiTranslateArea
-          inputMessage={props.inputMessage}
+          translatedMessage={translatedMessage}
+          setTranslatedMessage={setTranslatedMesasge}
           isReplyingNow={!!props.replyingMessage}
         />
       )}
@@ -38,6 +41,8 @@ export const Footer = (props: Props) => {
         latestMessagePositionRef={props.latestMessagePositionRef}
         replyingMessage={props.replyingMessage}
         setReplyingMessage={props.setReplyingMessage}
+        setTranslatedMessage={setTranslatedMesasge}
+        translatedMessage={translatedMessage}
       />
     </div>
   );

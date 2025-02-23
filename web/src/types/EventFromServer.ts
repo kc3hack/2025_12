@@ -3,4 +3,4 @@ import type { FailedToJoinRoomReason } from "./FailedToJoinRoomReason";
 import type { WSRoom } from "./WSRoom";
 import type { WSUserMessageFromServer } from "./WSUserMessageFromServer";
 
-export type EventFromServer = { "type": "SyncMessage", messages: Array<WSUserMessageFromServer>, } | { "type": "Message" } & WSUserMessageFromServer | { "type": "JoinedRoom" } & WSRoom | { "type": "FailedToJoinRoom", reason: FailedToJoinRoomReason, } | { "type": "AddReaction" };
+export type EventFromServer = { "type": "JoinedRoom" } & WSRoom | { "type": "FailedToJoinRoom", reason: FailedToJoinRoomReason, } | { "type": "SyncMessage", messages: Array<WSUserMessageFromServer>, } | { "type": "Message" } & WSUserMessageFromServer | { "type": "TranslatedMessage", message: string, } | { "type": "AddReaction" };

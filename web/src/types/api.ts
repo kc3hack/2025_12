@@ -48,7 +48,7 @@ export const schemas = {
   User,
 };
 
-export const endpoints = makeApi([
+const endpoints = makeApi([
   {
     method: "post",
     path: "/rooms",
@@ -372,7 +372,7 @@ export const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/webhook/user_deleted",
+    path: "/webhooks/user_deleted",
     alias: "webhook_user_deleted",
     description: `ユーザーがアカウントを削除したときにClerkから呼ばれるWebhook`,
     requestFormat: "binary",
@@ -400,7 +400,7 @@ export const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/webhook/user_signup",
+    path: "/webhooks/user_signup",
     alias: "webhook_user_signup",
     description: `ユーザーがアカウントを登録したときにClerkから呼ばれるWebhook`,
     requestFormat: "binary",
@@ -428,7 +428,7 @@ export const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/webhook/user_updated",
+    path: "/webhooks/user_updated",
     alias: "webhook_user_updated",
     description: `ユーザーがアカウント情報を更新したときにClerkから呼ばれるWebhook`,
     requestFormat: "binary",

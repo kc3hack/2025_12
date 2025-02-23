@@ -18,7 +18,6 @@ use axum::{
 };
 use clerk_rs::{clerk::Clerk, ClerkConfiguration};
 use db::{DBOption, DB};
-use models::Room;
 use std::{collections::HashMap, env, sync::Arc, time::Duration};
 use tokio::sync::{broadcast, Mutex};
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _};
@@ -43,11 +42,11 @@ impl AppState {
         Arc::new(app_state)
     }
 
-    async fn join(&self, room_id: &str) -> Result<Room, ()> {
+    async fn join(&self, room_id: &str) -> color_eyre::Result<models::Room> {
         let mut room_tx = self.room_tx.lock().await;
 
         let db = self.db.lock().await;
-        let room = db.get_room(room_id).await.unwrap();
+        let room = db.get_room(room_id).await?;
 
         if !room_tx.contains_key(room_id) {
             let (tx, _rx) = broadcast::channel(100);
@@ -66,6 +65,8 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer().pretty())
         .init();
+
+    color_eyre::install().expect("Eyre installation failed");
 
     let clerk_secret_key = env::var("CLERK_SECRET_KEY").expect("Clerk secret key not found");
     let config = ClerkConfiguration::new(None, None, Some(clerk_secret_key), None);
