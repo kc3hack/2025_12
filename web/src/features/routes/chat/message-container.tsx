@@ -29,6 +29,12 @@ export const MessageContainer = (props: Props) => {
   const [ws] = useAtom(wsAtom);
   const [user] = useAtom(userAtom);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  if (isFirstRender.current) {
+    myInitializationFunction();
+    isFirstRender.current = false;
+  }
 
   useEffect(() => {
     const handleWebSocketMessage = (e: MessageEvent) => {
@@ -115,4 +121,9 @@ export const MessageContainer = (props: Props) => {
       <div ref={props.latestMessagePositionRef} />
     </div>
   );
+  function myInitializationFunction() {
+    setTimeout(() => {
+      props.latestMessagePositionRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 1000);
+  }
 };
