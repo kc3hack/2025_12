@@ -51,7 +51,7 @@ const InvitePage = () => {
       });
       router.push(`/room/${roomId}`);
     } catch (error) {
-      toast.error("すでに参加しているか，存在しません");
+      toast.error("すでに参加しとるか，存在しまへん");
     }
   };
 
@@ -59,7 +59,7 @@ const InvitePage = () => {
     <div className={styles.container}>
       <Card className={styles.card}>
         <CardHeader>
-          <CardTitle className={styles.title}>あなたに招待が来ています</CardTitle>
+          <CardTitle className={styles.title}>あんたに招待が来とります</CardTitle>
         </CardHeader>
         <CardContent>
           <div className={styles.group}>

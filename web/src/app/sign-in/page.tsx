@@ -105,7 +105,7 @@ export default function SignInPage() {
                         </SignIn.Action>
 
                         <Button variant="link" size="sm" asChild>
-                          <Clerk.Link navigate="sign-up">新規登録はこちら</Clerk.Link>
+                          <Clerk.Link navigate="sign-up">新規登録はこっちやで</Clerk.Link>
                         </Button>
                       </div>
                     </CardFooter>

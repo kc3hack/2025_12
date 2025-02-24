@@ -17,7 +17,7 @@ export const Invite = () => {
     <div className={styles.container}>
       <Card className={styles.card}>
         <CardHeader>
-          <CardTitle className={styles.title}>あなたに招待が来ています</CardTitle>
+          <CardTitle className={styles.title}>あんたに招待が来とります</CardTitle>
         </CardHeader>
         <CardContent>
           <div className={styles.group}>

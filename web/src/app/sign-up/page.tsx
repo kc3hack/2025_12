@@ -114,7 +114,7 @@ export default function SignUpPage() {
                         </SignUp.Action>
                         <Button variant="link" size="sm" asChild>
                           <Clerk.Link navigate="sign-in">
-                            既にアカウントをお持ちですか？ログインする
+                            既にアカウントをお持ちでっか？ログインする
                           </Clerk.Link>
                         </Button>
                       </div>
@@ -128,7 +128,7 @@ export default function SignUpPage() {
                       <CardHeader>
                         <CardTitle>メールアドレスの認証</CardTitle>
                         <CardDescription>
-                          メールアドレスに送信された6桁のコードを入力してください
+                          メールアドレスに送信された6桁のコードを入力したってや
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="grid gap-y-4">
